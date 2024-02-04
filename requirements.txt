@@ -1,0 +1,14 @@
+numpy >= 1.14
+tqdm >= 4.23.4
+hyperopt >= 0.1.1
+h5py >= 2.8.0
+coverage >= 4.3.4
+codecov >= 2.0.15
+pytest >= 3.7.4
+pytest-cov >= 2.4.0
+flake8 == 7.0.0
+flake8_docstrings == 1.7.0
+pydocstyle == 2.1
+openai == 1.10.0
+datasets == 2.16.1
+langchain == 0.1.4

@@ -1,0 +1,27 @@
+[flake8]
+ignore = 
+    # D401 First line should be in imperative mood
+    D401,
+
+    # D202 No blank lines allowed after function docstring
+    D202,
+
+    # For doctests:
+    # D207 Docstring is under-indented
+    D207,
+    # D301 Use r""" if any backslashes in a docstring
+    D301,
+    # F401 'blah blah' imported but unused
+    F401,
+
+    # D100 Missing docstring in public module
+    D100,
+
+    # E501 line too long (88 > 79 characters)
+    E501,
+
+    # D400 First line should end with a period
+    D400,
+
+    # D103 Missing docstring in public function
+    D103,
