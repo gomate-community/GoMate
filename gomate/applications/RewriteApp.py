@@ -1,7 +1,7 @@
-from .components import HyDE_rewriter
+from gomate.modules import HyDE_rewriter
 
 
-class Rewriter():
+class RewriterApp():
     """改写模块，用于理解和优化用户的原始问题。
 
     实现包括

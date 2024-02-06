@@ -1,10 +1,10 @@
 import pytest
-from gomate.modules import Rewriter
+from gomate.applications import RewriterApp
 # import os
 
 def test_rewriter():
     component_name = 'hyde'
-    model = Rewriter(component_name = component_name)
+    model = RewriterApp(component_name = component_name)
     query = ['gomate是哪天发布的？','gomate是做什么的？']
     answer = model.run(query)
     assert answer is not None

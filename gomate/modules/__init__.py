@@ -1,1 +1,1 @@
-from .rewriter import Rewriter
+from .rewriter import HyDE_rewriter
