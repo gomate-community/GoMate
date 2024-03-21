@@ -12,6 +12,7 @@ class MatchCitation(object):
         ]
 
     def cut(self, para: str):
+        """"""
         pattern = [
             '([。！？\?])([^”’])',  # 单字符断句符
             '(\.{6})([^”’])',  # 英文省略号
