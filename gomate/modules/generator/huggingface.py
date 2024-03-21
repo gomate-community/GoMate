@@ -5,7 +5,6 @@ from transformers import pipeline
 from gomate.modules.generator.base import BaseLLM
 
 
-
 class Response(TypedDict):
     """Typed description of the response from the Transformers model"""
 
@@ -14,9 +13,8 @@ class Response(TypedDict):
 
 class HuggingFaceLLM(BaseLLM):
     def __init__(
-        self, model: str, do_sample: bool = False, token: Optional[str] = None
+            self, model: str, do_sample: bool = False, token: Optional[str] = None
     ):
-
         self.model = model
         self.do_sample = do_sample
         self.pipeline = pipeline(

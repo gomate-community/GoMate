@@ -26,7 +26,6 @@ class Response(TypedDict):
     """Typed description of the response from the OpenAI API"""
 
     # TODO: Add other response fields.  See:
-    # https://platform.openai.com/docs/guides/text-generation/chat-completions-response-format
     choices: List[Choice]
 
 
