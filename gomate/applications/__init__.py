@@ -1,2 +1,2 @@
-from .RewriterApp import RewriterApp
-from .RerankerApp import RerankerApp
+from .rewriter import RewriterApp
+from .rerank import RerankerApp

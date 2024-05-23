@@ -12,7 +12,11 @@ pydocstyle == 2.1
 openai == 1.10.0
 datasets == 2.16.1
 langchain == 0.1.4
-transformers == 4.37.2
+transformers == 4.41.1
 torch == 2.2.0
 pandas == 2.0.0
 nltk == 3.8.1
+sentencepiece==0.2.0
+PyPDF2==3.0.1
+html2text
+beautifulsoup4==4.12.3

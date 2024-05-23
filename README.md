@@ -18,3 +18,6 @@ git clone https://github.com/gomate-community/GoMate.git
 ```
 git install ...
 ```
+
+## Demo
+![demo](resources/demo.png)
