@@ -9,9 +9,7 @@
 """
 import os
 import shutil
-
 import gradio as gr
-
 from gomate.applications.rag import RagApplication
 
 
