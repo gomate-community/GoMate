@@ -44,7 +44,7 @@ vector = VectorStore(docs)
 ### 提取向量
 
 ```python
-embedding = BgeEmbedding("/data/users/searchgpt/pretrained_models/bge-large-zh-v1.5")  # 创建EmbeddingModel
+embedding = BgeEmbedding("BAAI/bge-large-zh-v1.5")  # 创建EmbeddingModel
 vector.get_vector(EmbeddingModel=embedding)
 vector.persist(path='storage')  # 将向量和文档内容保存到storage目录下，下次再用就可以直接加载本地的数据库
 vector.load_vector(path='storage')  # 加载本地的数据库
@@ -61,7 +61,7 @@ print(contents)
 
 ### 大模型问答
 ```python
-chat = GLMChat(path='/data/users/searchgpt/pretrained_models/chatglm3-6b')
+chat = GLMChat(path='THUDM/chatglm3-6b')
 print(chat.chat(question, [], content))
 ```
 
@@ -104,6 +104,16 @@ class RagApplication():
 
 
 ### 🌐体验RAG效果
+可以配置本地模型路径
+```text
+class ApplicationConfig:
+    llm_model_name = '/data/users/searchgpt/pretrained_models/chatglm3-6b'  # 本地模型文件 or huggingface远程仓库
+    embedding_model_name = '/data/users/searchgpt/pretrained_models/bge-reranker-large'  # 检索模型文件 or huggingface远程仓库
+    vector_store_path = './storage'
+    docs_path = './data/docs'
+
+```
+
 ```shell
 python app.py
 ```

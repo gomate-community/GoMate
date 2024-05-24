@@ -14,14 +14,14 @@ from gomate.applications.rag import RagApplication
 
 
 # 修改成自己的配置！！！
-class LangChainCFG:
+class ApplicationConfig:
     llm_model_name = '/data/users/searchgpt/pretrained_models/chatglm3-6b'  # 本地模型文件 or huggingface远程仓库
     embedding_model_name = '/data/users/searchgpt/pretrained_models/bge-reranker-large'  # 检索模型文件 or huggingface远程仓库
     vector_store_path = './storage'
     docs_path = './data/docs'
 
 
-config = LangChainCFG()
+config = ApplicationConfig()
 application = RagApplication(config)
 application.init_vector_store()
 
