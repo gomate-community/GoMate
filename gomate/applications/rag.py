@@ -10,7 +10,7 @@
 from gomate.modules.document.reader import ReadFiles
 from gomate.modules.generator.llm import GLMChat
 from gomate.modules.retrieval.embedding import BgeEmbedding
-from gomate.modules.store.vector import VectorStore
+from gomate.modules.store import VectorStore
 
 class RagApplication():
     def __init__(self, config):

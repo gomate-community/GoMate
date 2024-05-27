@@ -3,9 +3,7 @@
 """
 @author:quincy qiang
 @license: Apache Licence
-@file: __init__.py.py
-@time: 2024/05/27
+@file: parser.py
+@time: 2024/05/24
 @contact: yanqiangmiffy@gamil.com
-@software: PyCharm
-@description: coding..
 """

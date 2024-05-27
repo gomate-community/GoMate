@@ -10,7 +10,7 @@
 from gomate.modules.document.reader import ReadFiles
 from gomate.modules.generator.llm import GLMChat
 from gomate.modules.retrieval.embedding import BgeEmbedding
-from gomate.modules.store.vector import VectorStore
+from gomate.modules.store import VectorStore
 
 # step1：Document
 docs = ReadFiles('./data/docs').get_content(max_token_len=600, cover_content=150)

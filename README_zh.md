@@ -28,29 +28,27 @@ GoMate框架的设计核心在于其**高度的可配置性和模块化**，使�
 ```shell
 pip install -r requirements.txt
 ```
-### 导入模块
+### 1 文档解析
+
 ```python
 from gomate.modules.document.reader import ReadFiles
-from gomate.modules.generator.llm import GLMChat
-from gomate.modules.retrieval.embedding import BgeEmbedding
-from gomate.modules.store.vector import VectorStore
-```
-### 文档解析
-```python
+from gomate.modules.store import VectorStore
+
 docs = ReadFiles('./data/docs').get_content(max_token_len=600, cover_content=150)
 vector = VectorStore(docs)
 ```
 
-### 提取向量
+### 2 提取向量
 
 ```python
+from gomate.modules.retrieval.embedding import BgeEmbedding
 embedding = BgeEmbedding("BAAI/bge-large-zh-v1.5")  # 创建EmbeddingModel
 vector.get_vector(EmbeddingModel=embedding)
 vector.persist(path='storage')  # 将向量和文档内容保存到storage目录下，下次再用就可以直接加载本地的数据库
 vector.load_vector(path='storage')  # 加载本地的数据库
 ```
 
-### 检索文档
+### 3 检索文档
 
 ```python
 question = '伊朗坠机事故原因是什么？'
@@ -59,13 +57,14 @@ content = '\n'.join(contents[:5])
 print(contents)
 ```
 
-### 大模型问答
+### 4 大模型问答
 ```python
+from gomate.modules.generator.llm import GLMChat
 chat = GLMChat(path='THUDM/chatglm3-6b')
 print(chat.chat(question, [], content))
 ```
 
-### 添加文档
+### 5 添加文档
 ```python
 docs = ReadFiles('').get_content_by_file(file='data/add/伊朗问题.txt', max_token_len=600, cover_content=150)
 vector.add_documents('storage', docs, embedding)
@@ -84,15 +83,19 @@ print(chat.chat(question, [], content))
 from gomate.modules.document.reader import ReadFiles
 from gomate.modules.generator.llm import GLMChat
 from gomate.modules.retrieval.embedding import BgeEmbedding
-from gomate.modules.store.vector import VectorStore
+from gomate.modules.store import VectorStore
+
 
 class RagApplication():
     def __init__(self, config):
-       pass
+        pass
+
     def init_vector_store(self):
-       pass
+        pass
+
     def load_vector_store(self):
         pass
+
     def add_document(self, file_path):
         pass
 
