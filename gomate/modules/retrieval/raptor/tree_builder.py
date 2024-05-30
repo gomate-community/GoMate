@@ -9,7 +9,7 @@ from typing import Dict, List, Optional, Set, Tuple
 import openai
 import tiktoken
 from tenacity import retry, stop_after_attempt, wait_random_exponential
-
+from gomate.modules.refiner.summary import GLMSummarizationModel,GPT3SummarizationModel,GPT3TurboSummarizationModel,BaseSummarizationModel
 from gomate.modules.retrieval.embedding import BaseEmbeddingModel, OpenAIEmbeddingModel
 
 from gomate.modules.retrieval.raptor.tree_structures import Node, Tree
@@ -256,7 +256,7 @@ class TreeBuilder:
 
         return leaf_nodes
 
-    def build_from_text(self, text: str, use_multithreading: bool = True) -> Tree:
+    def build_from_text(self, text: str, use_multithreading: bool = False) -> Tree:
         """Builds a golden tree from the input text, optionally using multithreading.
 
         Args:
@@ -299,7 +299,7 @@ class TreeBuilder:
         current_level_nodes: Dict[int, Node],
         all_tree_nodes: Dict[int, Node],
         layer_to_nodes: Dict[int, List[Node]],
-        use_multithreading: bool = True,
+        use_multithreading: bool = False,
     ) -> Dict[int, Node]:
         """
         Constructs the hierarchical tree structure layer by layer by iteratively summarizing groups

@@ -69,7 +69,7 @@ class ClusterTreeBuilder(TreeBuilder):
                 context=node_texts,
                 max_tokens=summarization_length,
             )
-
+            logging.info(summarized_text)
             logging.info(
                 f"Node Texts Length: {len(self.tokenizer.encode(node_texts))}, Summarized Text Length: {len(self.tokenizer.encode(summarized_text))}"
             )

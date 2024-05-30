@@ -346,7 +346,7 @@ if __name__ == '__main__':
         selection_mode="top_k",
         summarization_length=100,
         summarization_model=summary_model,
-        embedding_models=embedding_model,
+        embedding_models={'sbert':embedding_model},
         cluster_embedding_model="sbert",
     )
 
