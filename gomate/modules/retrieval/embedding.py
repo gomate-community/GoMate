@@ -7,20 +7,60 @@
 @contact: yanqiangmiffy@gamil.com
 @software: PyCharm
 """
+import logging
 import os
-from copy import copy
-from typing import Dict, List, Optional, Tuple, Union
-import numpy as np
+from typing import List
+import logging
+from abc import ABC, abstractmethod
 
-os.environ['CURL_CA_BUNDLE'] = ''
-from dotenv import load_dotenv, find_dotenv
-_ = load_dotenv(find_dotenv())
+from openai import OpenAI
+from sentence_transformers import SentenceTransformer
+from tenacity import retry, stop_after_attempt, wait_random_exponential
+
+import numpy as np
+# os.environ['CURL_CA_BUNDLE'] = ''
+# from dotenv import load_dotenv, find_dotenv
+# _ = load_dotenv(find_dotenv())
+logging.basicConfig(format="%(asctime)s - %(message)s", level=logging.INFO)
+
+
+
+
+
+class BaseEmbeddingModel(ABC):
+    @abstractmethod
+    def create_embedding(self, text):
+        pass
+
+
+class OpenAIEmbeddingModel(BaseEmbeddingModel):
+    def __init__(self, model="text-embedding-ada-002"):
+        self.client = OpenAI()
+        self.model = model
+
+    @retry(wait=wait_random_exponential(min=1, max=20), stop=stop_after_attempt(6))
+    def create_embedding(self, text):
+        text = text.replace("\n", " ")
+        return (
+            self.client.embeddings.create(input=[text], model=self.model)
+            .data[0]
+            .embedding
+        )
+
+
+class SBertEmbeddingModel(BaseEmbeddingModel):
+    def __init__(self, model_name="sentence-transformers/multi-qa-mpnet-base-cos-v1"):
+        self.model = SentenceTransformer(model_name)
+
+    def create_embedding(self, text):
+        return self.model.encode(text)
 
 
 class BaseEmbeddings:
     """
     Base class for embeddings
     """
+
     def __init__(self, path: str, is_api: bool) -> None:
         self.path = path
         self.is_api = is_api
@@ -44,6 +84,7 @@ class OpenAIEmbedding(BaseEmbeddings):
     """
     class for OpenAI embeddings
     """
+
     def __init__(self, path: str = '', is_api: bool = True) -> None:
         super().__init__(path, is_api)
         if self.is_api:
@@ -59,10 +100,12 @@ class OpenAIEmbedding(BaseEmbeddings):
         else:
             raise NotImplementedError
 
+
 class JinaEmbedding(BaseEmbeddings):
     """
     class for Jina embeddings
     """
+
     def __init__(self, path: str = 'jinaai/jina-embeddings-v2-base-zh', is_api: bool = False) -> None:
         super().__init__(path, is_api)
         self._model = self.load_model()
@@ -80,10 +123,12 @@ class JinaEmbedding(BaseEmbeddings):
         model = AutoModel.from_pretrained(self.path, trust_remote_code=True).to(device)
         return model
 
+
 class ZhipuEmbedding(BaseEmbeddings):
     """
     class for Zhipu embeddings
     """
+
     def __init__(self, path: str = '', is_api: bool = True) -> None:
         super().__init__(path, is_api)
         if self.is_api:
@@ -92,15 +137,17 @@ class ZhipuEmbedding(BaseEmbeddings):
 
     def get_embedding(self, text: str) -> List[float]:
         response = self.client.embeddings.create(
-        model="embedding-2",
-        input=text,
+            model="embedding-2",
+            input=text,
         )
         return response.data[0].embedding
+
 
 class DashscopeEmbedding(BaseEmbeddings):
     """
     class for Dashscope embeddings
     """
+
     def __init__(self, path: str = '', is_api: bool = True) -> None:
         super().__init__(path, is_api)
         if self.is_api:
@@ -108,7 +155,7 @@ class DashscopeEmbedding(BaseEmbeddings):
             dashscope.api_key = os.getenv("DASHSCOPE_API_KEY")
             self.client = dashscope.TextEmbedding
 
-    def get_embedding(self, text: str, model: str='text-embedding-v1') -> List[float]:
+    def get_embedding(self, text: str, model: str = 'text-embedding-v1') -> List[float]:
         response = self.client.call(
             model=model,
             input=text
