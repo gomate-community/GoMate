@@ -11,10 +11,10 @@
 """
 import logging
 from abc import ABC, abstractmethod
-
+import torch
 from openai import OpenAI
 from tenacity import retry, stop_after_attempt, wait_random_exponential
-
+from transformers import AutoTokenizer, AutoModelForCausalLM
 logging.basicConfig(format="%(asctime)s - %(message)s", level=logging.INFO)
 
 
@@ -26,13 +26,14 @@ class BaseSummarizationModel(ABC):
 
 class GLMSummarizationModel(BaseSummarizationModel):
     def __init__(self, model_name_or_path: str = '') -> None:
-        super().__init__(model_name_or_path)
+        super().__init__()
+        self.model_name_or_path=model_name_or_path
         self.load_model()
-
     @retry(wait=wait_random_exponential(min=1, max=20), stop=stop_after_attempt(6))
     def summarize(self, context, max_tokens=500, stop_sequence=None):
         try:
-            response, history = self.model.chat(self.tokenizer, prompt, history)
+            prompt=f"Write a summary of the following, including as many key details as possible: {context}:"
+            response, history = self.model.chat(self.tokenizer, prompt, '')
             return response
         except Exception as e:
             print(e)

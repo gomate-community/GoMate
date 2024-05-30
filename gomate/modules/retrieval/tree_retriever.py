@@ -2,7 +2,7 @@ import logging
 from typing import List
 
 import tiktoken
-
+import pickle
 from gomate.modules.retrieval.embedding import BaseEmbeddingModel
 from gomate.modules.retrieval.embedding import OpenAIEmbeddingModel
 from gomate.modules.retrieval.raptor.cluster_tree_builder import ClusterTreeBuilder, ClusterTreeConfig
@@ -335,8 +335,8 @@ if __name__ == '__main__':
     tree_builder_class, tree_builder_config_class = supported_tree_builders[
         tree_builder_type
     ]
-    embedding_model=SBertEmbeddingModel(model_name="")
-    summary_model=GLMSummarizationModel(model_name_or_path="")
+    embedding_model=SBertEmbeddingModel(model_name=r"I:\pretrained_models\bert\english\all-mpnet-base-v2")
+    summary_model=GLMSummarizationModel(model_name_or_path=r"I:\pretrained_models\llm\chatglm3-6b")
     tree_builder_config = tree_builder_config_class(
         tokenizer=None,
         max_tokens=100,
@@ -349,12 +349,24 @@ if __name__ == '__main__':
         embedding_models=embedding_model,
         cluster_embedding_model="sbert",
     )
-    tree_builder = tree_builder_class(config.tree_builder_config)
 
-    with open('data/docs/sample.txt', 'r') as file:
+    tree_retriever_config = TreeRetrieverConfig(
+        tokenizer=None,
+        threshold=0.5,
+        top_k=5,
+        selection_mode="top_k",
+        context_embedding_model="sbert",
+        embedding_model=embedding_model,
+        num_layers=None,
+        start_layer=None,
+    )
+
+    tree_builder = tree_builder_class(tree_builder_config)
+
+    with open(r'H:\Projects\GoMate\data\docs\sample.txt', 'r') as file:
         text = file.read()
     tree = tree_builder.build_from_text(text=text)
-    retriever = TreeRetriever(self.tree_retriever_config, self.tree)
+    retriever = TreeRetriever(tree_retriever_config, tree)
     question = '"How did Cinderella reach her happy ending?'
 
     search_docs = retriever.retrieve(question)
