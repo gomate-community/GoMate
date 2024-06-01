@@ -1,10 +1,13 @@
 import logging
+import pickle
 from typing import List
 
 import tiktoken
-import pickle
+
+from gomate.modules.refiner.summary import GLMSummarizationModel
 from gomate.modules.retrieval.embedding import BaseEmbeddingModel
 from gomate.modules.retrieval.embedding import OpenAIEmbeddingModel
+from gomate.modules.retrieval.embedding import SBertEmbeddingModel
 from gomate.modules.retrieval.raptor.cluster_tree_builder import ClusterTreeBuilder, ClusterTreeConfig
 from gomate.modules.retrieval.raptor.tree_structures import Node, Tree
 from gomate.modules.retrieval.retrievers import BaseRetriever
@@ -12,8 +15,6 @@ from gomate.modules.retrieval.utils import (distances_from_embeddings, get_embed
                                             get_node_list, get_text,
                                             indices_of_nearest_neighbors_from_distances,
                                             reverse_mapping)
-from gomate.modules.retrieval.embedding import SBertEmbeddingModel
-from gomate.modules.refiner.summary import GLMSummarizationModel
 
 logging.basicConfig(format="%(asctime)s - %(message)s", level=logging.INFO)
 supported_tree_builders = {"cluster": (ClusterTreeBuilder, ClusterTreeConfig)}
@@ -331,24 +332,13 @@ class TreeRetriever(BaseRetriever):
 
 
 if __name__ == '__main__':
+    is_rebuild = False
     tree_builder_type = 'cluster'
     tree_builder_class, tree_builder_config_class = supported_tree_builders[
         tree_builder_type
     ]
-    embedding_model=SBertEmbeddingModel(model_name=r"I:\pretrained_models\bert\english\all-mpnet-base-v2")
-    summary_model=GLMSummarizationModel(model_name_or_path=r"I:\pretrained_models\llm\chatglm3-6b")
-    tree_builder_config = tree_builder_config_class(
-        tokenizer=None,
-        max_tokens=100,
-        num_layers=5,
-        threshold=0.5,
-        top_k=5,
-        selection_mode="top_k",
-        summarization_length=100,
-        summarization_model=summary_model,
-        embedding_models={'sbert':embedding_model},
-        cluster_embedding_model="sbert",
-    )
+    embedding_model = SBertEmbeddingModel(
+        model_name=r"I:\pretrained_models\bert\english\paraphrase-multilingual-mpnet-base-v2")
 
     tree_retriever_config = TreeRetrieverConfig(
         tokenizer=None,
@@ -360,19 +350,46 @@ if __name__ == '__main__':
         num_layers=None,
         start_layer=None,
     )
-
-    tree_builder = tree_builder_class(tree_builder_config)
-
-    with open(r'H:\Projects\GoMate\data\docs\sample.txt', 'r') as file:
-        text = file.read()
-    tree = tree_builder.build_from_text(text=text)
+    if is_rebuild:
+        summary_model = GLMSummarizationModel(model_name_or_path=r"I:\pretrained_models\llm\chatglm3-6b")
+        tree_builder_config = tree_builder_config_class(
+            tokenizer=None,
+            max_tokens=100,
+            num_layers=5,
+            threshold=0.5,
+            top_k=5,
+            selection_mode="top_k",
+            summarization_length=100,
+            summarization_model=summary_model,
+            embedding_models={'sbert': embedding_model},
+            cluster_embedding_model="sbert",
+        )
+        tree_builder = tree_builder_class(tree_builder_config)
+        # with open(r'H:\Projects\GoMate\data\docs\sample.txt', 'r') as file:
+        #     text = file.read()
+        text = ''
+        new_files = [
+            r'H:\Projects\GoMate\data\docs\伊朗.txt',
+            r'H:\Projects\GoMate\data\docs\伊朗总统罹难事件.txt',
+            r'H:\Projects\GoMate\data\docs\伊朗总统莱希及多位高级官员遇难的直升机事故.txt',
+            r'H:\Projects\GoMate\data\docs\伊朗问题.txt',
+        ]
+        for filename in new_files:
+            with open(filename, 'r',encoding="utf-8") as file:
+                text += file.read()
+        print(len(text))
+        tree = tree_builder.build_from_text(text=text)
+    else:
+        with open('tree.pkl', 'rb') as f:
+            tree = pickle.load(f)
     retriever = TreeRetriever(tree_retriever_config, tree)
-    question = '"How did Cinderella reach her happy ending?'
+    # question = '"How did Cinderella reach her happy ending?'
+    question = '直升机'
 
     search_docs = retriever.retrieve(question)
     print(search_docs)
 
-    path="tree.pkl"
+    path = "tree.pkl"
     with open(path, "wb") as file:
         pickle.dump(tree, file)
     logging.info(f"Tree successfully saved to {path}")
