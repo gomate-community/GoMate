@@ -252,7 +252,7 @@ class BM25Retriever(BaseRetriever):
         self.delta = config.delta
         self.algorithm = config.algorithm
 
-    def fit_bm25(self, corpus):
+    def build_from_texts(self, corpus):
         self.corpus=corpus
         if self.algorithm == 'Okapi':
             self.bm25 = BM25Okapi(corpus=corpus, tokenizer=self.tokenizer, k1=self.k1, b=self.b, epsilon=self.epsilon)

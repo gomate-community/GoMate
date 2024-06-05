@@ -20,7 +20,7 @@ def reverse_mapping(layer_to_nodes: Dict[int, List[Node]]) -> Dict[Node, int]:
 
 
 def split_text(
-    text: str, tokenizer: tiktoken.get_encoding("cl100k_base"), max_tokens: int, overlap: int = 0
+    text: str, tokenizer: None, max_tokens: int, overlap: int = 0
 ):
     """
     Splits the input text into smaller chunks based on the tokenizer and maximum allowed tokens.
