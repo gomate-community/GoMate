@@ -20,7 +20,7 @@ sentencepiece==0.2.0
 PyPDF2==3.0.1
 html2text
 beautifulsoup4==4.12.3
-faiss-cpu
+faiss-cpu==1.8.0
 umap-learn==0.5.5
 sentence_transformers==3.0.0
 threadpoolctl==3.5.0

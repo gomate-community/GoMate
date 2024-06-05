@@ -53,7 +53,7 @@ class SBertEmbeddingModel(BaseEmbeddingModel):
         self.model = SentenceTransformer(model_name)
 
     def create_embedding(self, text):
-        return self.model.encode(text)
+        return self.model.encode(text,show_progress_bar=False)
 
 
 class BaseEmbeddings:
