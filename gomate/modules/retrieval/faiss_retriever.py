@@ -166,11 +166,6 @@ class FaissRetriever(BaseRetriever):
         if self.index is None and self.all_embeddings:
             self.index = faiss.IndexFlatIP(self.all_embeddings[0].shape[1])
 
-        # first_shape = self.all_embeddings[0].shape
-        # for embedding in self.all_embeddings:
-        #     if embedding.shape != first_shape:
-        #         print("Found an embedding with a different shape:", embedding.shape)
-
         self.all_embeddings = np.vstack(self.all_embeddings)
         print(self.all_embeddings.shape)
         print(len(self.context_chunks))
