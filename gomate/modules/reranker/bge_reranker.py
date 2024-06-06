@@ -3,27 +3,19 @@
 """
 @author:quincy qiang
 @license: Apache Licence
-@file: reranker.py
-@time: 2024/05/22
+@file: bge_reranker.py
+@time: 2024/06/05
 @contact: yanqiangmiffy@gamil.com
 @software: PyCharm
 @description: coding..
 """
 from typing import List
+
 import numpy as np
 import torch
 from transformers import AutoModelForSequenceClassification, AutoTokenizer
 
-class BaseReranker:
-    """
-    Base class for reranker
-    """
-
-    def __init__(self, path: str) -> None:
-        self.path = path
-
-    def rerank(self, text: str, content: List[str], k: int) -> List[str]:
-        raise NotImplementedError
+from gomate.modules.reranker.base import BaseReranker
 
 
 class BgeReranker(BaseReranker):
