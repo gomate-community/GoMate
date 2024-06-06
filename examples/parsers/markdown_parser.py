@@ -9,7 +9,7 @@
 @software: PyCharm
 @description: coding..
 """
-from gomate.modules.document.markdownparser import MarkdownParser
+from gomate.modules.document.markdown_parser import MarkdownParser
 
 
 if __name__ == '__main__':
