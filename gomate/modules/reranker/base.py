@@ -19,3 +19,5 @@ class BaseReranker(ABC):
     """
     def rerank(self, text: str, content: List[str], k: int) -> List[str]:
         raise NotImplementedError
+
+
