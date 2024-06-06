@@ -27,3 +27,4 @@ faiss-cpu==1.8.0
 umap-learn==0.5.5
 sentence_transformers==3.0.0
 threadpoolctl==3.5.0
+PyMuPDF==1.24.5
