@@ -9,41 +9,66 @@
 @software: PyCharm
 @description: coding..
 """
-from typing import List
 
-import numpy as np
+from typing import List, Any
+
 import torch
-from transformers import AutoModelForSequenceClassification, AutoTokenizer
+from transformers import AutoTokenizer, AutoModelForSequenceClassification
 
 from gomate.modules.reranker.base import BaseReranker
 
 
+class BgeRerankerConfig:
+    """
+    Configuration class for setting up a BERT-based reranker.
+
+    Attributes:
+        model_name_or_path (str): Path or model identifier for the pretrained model from Hugging Face's model hub.
+        device (str): Device to load the model onto ('cuda' or 'cpu').
+    """
+
+    def __init__(self, model_name_or_path='bert-base-uncased'):
+        self.model_name_or_path = model_name_or_path
+        self.device = 'cuda' if torch.cuda.is_available() else 'cpu'
+
+    def log_config(self):
+        # Log the current configuration settings
+        return f"""
+        BgeRerankerConfig:
+            Model Name or Path: {self.model_name_or_path}
+            Device: {self.device}
+        """
+
+
 class BgeReranker(BaseReranker):
     """
-    class for Bge reranker
+    A reranker that utilizes a BERT-based model for sequence classification
+    to rerank a list of documents based on their relevance to a given query.
     """
 
-    def __init__(self, path: str = 'BAAI/bge-reranker-base') -> None:
-        super().__init__(path)
-        self._model, self._tokenizer = self.load_model(path)
+    def __init__(self, config):
+        super().__init__()
+        self.config = config
+        self.rerank_tokenizer = AutoTokenizer.from_pretrained(config.model_name_or_path)
+        self.rerank_model = AutoModelForSequenceClassification.from_pretrained(config.model_name_or_path) \
+            .half().to(config.device).eval()
+        self.device = config.device
+        print('Successful load rerank model')
 
-    def rerank(self, text: str, content: List[str], k: int) -> List[str]:
-        import torch
-        pairs = [(text, c) for c in content]
+    def rerank(self, query: str, documents: List[str], k: int = 5) -> list[dict[str, Any]]:
+        # Process input documents for uniqueness and formatting
+        documents = list(set(documents))
+        pairs = [[query, d] for d in documents]
+
+        # Tokenize and predict relevance scores
         with torch.no_grad():
-            inputs = self._tokenizer(pairs, padding=True, truncation=True, return_tensors='pt', max_length=512)
-            inputs = {k: v.to(self._model.device) for k, v in inputs.items()}
-            scores = self._model(**inputs, return_dict=True).logits.view(-1, ).float()
-            index = np.argsort(scores.tolist())[-k:][::-1]
-        return [content[i] for i in index]
+            inputs = self.rerank_tokenizer(pairs, padding=True, truncation=True, return_tensors='pt',
+                                           max_length=512).to(self.device)
+            scores = self.rerank_model(**inputs, return_dict=True).logits.view(-1).float().cpu().tolist()
 
-    def load_model(self, path: str):
+        # Pair documents with their scores, sort by scores in descending order
+        ranked_docs = sorted(zip(documents, scores), key=lambda x: x[1], reverse=True)
 
-        if torch.cuda.is_available():
-            device = torch.device("cuda")
-        else:
-            device = torch.device("cpu")
-        tokenizer = AutoTokenizer.from_pretrained(path)
-        model = AutoModelForSequenceClassification.from_pretrained(path).to(device)
-        model.eval()
-        return model, tokenizer
+        # Return the top k documents
+        top_docs = [{'text': doc, 'score': score} for doc, score in ranked_docs[:k]]
+        return top_docs

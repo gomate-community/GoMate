@@ -10,15 +10,12 @@
 @description: coding..
 """
 from typing import List
+from abc import ABC, abstractmethod
 
 
-class BaseReranker:
+class BaseReranker(ABC):
     """
     Base class for reranker
     """
-
-    def __init__(self, path: str) -> None:
-        self.path = path
-
     def rerank(self, text: str, content: List[str], k: int) -> List[str]:
         raise NotImplementedError
