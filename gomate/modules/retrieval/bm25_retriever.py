@@ -14,7 +14,7 @@ from typing import List,Dict
 import jieba
 import numpy as np
 import tiktoken
-from gomate.modules.retrieval.retrievers import BaseRetriever
+from gomate.modules.retrieval.base import BaseRetriever
 jieba.setLogLevel(logging.INFO)
 
 def tokenizer(text: str):

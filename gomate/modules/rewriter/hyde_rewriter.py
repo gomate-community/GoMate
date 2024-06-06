@@ -7,7 +7,7 @@
 @license: Apache Licence
 @time: 2024/5/31 1:23
 """
-from gomate.modules.rewriter.rewriters import BaseRewriter
+from gomate.modules.rewriter.base import BaseRewriter
 
 class HydeRewriter(BaseRewriter):
     def __init__(self):

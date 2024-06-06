@@ -11,7 +11,10 @@ flake8_docstrings == 1.7.0
 pydocstyle == 2.1
 openai == 1.10.0
 datasets == 2.16.1
-langchain == 0.1.4
+langchain==0.2.0
+langchain-core==0.2.1
+langchain-text-splitters==0.2.0
+langsmith==0.1.61
 transformers == 4.41.1
 torch == 2.2.0
 pandas == 2.0.0
@@ -24,3 +27,4 @@ faiss-cpu==1.8.0
 umap-learn==0.5.5
 sentence_transformers==3.0.0
 threadpoolctl==3.5.0
+PyMuPDF==1.24.5

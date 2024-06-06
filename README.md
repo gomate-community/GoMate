@@ -34,10 +34,10 @@ pip install -r requirements.txt
 ### 1 文档解析
 
 ```python
-from gomate.modules.document.reader import ReadFiles
+from gomate.modules.document.parset import TextParser
 from gomate.modules.store import VectorStore
 
-docs = ReadFiles('./data/docs').get_content(max_token_len=600, cover_content=150)
+docs = TextParser('./data/docs').get_content(max_token_len=600, cover_content=150)
 vector = VectorStore(docs)
 ```
 
@@ -70,7 +70,7 @@ print(chat.chat(question, [], content))
 ### 5 添加文档
 
 ```python
-docs = ReadFiles('').get_content_by_file(file='data/伊朗问题.txt', max_token_len=600, cover_content=150)
+docs = TextParser.get_content_by_file(file='data/伊朗问题.txt', max_token_len=600, cover_content=150)
 vector.add_documents('storage', docs, embedding)
 question = '如今伊朗人的经济生活状况如何？'
 contents = vector.query(question, EmbeddingModel=embedding, k=1)

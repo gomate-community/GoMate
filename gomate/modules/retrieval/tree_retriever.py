@@ -10,7 +10,7 @@ from gomate.modules.retrieval.embedding import OpenAIEmbeddingModel
 from gomate.modules.retrieval.embedding import SBertEmbeddingModel
 from gomate.modules.retrieval.raptor.cluster_tree_builder import ClusterTreeBuilder, ClusterTreeConfig
 from gomate.modules.retrieval.raptor.tree_structures import Node, Tree
-from gomate.modules.retrieval.retrievers import BaseRetriever
+from gomate.modules.retrieval.base import BaseRetriever
 from gomate.modules.retrieval.utils import (distances_from_embeddings, get_embeddings,
                                             get_node_list, get_text,
                                             indices_of_nearest_neighbors_from_distances,

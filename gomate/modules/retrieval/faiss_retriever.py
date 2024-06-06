@@ -11,7 +11,7 @@ from tqdm import tqdm
 
 from gomate.modules.retrieval.embedding import BaseEmbeddingModel, OpenAIEmbeddingModel
 from gomate.modules.retrieval.embedding import SBertEmbeddingModel
-from gomate.modules.retrieval.retrievers import BaseRetriever
+from gomate.modules.retrieval.base import BaseRetriever
 from gomate.modules.retrieval.utils import split_text
 
 
