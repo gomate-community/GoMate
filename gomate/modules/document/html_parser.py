@@ -21,7 +21,7 @@ def get_encoding(file):
         tmp = chardet.detect(f.read())
         return tmp['encoding']
 
-class RAGFlowHtmlParser:
+class HtmlParser:
     def __call__(self, fnm, binary=None):
         txt = ""
         if binary:

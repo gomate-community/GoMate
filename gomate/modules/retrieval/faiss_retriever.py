@@ -116,7 +116,8 @@ class FaissRetriever(BaseRetriever):
             if self.index_path and os.path.exists(self.index_path):
                 self.load_index(self.index_path)
         else:
-            os.remove(self.index_path)
+            if self.index_path and os.path.exists(self.index_path):
+                os.remove(self.index_path)
 
     def load_index(self, index_path):
         """

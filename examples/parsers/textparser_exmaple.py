@@ -20,7 +20,7 @@ if __name__ == '__main__':
     )
 
     chunks=text_parser.get_chunks(
-        filepath="../../data/制度汇编.txt"
+        filepath="../../data/docs/制度汇编.txt"
     )
 
     print(len(chunks))

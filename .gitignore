@@ -11,3 +11,4 @@ log/*
 .pytest_cache/
 .cache
 htmlcov/*
+data/competitions/*
