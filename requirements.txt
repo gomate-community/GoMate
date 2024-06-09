@@ -9,11 +9,13 @@ pytest-cov >= 2.4.0
 flake8 == 7.0.0
 flake8_docstrings == 1.7.0
 pydocstyle == 2.1
-openai == 1.10.0
+openai == 1.33.0
 datasets == 2.16.1
 langchain==0.2.0
-langchain-core==0.2.1
-langchain-text-splitters==0.2.0
+langchain-core==0.2.5
+langchain-text-splitters==0.2.1
+langchain-huggingface==0.0.3
+langchain_openai==0.1.8
 langsmith>=0.1.61
 transformers == 4.41.1
 torch == 2.2.0
