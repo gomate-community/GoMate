@@ -9,12 +9,12 @@
 @software: PyCharm
 @description: coding..
 """
-from gomate.modules.document.pdfparser import PdfParserUsingPyMuPDF
+from gomate.modules.document.pdf_parser_fast import PdfParserUsingPyMuPDF
 
 
 if __name__ == '__main__':
     parser=PdfParserUsingPyMuPDF(max_chunk_size=1000)
-    chunks=parser.get_chunks(filepath="../../data/汽车操作手册.pdf")
+    chunks=parser.get_chunks(filepath="../../data/docs/汽车操作手册.pdf")
     print(len(chunks))
     for chunk in chunks:
         print(chunk)

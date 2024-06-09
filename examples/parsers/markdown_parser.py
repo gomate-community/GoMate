@@ -9,15 +9,15 @@
 @software: PyCharm
 @description: coding..
 """
-from gomate.modules.document.markdownparser import MarkdownParser
+from gomate.modules.document.markdown_parser import MarkdownParser
 
 
 if __name__ == '__main__':
     markdown_parser=MarkdownParser(max_chunk_size=100)
 
-    chunks=markdown_parser.get_chunks(filepath="../../data/bm25算法.md")
+    chunks=markdown_parser.get_chunks(filepath="../../data/docs/bm25算法.md")
 
     print(len(chunks))
 
     for chunk in chunks:
-        print(chunk)
+        print(chunk.page_content)
