@@ -89,6 +89,29 @@ class TextEmbedding(Embeddings, ABC):
         # self.W, self.mu = torch.from_numpy(self.W).cuda(), torch.from_numpy(self.mu).cuda()
         return sentence_embeddings
 
+    def embed_query(self, text: str) -> List[float]:
+        """
+            Compute query embeddings using a HuggingFace transformer model.
+        Args:
+            text: The text to embed.
+        Returns:
+            Embeddings for the text.
+        """
+        text = text.replace("\n", " ")
+        if 'bge' in self.emb_model_name_or_path:
+            encoded_input = self.tokenizer([self.DEFAULT_QUERY_BGE_INSTRUCTION_ZH + text], padding=True,
+                                           truncation=True, return_tensors='pt').to(self.device)
+        else:
+            encoded_input = self.tokenizer([text], padding=True,
+                                           truncation=True, return_tensors='pt').to(self.device)
+        with torch.no_grad():
+            model_output = self.model(**encoded_input)
+            # Perform pooling. In this case, cls pooling.
+            sentence_embeddings = model_output[0][:, 0]
+        sentence_embeddings = torch.nn.functional.normalize(sentence_embeddings, p=2, dim=1)
+        # sentence_embeddings = (sentence_embeddings + self.mu) @ self.W
+        return sentence_embeddings[0].tolist()
+
 class BaseEmbeddingModel(ABC):
     @abstractmethod
     def create_embedding(self, text):
@@ -110,13 +133,26 @@ class OpenAIEmbeddingModel(BaseEmbeddingModel):
         )
 
 
-class SBertEmbeddingModel(BaseEmbeddingModel):
+
+class SBertEmbedding(Embeddings,ABC):
     def __init__(self, model_name="sentence-transformers/multi-qa-mpnet-base-cos-v1"):
         self.model = SentenceTransformer(model_name)
 
     def create_embedding(self, text):
         return self.model.encode(text,show_progress_bar=False)
 
+    def embed_documents(self, texts: List[str]) -> List[List[float]]:
+        """Embed search docs."""
+        embeddings=self.model.encode(texts, show_progress_bar=False)
+        return embeddings.tolist()
+    def embed_query(self, text: str) -> List[float]:
+        """Embed query text."""
+        embeddings = self.model.encode(text, show_progress_bar=False)
+        print(embeddings)
+        print(embeddings.tolist())
+        print(embeddings.tolist()[0])
+        print(embeddings.tolist()[0])
+        return embeddings.tolist()
 
 class BaseEmbeddings:
     """
