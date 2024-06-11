@@ -104,9 +104,15 @@ class FaissRetriever(BaseRetriever):
         :param batch_size: Number of documents to process in each batch.
         """
 
-        self.vector_store = FAISS.from_documents(documents, embedding=embedding_model)
-        for document in tqdm(documents, desc="build_from_documents"):
-            self.vector_store.add_documents([document])
+        self.vector_store = FAISS.from_documents(documents, embedding=self.embedding_model)
+        # for document in tqdm(documents, desc="build_from_documents"):
+        #     self.vector_store.add_documents([document])
+        #     del document
+                # if self.vector_store:
+                #     self.vector_store.add_documents([document])
+                # else:
+                #     self.vector_store = FAISS.from_documents([document], self.embedding_model)
+
         self.vector_store.save_local(self.vectorstore_path)
 
     def retrieve(self, query: str) -> list[Any]:
@@ -124,7 +130,7 @@ class FaissRetriever(BaseRetriever):
 if __name__ == '__main__':
 
     embedding_model_path = "/home/test/pretrained_models/bge-large-zh-v1.5"
-    embedding_model = SBertEmbedding(embedding_model_path)
+    embedding_model = TextEmbedding(embedding_model_path)
     retriever_config = FaissRetrieverConfig(
         embedding_model=embedding_model,
         top_k=5,

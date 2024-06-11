@@ -12,7 +12,7 @@ import os
 from typing import List
 import logging
 from abc import ABC, abstractmethod
-
+from tqdm import tqdm
 from openai import OpenAI
 from sentence_transformers import SentenceTransformer
 from tenacity import retry, stop_after_attempt, wait_random_exponential
@@ -65,7 +65,7 @@ class TextEmbedding(Embeddings, ABC):
         texts = [t.replace("\n", " ") for t in texts]
         sentence_embeddings = []
 
-        for start in range(0, num_texts, self.batch_size):
+        for start in tqdm(range(0, num_texts, self.batch_size),desc="embed_documents"):
             end = min(start + self.batch_size, num_texts)
             batch_texts = texts[start:end]
             encoded_input = self.tokenizer(batch_texts, max_length=512, padding=True, truncation=True,
