@@ -14,6 +14,7 @@ sys.path.append('/home/test/codes/GoMate')
 import datasets
 from langchain_core.documents import Document
 from tqdm import tqdm
+from langchain_community.vectorstores.faiss import FAISS
 
 from gomate.modules.retrieval.embedding import TextEmbedding
 from gomate.modules.retrieval.faiss_retriever import FaissRetriever, FaissRetrieverConfig
@@ -47,21 +48,39 @@ def process_batch(batch, batch_index):
     gc.collect()
 
 if __name__ == '__main__':
-    dataset_path = '/home/test/codes/GoMate/data/docs/wikipedia-nq-corpus'
-    wikipedia_dataset = datasets.load_from_disk(dataset_path)
-    print(len(wikipedia_dataset['train']))
 
-    batch_size = 2000000
-    num_batches = (len(wikipedia_dataset['train']) + batch_size - 1) // batch_size
+    build=False
+    if build:
 
-    for batch_index in range(num_batches):
-        start_idx = batch_index * batch_size
-        end_idx = min(start_idx + batch_size, len(wikipedia_dataset['train']))
-        batch = wikipedia_dataset['train'].select(range(start_idx,end_idx))
-        process_batch(batch, batch_index)
-        del batch
+        dataset_path = '/home/test/codes/GoMate/data/docs/wikipedia-nq-corpus'
+        wikipedia_dataset = datasets.load_from_disk(dataset_path)
+        print(len(wikipedia_dataset['train']))
+
+        batch_size = 2000000
+        num_batches = (len(wikipedia_dataset['train']) + batch_size - 1) // batch_size
+
+        for batch_index in range(num_batches):
+            start_idx = batch_index * batch_size
+            end_idx = min(start_idx + batch_size, len(wikipedia_dataset['train']))
+            batch = wikipedia_dataset['train'].select(range(start_idx,end_idx))
+            process_batch(batch, batch_index)
+            del batch
+
+    merge=False
+    if merge:
+        embedding_model_path = "/home/test/pretrained_models/mpnet-base"
+        embedding_model = TextEmbedding(embedding_model_path, batch_size=256)
+        db = FAISS.load_local('/home/test/codes/GoMate/wikipedia_index_0', embeddings=embedding_model, index_name='index',allow_dangerous_deserialization=True)
+        for i in tqdm(range(2,11)):
+            db_new = FAISS.load_local(f'/home/test/codes/GoMate/wikipedia_index_{i}', embeddings=embedding_model,
+                                  index_name='index', allow_dangerous_deserialization=True)
+
+            db.merge_from(db_new)
+        db.save_local('/home/test/codes/GoMate/wikipedia_index')
 
 
-        # # 示例查询，可以选择某个批次的检索器来执行查询
-        # contexts = retriever.retrieve("Aaron is a prophet")
-        # print(contexts)
+    embedding_model_path = "/home/test/pretrained_models/mpnet-base"
+    embedding_model = TextEmbedding(embedding_model_path, batch_size=256)
+    db = FAISS.load_local('/home/test/codes/GoMate/wikipedia_index', embeddings=embedding_model, index_name='index',allow_dangerous_deserialization=True)
+    docs = db.similarity_search_with_score('Iphone')
+    print(docs)
