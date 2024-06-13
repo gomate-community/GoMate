@@ -17,7 +17,7 @@ from copy import deepcopy
 import onnxruntime as ort
 from huggingface_hub import snapshot_download
 
-from api.utils.file_utils import get_project_base_directory
+from api import get_project_base_directory
 from .operators import *
 from rag.settings import cron_logger
 

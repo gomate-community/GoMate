@@ -23,7 +23,7 @@ def init_in_out(args):
     from PIL import Image
     import os
     import traceback
-    from api.utils.file_utils import traversal_files
+    from api import traversal_files
     images = []
     outputs = []
 

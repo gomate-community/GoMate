@@ -17,7 +17,7 @@ import os
 
 from huggingface_hub import snapshot_download
 
-from api.utils.file_utils import get_project_base_directory
+from api import get_project_base_directory
 from .operators import *
 import numpy as np
 import onnxruntime as ort
