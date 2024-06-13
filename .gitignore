@@ -12,3 +12,4 @@ log/*
 .cache
 htmlcov/*
 data/competitions/*
+data/docs
