@@ -55,7 +55,7 @@ class BgeReranker(BaseReranker):
         self.device = config.device
         print('Successful load rerank model')
 
-    def rerank(self, query: str, documents: List[str], k: int = 5) -> list[dict[str, Any]]:
+    def rerank(self, query: str, documents: List[str], k: int = 5,is_sorted:bool=False) -> list[dict[str, Any]]:
         # Process input documents for uniqueness and formatting
         documents = list(set(documents))
         pairs = [[query, d] for d in documents]
@@ -67,8 +67,10 @@ class BgeReranker(BaseReranker):
             scores = self.rerank_model(**inputs, return_dict=True).logits.view(-1).float().cpu().tolist()
 
         # Pair documents with their scores, sort by scores in descending order
-        ranked_docs = sorted(zip(documents, scores), key=lambda x: x[1], reverse=True)
-
-        # Return the top k documents
-        top_docs = [{'text': doc, 'score': score} for doc, score in ranked_docs[:k]]
+        if is_sorted:
+            ranked_docs = sorted(zip(documents, scores), key=lambda x: x[1], reverse=True)
+            # Return the top k documents
+            top_docs = [{'text': doc, 'score': score} for doc, score in ranked_docs[:k]]
+        else:
+            top_docs= [{'text': doc, 'score': score} for doc, score in zip(documents,scores)]
         return top_docs
