@@ -9,6 +9,7 @@
 @software: PyCharm
 @description: coding..
 """
+import loguru
 from fastapi import APIRouter
 
 from api.apps.core.rerank.bodys import RerankBody
@@ -29,8 +30,13 @@ bge_reranker = BgeReranker(reranker_config)
 @rerank_router.post("/rerank/", response_model=None, summary="重排序检索文档")
 async def rerank(rerank_body: RerankBody):
     contexts = rerank_body.contexts
+    query=rerank_body.query
+    loguru.logger.info(query)
+    loguru.logger.info(contexts)
     top_docs = bge_reranker.rerank(
-        query=rerank_body.query,
+        query=query,
         documents=contexts,
+        is_sorted=False
     )
-    return ApiResponse(top_docs, message="创建应用成功")
+    loguru.logger.info(top_docs)
+    return ApiResponse(top_docs, message="重排序检索文档成功")

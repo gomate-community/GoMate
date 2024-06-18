@@ -10,6 +10,8 @@
 @description: coding..
 """
 import sys
+import os
+os.environ["TOKENIZERS_PARALLELISM"] = "false"
 sys.path.append('.')
 sys.path.append('/data/users/searchgpt/yq/GoMate')
 from apps.app import create_app

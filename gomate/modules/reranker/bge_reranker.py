@@ -9,7 +9,8 @@
 @software: PyCharm
 @description: coding..
 """
-
+import os
+os.environ["TOKENIZERS_PARALLELISM"] = "false"
 from typing import List, Any
 
 import torch
@@ -55,9 +56,9 @@ class BgeReranker(BaseReranker):
         self.device = config.device
         print('Successful load rerank model')
 
-    def rerank(self, query: str, documents: List[str], k: int = 5,is_sorted:bool=False) -> list[dict[str, Any]]:
+    def rerank(self, query: str, documents: List[str], k: int = 5, is_sorted: bool = False) -> list[dict[str, Any]]:
         # Process input documents for uniqueness and formatting
-        documents = list(set(documents))
+        # documents = list(set(documents))
         pairs = [[query, d] for d in documents]
 
         # Tokenize and predict relevance scores
@@ -72,5 +73,5 @@ class BgeReranker(BaseReranker):
             # Return the top k documents
             top_docs = [{'text': doc, 'score': score} for doc, score in ranked_docs[:k]]
         else:
-            top_docs= [{'text': doc, 'score': score} for doc, score in zip(documents,scores)]
+            top_docs = [{'text': doc, 'score': score} for doc, score in zip(documents, scores)]
         return top_docs
