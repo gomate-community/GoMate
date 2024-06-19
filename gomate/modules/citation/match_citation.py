@@ -1,14 +1,14 @@
 import re
+from abc import ABC
 from typing import List
 
 import jieba
 
 
-class MatchCitation(object):
-
+class MatchCitation(ABC):
     def __init__(self):
         self.stopwords = [
-            line.strip() for line in open('./config/stopwords.txt').readlines()
+            "的"
         ]
 
     def cut(self, para: str):
@@ -146,6 +146,21 @@ class MatchCitation(object):
             final_response = ''.join(final_response)
         return final_response
 
+    def concatenate_citations(self, result: list[dict] = None):
+        """
+
+        :param result:
+        :return:
+        """
+        final_text = ""
+        for item in result:
+            if item['type'] == 'default':
+                final_text += ''.join(item['texts'])
+            elif item['type'] == 'quote':
+                quotes = ''.join([f'[{q}]' for q in item['texts']])
+                final_text += quotes
+        return final_text
+
 
 if __name__ == '__main__':
     mc = MatchCitation()
@@ -156,7 +171,24 @@ if __name__ == '__main__':
             "海洋霸主巨齿鲨，今夏再掀狂澜！乔纳斯·泰勒（杰森·斯坦森 饰）与科学家张九溟（吴京 饰）双雄联手，进入海底7000米深渊执行探索任务。他们意外遭遇史前巨兽海洋霸主巨齿鲨群的攻击，还将对战凶猛危险的远古怪兽群。惊心动魄的深渊冒险，巨燃巨爽的深海大战一触即发",
             "本·维特利 编剧：乔·霍贝尔埃里希·霍贝尔迪恩·乔格瑞斯 国家地区：中国 | 美国 发行公司：上海华人影业有限公司五洲电影发行有限公司中国电影股份有限公司北京电影发行分公司 出品公司：上海华人影业有限公司华纳兄弟影片公司北京登峰国际文化传播有限公司 更多片名：巨齿鲨2 剧情：海洋霸主巨齿鲨，今夏再掀狂澜！乔纳斯·泰勒（杰森·斯坦森 饰）与科学家张九溟（吴京 饰）双雄联手，进入海底7000米深渊执行探索任务。他们意外遭遇史前巨兽海洋霸主巨齿鲨群的攻击，还将对战凶猛危险的远古怪兽群。惊心动魄的深渊冒险，巨燃巨爽的深海大战一触即发……"
         ],
-        selected_idx=[1, 2]
+        selected_idx=[0, 1],
+        markdown=True
     )
 
     print(result)
+
+    # result = [
+    #     {'type': 'default',
+    #      'texts': ['巨齿鲨2是一部科幻冒险电影，由本·维特利执导，杰森·斯坦森、吴京、蔡书雅和克利夫·柯蒂斯主演。']},
+    #     {'type': 'default', 'texts': ['电影讲述了海洋霸主巨齿鲨，今夏再掀狂澜']},
+    #     {'type': 'quote', 'texts': ['2', '3']}, {'type': 'default', 'texts': ['！']},
+    #     {'type': 'default',
+    #      'texts': ['乔纳斯·泰勒（杰森·斯坦森饰）与科学家张九溟（吴京饰）双雄联手，进入海底7000米深渊执行探索任务']},
+    #     {'type': 'quote', 'texts': ['2', '3']}, {'type': 'default', 'texts': ['。']},
+    #     {'type': 'default', 'texts': ['他们意外遭遇史前巨兽海洋霸主巨齿鲨群的攻击，还将对战凶猛危险的远古怪兽群']},
+    #     {'type': 'quote', 'texts': ['2', '3']}, {'type': 'default', 'texts': ['。']},
+    #     {'type': 'default', 'texts': ['惊心动魄的深渊冒险，巨燃巨爽的深海大战一触即发']},
+    #     {'type': 'quote', 'texts': ['2', '3']}, {'type': 'default', 'texts': ['。']}
+    # ]
+    # response=mc.concatenate_citations(result)
+    # print(response)

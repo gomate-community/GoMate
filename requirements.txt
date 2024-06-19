@@ -15,7 +15,7 @@ langchain==0.2.0
 langchain-core==0.2.5
 langchain-text-splitters==0.2.1
 langchain-huggingface==0.0.3
-langchain_openai==0.1.8
+langchain-openai==0.1.8
 langsmith>=0.1.61
 transformers == 4.41.1
 torch == 2.2.0
@@ -38,3 +38,5 @@ pdfplumber==0.11.0
 readability==0.3.1
 html_text==0.6.2
 python-docx==1.1.2
+tortoise==0.1.1
+python-magic==0.4.27

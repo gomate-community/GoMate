@@ -25,10 +25,33 @@ documents = [
 embedding_path = r'H:\pretrained_models\bert\english\paraphrase-multilingual-mpnet-base-v2'
 embedding_model = HuggingFaceEmbeddings(model_name=embedding_path)
 db = FAISS.from_documents(documents, embedding=embedding_model)
-
+# 保存索引以及文档、向量
 db.save_local('../.cache/faiss.index')
 
+
+## 加载索引
 db = FAISS.load_local('../.cache/faiss.index', embeddings=embedding_model, index_name='index',allow_dangerous_deserialization=True)
+## 检索相关文档
 docs = db.similarity_search_with_score('台式机电脑')
 print(docs)
+
+
+## 追加新的文档
+db.add_documents(
+[
+    Document(
+        meta_data={'text': 'PC'},
+        page_content='我的苹果电脑，支持人工智能',
+    ),
+    Document(
+        meta_data={'text': 'doctor'},
+        page_content='我的办公场地变化了',
+    )
+]
+)
+
+docs = db.similarity_search_with_score('苹果电脑')
+
+print(docs)
+
 

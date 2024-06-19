@@ -21,7 +21,7 @@ sys.path.insert(
 
 from deepdoc.vision.seeit import draw_box
 from deepdoc.vision import Recognizer, LayoutRecognizer, TableStructureRecognizer, OCR, init_in_out
-from api.utils.file_utils import get_project_base_directory
+from api import get_project_base_directory
 import argparse
 import re
 import numpy as np
