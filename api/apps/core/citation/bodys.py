@@ -30,6 +30,6 @@ class CitationBody(BaseModel):
         ],
         description="待引用的检索文档")
     selected_idx: List[int] = Field(
-        [1, 2, 3, 4],
+        [1,2],
         description="文档对应的索引"
     )

@@ -54,7 +54,8 @@ class RagTokenizer:
         self.DEBUG = debug
         self.DENOMINATOR = 1000000
         self.trie_ = datrie.Trie(string.printable)
-        self.DIR_ = os.path.join(get_project_base_directory(), "rag/res", "huqie")
+        # self.DIR_ = os.path.join(get_project_base_directory(), "rag/res", "huqie")
+        self.DIR_ = os.path.join(get_project_base_directory(), "data/huqie", "huqie")
 
         self.stemmer = PorterStemmer()
         self.lemmatizer = WordNetLemmatizer()

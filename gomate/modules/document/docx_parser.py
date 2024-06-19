@@ -110,7 +110,7 @@ class DocxParser:
             return lines
         return ["\n".join(lines)]
 
-    def __call__(self, fnm, from_page=0, to_page=100000):
+    def parse(self, fnm, from_page=0, to_page=100000):
         self.doc = Document(fnm) if isinstance(
             fnm, str) else Document(BytesIO(fnm))
         pn = 0
@@ -129,3 +129,8 @@ class DocxParser:
 
         tbls = [self.__extract_table_content(tb) for tb in self.doc.tables]
         return secs, tbls
+if __name__ == '__main__':
+    dp=DocxParser()
+    secs, tbls=dp.parse('/home/test/codes/GoMate/data/docs/夏至各地习俗.docx')
+    print(secs)
+    print(tbls)

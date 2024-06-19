@@ -10,7 +10,7 @@
 @description: coding..
 """
 import os
-PROJECT_BASE='.'
+PROJECT_BASE='/home/test/codes/GoMate'
 def contains_text(text):
     # Check if the token contains at least one alphanumeric character
     return any(char.isalnum() for char in text)

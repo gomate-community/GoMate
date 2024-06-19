@@ -15,7 +15,7 @@ from io import BytesIO
 from pptx import Presentation
 
 
-class RAGFlowPptParser(object):
+class PptParser(object):
     def __init__(self):
         super().__init__()
 
@@ -39,7 +39,7 @@ class RAGFlowPptParser(object):
                     texts.append(t)
             return "\n".join(texts)
 
-    def __call__(self, fnm, from_page, to_page, callback=None):
+    def parse(self, fnm, from_page=0, to_page=100000, callback=None):
         ppt = Presentation(fnm) if isinstance(
             fnm, str) else Presentation(
             BytesIO(fnm))
@@ -59,3 +59,8 @@ class RAGFlowPptParser(object):
             txts.append("\n".join(texts))
 
         return txts
+
+if __name__ == '__main__':
+    pp=PptParser()
+    txts=pp.parse('/home/test/codes/GoMate/data/docs/集成电路封装材料-光敏材料.pptx')
+    print(txts)
