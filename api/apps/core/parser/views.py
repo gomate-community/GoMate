@@ -10,7 +10,7 @@
 @description: coding..
 """
 import re
-
+import loguru
 import magic
 from fastapi import APIRouter
 from fastapi import File, UploadFile, HTTPException
@@ -29,7 +29,7 @@ parse_router = APIRouter()
 
 
 @parse_router.post("/parse/", response_model=None, summary="文件解析")
-async def parser(file: UploadFile = File(...), description: str = None):
+async def parser(file: UploadFile = File(...),chunk_size=512):
     try:
         # 读取文件内容
         filename = file.filename
@@ -38,7 +38,7 @@ async def parser(file: UploadFile = File(...), description: str = None):
         # 检测文件类型
         mime = magic.Magic(mime=True)
         file_type = mime.from_buffer(content)
-
+        loguru.logger.info(filename,content,mime)
         if re.search(r"\.docx$", filename, re.IGNORECASE):
             parser = DocxParser()
         elif re.search(r"\.pdf$", filename, re.IGNORECASE):
@@ -58,6 +58,7 @@ async def parser(file: UploadFile = File(...), description: str = None):
             raise NotImplementedError(
                 "file type not supported yet(pdf, xlsx, doc, docx, txt supported)")
         contents = parser.parse(content)
+        loguru.logger.info(contents)
         contents = tc.chunk_sentences(contents, chunk_size=512)
         # 返回成功响应
         return JSONResponse(content=contents, status_code=200)

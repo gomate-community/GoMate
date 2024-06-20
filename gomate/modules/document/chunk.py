@@ -14,7 +14,8 @@ class TextChunker:
 
         # 将标点符号和前面的句子合并
         sentences = ["".join(i) for i in zip(sentences[0::2], sentences[1::2])] + sentences[2::2]
-        return [sentence.strip() for sentence in sentences if sentence.strip()]
+        sentences=[sentence.strip() for sentence in sentences if sentence.strip()]
+        return sentences
 
     def chunk_sentences(self, paragraphs, chunk_size):
         """
@@ -31,14 +32,14 @@ class TextChunker:
 
         # 分句
         sentences = self.split_sentences(text)
-
+        if len(sentences)==0:
+            sentences=paragraphs
         chunks = []
         current_chunk = []
         current_chunk_tokens = 0
 
         for sentence in sentences:
             tokens = self.tokenizer.tokenize(sentence)
-            print(len(tokens),tokens)
             if current_chunk_tokens + len(tokens) <= chunk_size:
                 current_chunk.append(sentence)
                 current_chunk_tokens += len(tokens)
@@ -207,7 +208,7 @@ if __name__ == '__main__':
                   '[5]欧阳金雨 .及早抓住疫情过后的消费机会 [N].湖南日报 ,2020', '-02-23(003).',
                   '作者简介 ：谭诗怡（1999.10- ），女，籍贯:湖南湘乡 ，湘潭大学，本', '科在读，研究方向 :电子商务',
                   '11Copyright©博看网 www.bookan.com.cn. All Rights Reserved.']
-
+    paragraphs=['Hello!\nHi!\nGoodbye!']
     tc = TextChunker()
     chunk_size = 512
     chunks = tc.chunk_sentences(paragraphs, chunk_size)
