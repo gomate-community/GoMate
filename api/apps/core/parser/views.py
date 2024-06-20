@@ -9,83 +9,57 @@
 @software: PyCharm
 @description: coding..
 """
-from typing import List
+import re
 
-from pydantic import BaseModel, Field
-from fastapi import FastAPI, File, UploadFile, HTTPException
-from fastapi.responses import JSONResponse
-from fastapi import APIRouter
 import magic
-import pdfplumber
-import docx
-import openpyxl
-from pptx import Presentation
-from typing import List
+from fastapi import APIRouter
+from fastapi import File, UploadFile, HTTPException
+from fastapi.responses import JSONResponse
 
+from gomate.modules.document.chunk import TextChunker
+from gomate.modules.document.docx_parser import DocxParser
+from gomate.modules.document.excel_parser import ExcelParser
+from gomate.modules.document.html_parser import HtmlParser
+from gomate.modules.document.pdf_parser import PdfSimParser
+from gomate.modules.document.ppt_parser import PptParser
+from gomate.modules.document.txt_parser import TextParser
+
+tc = TextChunker()
 parse_router = APIRouter()
+
 
 @parse_router.post("/parse/", response_model=None, summary="文件解析")
 async def parser(file: UploadFile = File(...), description: str = None):
     try:
         # 读取文件内容
+        filename = file.filename
         content = await file.read()
-
+        # bytes_io = BytesIO(content)
         # 检测文件类型
         mime = magic.Magic(mime=True)
         file_type = mime.from_buffer(content)
 
-        if file_type == "text/plain" or file.filename.endswith('.md'):
-            # 处理txt或markdown文件
-            text = content.decode("utf-8")
-            # 在这里处理文本内容，例如保存到数据库
-            with open(f"/path/to/save/{file.filename}", "w", encoding="utf-8") as f:
-                f.write(text)
-
-        elif file_type == "application/pdf":
-            # 处理PDF文件
-            with pdfplumber.open(file.file) as pdf:
-                text = "\n".join(page.extract_text() for page in pdf.pages)
-                # 在这里处理文本内容，例如保存到数据库
-                with open(f"/path/to/save/{file.filename}.txt", "w", encoding="utf-8") as f:
-                    f.write(text)
-
-        elif file_type == "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
-            # 处理docx文件
-            doc = docx.Document(file.file)
-            text = "\n".join(paragraph.text for paragraph in doc.paragraphs)
-            # 在这里处理文本内容，例如保存到数据库
-            with open(f"/path/to/save/{file.filename}.txt", "w", encoding="utf-8") as f:
-                f.write(text)
-
-        elif file_type == "text/html":
-            # 处理html文件
-            text = content.decode("utf-8")
-            # 在这里处理HTML内容，例如解析和保存到数据库
-            with open(f"/path/to/save/{file.filename}", "w", encoding="utf-8") as f:
-                f.write(text)
-
-        elif file_type == "application/vnd.openxmlformats-officedocument.presentationml.presentation":
-            # 处理ppt文件
-            prs = Presentation(file.file)
-            text = "\n".join(shape.text for slide in prs.slides for shape in slide.shapes if hasattr(shape, "text"))
-            # 在这里处理文本内容，例如保存到数据库
-            with open(f"/path/to/save/{file.filename}.txt", "w", encoding="utf-8") as f:
-                f.write(text)
-
-        elif file_type == "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet":
-            # 处理excel文件
-            wb = openpyxl.load_workbook(file.file)
-            sheet = wb.active
-            text = "\n".join(" ".join(cell.value for cell in row) for row in sheet.iter_rows())
-            # 在这里处理文本内容，例如保存到数据库
-            with open(f"/path/to/save/{file.filename}.txt", "w", encoding="utf-8") as f:
-                f.write(text)
-
+        if re.search(r"\.docx$", filename, re.IGNORECASE):
+            parser = DocxParser()
+        elif re.search(r"\.pdf$", filename, re.IGNORECASE):
+            parser = PdfSimParser()
+        elif re.search(r"\.xlsx?$", filename, re.IGNORECASE):
+            parser = ExcelParser()
+        elif re.search(r"\.pptx$", filename, re.IGNORECASE):
+            parser = PptParser()
+        elif re.search(r"\.(txt|md|py|js|java|c|cpp|h|php|go|ts|sh|cs|kt)$", filename, re.IGNORECASE):
+            parser = TextParser()
+        elif re.search(r"\.(htm|html)$", filename, re.IGNORECASE):
+            parser = HtmlParser()
+        elif re.search(r"\.doc$", filename, re.IGNORECASE):
+            parser = DocxParser()
         else:
-            raise HTTPException(status_code=400, detail="不支持的文件类型")
-
+            parser = DocxParser()
+            raise NotImplementedError(
+                "file type not supported yet(pdf, xlsx, doc, docx, txt supported)")
+        contents = parser.parse(content)
+        contents = tc.chunk_sentences(contents, chunk_size=512)
         # 返回成功响应
-        return JSONResponse(content={"filename": file.filename, "description": description, "file_type": file_type}, status_code=200)
+        return JSONResponse(content=contents, status_code=200)
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"文件上传失败: {str(e)}")
-
