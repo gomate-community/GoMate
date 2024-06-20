@@ -11,24 +11,28 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 #
-from gomate.modules.document.utils import find_codec
-import readability
-import html_text
 import chardet
+import html_text
+import readability
+
+from gomate.modules.document.utils import find_codec
+
 
 def get_encoding(file):
-    with open(file,'rb') as f:
+    with open(file, 'rb') as f:
         tmp = chardet.detect(f.read())
         return tmp['encoding']
 
+
 class HtmlParser:
-    def __call__(self, fnm, binary=None):
+    def parse(self, fnm):
         txt = ""
-        if binary:
-            encoding = find_codec(binary)
-            txt = binary.decode(encoding, errors="ignore")
+        if not isinstance(
+            fnm, str):
+            encoding = find_codec(fnm)
+            txt = fnm.decode(encoding, errors="ignore")
         else:
-            with open(fnm, "r",encoding=get_encoding(fnm)) as f:
+            with open(fnm, "r", encoding=get_encoding(fnm)) as f:
                 txt = f.read()
 
         html_doc = readability.Document(txt)
@@ -37,3 +41,9 @@ class HtmlParser:
         txt = f'{title}\n{content}'
         sections = txt.split("\n")
         return sections
+
+
+if __name__ == '__main__':
+    hp = HtmlParser()
+    contents = hp.parse('/data/users/searchgpt/yq/GoMate_dev/data/docs/如何打通发展新质生产力的堵点卡点_新浪新闻.html')
+    print(contents)

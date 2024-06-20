@@ -128,9 +128,10 @@ class DocxParser:
                     pn += 1
 
         tbls = [self.__extract_table_content(tb) for tb in self.doc.tables]
-        return secs, tbls
+        secs=[sec[0] for sec in secs]
+        return secs+tbls
 if __name__ == '__main__':
     dp=DocxParser()
-    secs, tbls=dp.parse('/home/test/codes/GoMate/data/docs/夏至各地习俗.docx')
+    secs, tbls=dp.parse('/data/users/searchgpt/yq/GoMate/data/docs/夏至各地习俗.docx')
     print(secs)
     print(tbls)

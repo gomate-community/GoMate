@@ -62,5 +62,5 @@ class PptParser(object):
 
 if __name__ == '__main__':
     pp=PptParser()
-    txts=pp.parse('/home/test/codes/GoMate/data/docs/集成电路封装材料-光敏材料.pptx')
+    txts=pp.parse('/data/users/searchgpt/yq/GoMate/data/docs/集成电路封装材料-光敏材料.pptx')
     print(txts)

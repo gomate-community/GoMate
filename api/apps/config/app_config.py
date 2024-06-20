@@ -39,7 +39,7 @@ class AppConfig:
 
     WEB_URL: ClassVar[str] = '*'
     # 接口地址
-    API_URL: ClassVar[str] = 'http://127.0.0.1:10000'
+    API_URL: ClassVar[str] = 'http://127.0.0.1:10001'
     # 运行访问的地址
     API_HOST: ClassVar[str] = '0.0.0.0'
     # 端口

@@ -126,3 +126,8 @@ python app.py
 ```
 浏览器访问：[127.0.0.1:7860](127.0.0.1:7860)
 ![demo.png](resources%2Fdemo.png)
+
+
+## ⭐️ Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=gomate-community/GoMate&type=Date)](https://star-history.com/#gomate-community/GoMate&Date)

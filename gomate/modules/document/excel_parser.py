@@ -11,10 +11,10 @@
 #  limitations under the License.
 #
 
-from openpyxl import load_workbook
-import sys
 from io import BytesIO
+from openpyxl import load_workbook
 from gomate.modules.document.utils import find_codec
+
 
 class ExcelParser:
     def html(self, fnm, chunk_rows=256):
@@ -51,7 +51,7 @@ class ExcelParser:
 
         return tb_chunks
 
-    def __call__(self, fnm):
+    def parse(self, fnm):
         if isinstance(fnm, str):
             wb = load_workbook(fnm)
         else:
@@ -60,7 +60,7 @@ class ExcelParser:
         for sheetname in wb.sheetnames:
             ws = wb[sheetname]
             rows = list(ws.rows)
-            if not rows:continue
+            if not rows: continue
             ti = list(rows[0])
             for r in list(rows[1:]):
                 l = []
@@ -93,5 +93,7 @@ class ExcelParser:
 
 
 if __name__ == "__main__":
-    psr = RAGFlowExcelParser()
-    psr(sys.argv[1])
+    psr = ExcelParser()
+    contents=psr.parse('/data/users/searchgpt/yq/GoMate_dev/data/docs/dev.xlsx')
+    print(len(contents))
+    print(contents[0])

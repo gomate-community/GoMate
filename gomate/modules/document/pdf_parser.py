@@ -25,11 +25,11 @@ import numpy as np
 from timeit import default_timer as timer
 from PyPDF2 import PdfReader as pdf2_read
 
-from gomate.modules.document.utils import get_project_base_directory
-from gomate.modules.document.vision import OCR, Recognizer, LayoutRecognizer, TableStructureRecognizer
+# from gomate.modules.document.utils import get_project_base_directory
+# from gomate.modules.document.vision import OCR, Recognizer, LayoutRecognizer, TableStructureRecognizer
 from gomate.modules.document import rag_tokenizer
 from copy import deepcopy
-from huggingface_hub import snapshot_download
+# from huggingface_hub import snapshot_download
 
 logging.getLogger("pdfminer").setLevel(logging.WARNING)
 
@@ -1135,8 +1135,8 @@ class PdfParser:
         return poss
 
 
-class PlainParser(object):
-    def __call__(self, filename, from_page=0, to_page=100000, **kwargs):
+class PdfSimParser(object):
+    def parse(self, filename, from_page=0, to_page=100000, **kwargs):
         self.outlines = []
         lines = []
         try:
@@ -1161,7 +1161,7 @@ class PlainParser(object):
         if not self.outlines:
             logging.warning(f"Miss outlines")
 
-        return [(l, "") for l in lines], []
+        return lines
 
     def crop(self, ck, need_position):
         raise NotImplementedError
@@ -1172,4 +1172,6 @@ class PlainParser(object):
 
 
 if __name__ == "__main__":
-    pass
+    pp=PdfSimParser()
+    contents=pp.parse('/data/users/searchgpt/yq/GoMate_dev/data/docs/新冠肺炎疫情.pdf')
+    print(contents)
