@@ -7,7 +7,7 @@ import tiktoken
 from gomate.modules.refiner.summary import GLMSummarizationModel
 from gomate.modules.retrieval.embedding import BaseEmbeddingModel
 from gomate.modules.retrieval.embedding import OpenAIEmbeddingModel
-from gomate.modules.retrieval.embedding import SBertEmbeddingModel
+from gomate.modules.retrieval.embedding import SBertEmbedding
 from gomate.modules.retrieval.raptor.cluster_tree_builder import ClusterTreeBuilder, ClusterTreeConfig
 from gomate.modules.retrieval.raptor.tree_structures import Node, Tree
 from gomate.modules.retrieval.base import BaseRetriever
