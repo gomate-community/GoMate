@@ -131,3 +131,6 @@ python app.py
 ## ⭐️ Star History
 
 [![Star History Chart](https://api.star-history.com/svg?repos=gomate-community/GoMate&type=Date)](https://star-history.com/#gomate-community/GoMate&Date)
+
+## 技术咨询
+WeChat:1185918903
