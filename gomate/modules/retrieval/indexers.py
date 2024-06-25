@@ -7,7 +7,8 @@
 @time: 2024/06/05
 @contact: yanqiangmiffy@gamil.com
 @software: PyCharm
-@description: coding..
+@description:
+@source: https://github.com/facebookresearch/DPR/tree/main
 """
 import faiss
 import logging

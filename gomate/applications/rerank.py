@@ -1,4 +1,4 @@
-from gomate.modules import bge_large_reranker
+from gomate.modules.reranker.bge_reranker import BgeReranker,BgeRerankerConfig
 
 
 class RerankerApp():
@@ -15,7 +15,10 @@ class RerankerApp():
         self.reranker_list = ['bge_large']
         assert component_name in self.reranker_list
         if component_name == 'bge_large':
-            self.reranker = bge_large_reranker()
+            reranker_config = BgeRerankerConfig(
+                model_name_or_path="/home/test/pretrained_models/bge-reranker-large"
+            )
+            self.reranker = BgeReranker(reranker_config)
 
     def run(self, query, contexts):
         """Run the required reranker"""
@@ -23,4 +26,4 @@ class RerankerApp():
             raise ValueError('missing query')
         if contexts is None:
             raise ValueError('missing contexts')
-        return self.reranker.run(query, contexts)
+        return self.reranker.rerank(query, contexts)

@@ -5,12 +5,11 @@ from typing import Any
 
 from langchain_community.vectorstores.faiss import FAISS
 from langchain_core.documents import Document
-from tqdm import tqdm
 from langchain_core.embeddings import Embeddings
 
 from gomate.modules.retrieval.base import BaseRetriever
-from gomate.modules.retrieval.embedding import BaseEmbeddingModel, OpenAIEmbeddingModel
-from gomate.modules.retrieval.embedding import SBertEmbedding,TextEmbedding
+from gomate.modules.retrieval.embedding import OpenAIEmbeddingModel
+from gomate.modules.retrieval.embedding import TextEmbedding
 
 
 class FaissRetrieverConfig:
@@ -22,7 +21,6 @@ class FaissRetrieverConfig:
             vectorstore_path=None,
             rebuild_index=True
     ):
-
         if embedding_model is not None and not isinstance(
                 embedding_model, Embeddings
         ):
@@ -37,20 +35,19 @@ class FaissRetrieverConfig:
         self.rebuild_index = rebuild_index
 
     def log_config(self):
-        config_summary = """
-		FaissRetrieverConfig:
-			Embedding Model: {embedding_model}
-			Top K: {top_k}
-			Embedding Model String: {embedding_model_string}
-			Index Path: {vectorstore_path}
-			Rebuild Index Path: {rebuild_index}
-		""".format(
+        config_summary = ("""
+            FaissRetrieverConfig:
+                Embedding Model: {embedding_model}
+                Top K: {top_k}
+                Embedding Model String: {embedding_model_string}
+                Index Path: {vectorstore_path}
+                Rebuild Index Path: {rebuild_index}""".format(
             embedding_model=self.embedding_model,
             top_k=self.top_k,
             embedding_model_string=self.embedding_model_string,
             vectorstore_path=self.vectorstore_path,
             rebuild_index=self.rebuild_index
-        )
+        ))
         return config_summary
 
 
@@ -108,10 +105,10 @@ class FaissRetriever(BaseRetriever):
         # for document in tqdm(documents, desc="build_from_documents"):
         #     self.vector_store.add_documents([document])
         #     del document
-                # if self.vector_store:
-                #     self.vector_store.add_documents([document])
-                # else:
-                #     self.vector_store = FAISS.from_documents([document], self.embedding_model)
+        # if self.vector_store:
+        #     self.vector_store.add_documents([document])
+        # else:
+        #     self.vector_store = FAISS.from_documents([document], self.embedding_model)
 
         self.vector_store.save_local(self.vectorstore_path)
 

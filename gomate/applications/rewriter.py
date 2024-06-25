@@ -1,4 +1,4 @@
-from gomate.modules import HyDE_rewriter
+from gomate.modules.rewriter.hyde_rewriter import HydeRewriter
 
 
 class RewriterApp():
