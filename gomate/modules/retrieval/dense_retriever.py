@@ -115,7 +115,7 @@ class DenseRetriever(BaseRetriever):
         if index_dir is None:
             index_dir = self.index_dir
         data = np.load(os.path.join(index_dir, 'document.vecstore.npz'), allow_pickle=True)
-        self.documents, self.embeddings = data['documents'], data['embeddings']
+        self.documents, self.embeddings = data['documents'].tolist(), data['embeddings'].tolist()
         self.index = faiss.read_index(os.path.join(index_dir, 'fassis.index'))
         print("Index loaded successfully from", index_dir)
         del data

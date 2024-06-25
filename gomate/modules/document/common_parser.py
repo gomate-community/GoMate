@@ -15,7 +15,8 @@ from gomate.modules.document.txt_parser import TextParser
 class CommonParser():
     def __init__(self):
         self.tc = TextChunker()
-    def parser(self, file_path):
+
+    def parse(self, file_path):
         # 读取文件内容
         filename = file_path
         with open(file_path, 'rb') as f:
@@ -24,7 +25,7 @@ class CommonParser():
         # 检测文件类型
         mime = magic.Magic(mime=True)
         file_type = mime.from_buffer(content)
-        loguru.logger.info(filename,file_type, mime)
+        loguru.logger.info(filename, file_type, mime)
         if re.search(r"\.docx$", filename, re.IGNORECASE):
             parser = DocxParser()
         elif re.search(r"\.pdf$", filename, re.IGNORECASE):

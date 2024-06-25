@@ -18,8 +18,8 @@ from gomate.modules.retrieval.dense_retriever import DenseRetrieverConfig
 
 # 修改成自己的配置！！！
 app_config = ApplicationConfig()
-app_config.docs_path="./docs/"
-app_config.llm_model_path="/data/users/searchgpt/pretrained_models/chatglm3-6b/"
+app_config.docs_path = "./docs/"
+app_config.llm_model_path = "/data/users/searchgpt/pretrained_models/chatglm3-6b/"
 
 retriever_config = DenseRetrieverConfig(
     model_name_or_path="/data/users/searchgpt/pretrained_models/bge-large-zh-v1.5",
@@ -44,6 +44,8 @@ def get_file_list():
 
 file_list = get_file_list()
 
+def info_fn(filename):
+    gr.Info(f"upload file:{filename} success!")
 
 def upload_file(file):
     cache_base_dir = app_config.docs_path
@@ -54,8 +56,8 @@ def upload_file(file):
     # file_list首位插入新上传的文件
     file_list.insert(0, filename)
     application.add_document(app_config.docs_path + filename)
-    return gr.Dropdown.update(choices=file_list, value=filename)
-
+    info_fn(filename)
+    return gr.Dropdown(choices=file_list, value=filename,interactive=True)
 
 def set_knowledge(kg_name, history):
     try:
@@ -128,10 +130,10 @@ with gr.Blocks(theme="soft") as demo:
 
             large_language_model = gr.Dropdown(
                 [
-                    "ChatGLM-6B-int4",
+                    "ChatGLM3-6B",
                 ],
                 label="large language model",
-                value="ChatGLM-6B-int4")
+                value="ChatGLM3-6B")
 
             top_k = gr.Slider(1,
                               20,
@@ -164,7 +166,12 @@ with gr.Blocks(theme="soft") as demo:
                            visible=True,
                            file_types=['.txt', '.md', '.docx', '.pdf']
                            )
-
+            # uploaded_files = gr.Dropdown(
+            #     file_list,
+            #     label="已上传的文件列表",
+            #     value=file_list[0] if len(file_list) > 0 else '',
+            #     interactive=True
+            # )
         with gr.Column(scale=4):
             with gr.Row():
                 chatbot = gr.Chatbot(label='Gomate Application').style(height=400)

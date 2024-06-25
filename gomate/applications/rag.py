@@ -11,14 +11,15 @@ import os
 
 from gomate.modules.document.common_parser import CommonParser
 from gomate.modules.generator.llm import GLMChat
-from gomate.modules.reranker.bge_reranker import BgeRerankerConfig,BgeReranker
-from gomate.modules.retrieval.dense_retriever import DenseRetrieverConfig,DenseRetriever
+from gomate.modules.reranker.bge_reranker import BgeReranker
+from gomate.modules.retrieval.dense_retriever import DenseRetriever
 
 
 class ApplicationConfig():
     def __init__(self):
-        self.retriever_config=None
-        self.rerank_config=None
+        self.retriever_config = None
+        self.rerank_config = None
+
 
 class RagApplication():
     def __init__(self, config):
@@ -36,17 +37,19 @@ class RagApplication():
         chunks = []
         for filename in os.listdir(self.config.docs_path):
             file_path = os.path.join(self.config.docs_path, filename)
-            chunks.extend(self.parser.parser(file_path))
+            chunks.extend(self.parser.parse(file_path))
         self.retriever.build_from_texts(chunks)
         print("init_vector_store done! ")
         self.retriever.save_index(self.config.retriever_config.index_dir)
+
     def load_vector_store(self):
         self.retriever.load_index(self.config.retriever_config.index_dir)
 
     def add_document(self, file_path):
-        chunks = self.parser.parser(file_path)
+        chunks = self.parser.parse(file_path)
         for chunk in chunks:
             self.retriever.add_text(chunk)
+        print("add_document done!")
 
     def chat(self, question: str = '', top_k: int = 5):
         contents = self.retriever.retrieve(query=question, top_k=top_k)

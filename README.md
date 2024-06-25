@@ -33,31 +33,54 @@ pip install -r requirements.txt
 ```
 ### 1 文档解析
 
-```python
-from gomate.modules.document.parset import TextParser
-from gomate.modules.store import VectorStore
-
-docs = TextParser('./data/docs').get_content(max_token_len=600, cover_content=150)
-vector = VectorStore(docs)
-```
-
-### 2 提取向量
+目前支持解析的文件类型包括：`text`,`docx`,`ppt`,`excel`,`html`,`pdf`,`md`
 
 ```python
-from gomate.modules.retrieval.embedding import BgeEmbedding
-embedding = BgeEmbedding("BAAI/bge-large-zh-v1.5")  # 创建EmbeddingModel
-vector.get_vector(EmbeddingModel=embedding)
-vector.persist(path='storage')  # 将向量和文档内容保存到storage目录下，下次再用就可以直接加载本地的数据库
-vector.load_vector(path='storage')  # 加载本地的数据库
+from gomate.modules.document.common_parser import CommonParser
+
+parser = CommonParser()
+document_path = 'docs/夏至各地习俗.docx'
+chunks = parser.parse(document_path)
+print(chunks)
 ```
+
+### 2 构建检索器
+
+```python
+import pandas as pd
+from tqdm import tqdm
+
+from gomate.modules.retrieval.dense_retriever import DenseRetriever, DenseRetrieverConfig
+
+retriever_config = DenseRetrieverConfig(
+    model_name_or_path="bge-large-zh-v1.5",
+    dim=1024,
+    index_dir='dense_cache'
+)
+config_info = retriever_config.log_config()
+print(config_info)
+
+retriever = DenseRetriever(config=retriever_config)
+
+data = pd.read_json('docs/zh_refine.json', lines=True)[:5]
+print(data)
+print(data.columns)
+
+retriever.build_from_texts(documents)
+```
+
+
+保存索引
+```python
+retriever.save_index()
+```
+
 
 ### 3 检索文档
 
 ```python
-question = '伊朗坠机事故原因是什么？'
-contents = vector.query(question, EmbeddingModel=embedding, k=1)
-content = '\n'.join(contents[:5])
-print(contents)
+result = retriever.retrieve("RCEP具体包括哪些国家")
+print(result)
 ```
 
 ### 4 大模型问答
@@ -70,13 +93,12 @@ print(chat.chat(question, [], content))
 ### 5 添加文档
 
 ```python
-docs = TextParser.get_content_by_file(file='data/docs/伊朗问题.txt', max_token_len=600, cover_content=150)
-vector.add_documents('storage', docs, embedding)
-question = '如今伊朗人的经济生活状况如何？'
-contents = vector.query(question, EmbeddingModel=embedding, k=1)
-content = '\n'.join(contents[:5])
-print(contents)
-print(chat.chat(question, [], content))
+for documents in tqdm(data['positive'], total=len(data)):
+    for document in documents:
+        retriever.add_text(document)
+for documents in tqdm(data['negative'], total=len(data)):
+    for document in documents:
+        retriever.add_text(document)
 ```
 
 ## 🔧定制化RAG
@@ -84,10 +106,13 @@ print(chat.chat(question, [], content))
 > 构建自定义的RAG应用
 
 ```python
-from gomate.modules.document.reader import ReadFiles
+import os
+
+from gomate.modules.document.common_parser import CommonParser
 from gomate.modules.generator.llm import GLMChat
-from gomate.modules.retrieval.embedding import BgeEmbedding
-from gomate.modules.store import VectorStore
+from gomate.modules.reranker.bge_reranker import BgeReranker
+from gomate.modules.retrieval.dense_retriever import DenseRetriever
+
 
 
 class RagApplication():
@@ -113,12 +138,24 @@ class RagApplication():
 ### 🌐体验RAG效果
 可以配置本地模型路径
 ```text
-class ApplicationConfig:
-    llm_model_name = '/data/users/searchgpt/pretrained_models/chatglm3-6b'  # 本地模型文件 or huggingface远程仓库
-    embedding_model_name = '/data/users/searchgpt/pretrained_models/bge-reranker-large'  # 检索模型文件 or huggingface远程仓库
-    vector_store_path = './storage'
-    docs_path = './data/docs'
+# 修改成自己的配置！！！
+app_config = ApplicationConfig()
+app_config.docs_path = "./docs/"
+app_config.llm_model_path = "/data/users/searchgpt/pretrained_models/chatglm3-6b/"
 
+retriever_config = DenseRetrieverConfig(
+    model_name_or_path="/data/users/searchgpt/pretrained_models/bge-large-zh-v1.5",
+    dim=1024,
+    index_dir='/data/users/searchgpt/yq/GoMate/examples/retrievers/dense_cache'
+)
+rerank_config = BgeRerankerConfig(
+    model_name_or_path="/data/users/searchgpt/pretrained_models/bge-reranker-large"
+)
+
+app_config.retriever_config = retriever_config
+app_config.rerank_config = rerank_config
+application = RagApplication(app_config)
+application.init_vector_store()
 ```
 
 ```shell
@@ -127,7 +164,9 @@ python app.py
 浏览器访问：[127.0.0.1:7860](127.0.0.1:7860)
 ![demo.png](resources%2Fdemo.png)
 
+app后台日志：
 
+![app_logging.png](resources%2Fapp_logging.png)
 ## ⭐️ Star History
 
 [![Star History Chart](https://api.star-history.com/svg?repos=gomate-community/GoMate&type=Date)](https://star-history.com/#gomate-community/GoMate&Date)
