@@ -8,6 +8,8 @@
 @time: 2024/6/1 15:48
 """
 import os
+
+from gomate.modules.document.common_parser import CommonParser
 from gomate.modules.retrieval.bm25_retriever import BM25RetrieverConfig, BM25Retriever, tokenizer
 
 if __name__ == '__main__':
@@ -26,15 +28,17 @@ if __name__ == '__main__':
     root_dir = os.path.abspath(os.path.dirname(__file__))
     print(root_dir)
     new_files = [
-        r'H:\Projects\GoMate\data\伊朗.txt',
-        r'H:\Projects\GoMate\data\伊朗总统罹难事件.txt',
-        r'H:\Projects\GoMate\data\伊朗总统莱希及多位高级官员遇难的直升机事故.txt',
-        r'H:\Projects\GoMate\data\伊朗问题.txt',
+        r'/data/users/searchgpt/yq/GoMate_dev/data/docs/伊朗.txt',
+        r'/data/users/searchgpt/yq/GoMate_dev/data/docs/伊朗总统罹难事件.txt',
+        r'/data/users/searchgpt/yq/GoMate_dev/data/docs/伊朗总统莱希及多位高级官员遇难的直升机事故.txt',
+        r'/data/users/searchgpt/yq/GoMate_dev/data/docs/伊朗问题.txt',
+        r'/data/users/searchgpt/yq/GoMate_dev/data/docs/新冠肺炎疫情.pdf',
     ]
+    parser = CommonParser()
     for filename in new_files:
-        with open(filename, 'r', encoding="utf-8") as file:
-            corpus.append(file.read())
+        chunks = parser.parse(filename)
+        corpus.extend(chunks)
     bm25_retriever.build_from_texts(corpus)
-    query = "伊朗总统莱希"
+    query = "新冠肺炎疫情"
     search_docs = bm25_retriever.retrieve(query)
     print(search_docs)
