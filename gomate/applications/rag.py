@@ -13,7 +13,7 @@ from gomate.modules.document.common_parser import CommonParser
 from gomate.modules.generator.llm import GLMChat
 from gomate.modules.reranker.bge_reranker import BgeReranker
 from gomate.modules.retrieval.dense_retriever import DenseRetriever
-
+from gomate.modules.citation.match_citation import MatchCitation
 
 class ApplicationConfig():
     def __init__(self):
@@ -28,7 +28,7 @@ class RagApplication():
         self.retriever = DenseRetriever(self.config.retriever_config)
         self.reranker = BgeReranker(self.config.rerank_config)
         self.llm = GLMChat(self.config.llm_model_path)
-
+        self.mc=MatchCitation()
     def init_vector_store(self):
         """
 
@@ -57,4 +57,10 @@ class RagApplication():
         content = '\n'.join([content['text'] for content in contents])
         print(contents)
         response, history = self.llm.chat(question, [], content)
-        return response, history, contents
+        result = self.mc.ground_response(
+            response=response,
+            evidences=[content['text'] for content in contents],
+            selected_idx=[idx for idx in range(len(contents))],
+            markdown=True
+        )
+        return result, history, contents

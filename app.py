@@ -19,7 +19,7 @@ from gomate.modules.retrieval.dense_retriever import DenseRetrieverConfig
 # 修改成自己的配置！！！
 app_config = ApplicationConfig()
 app_config.docs_path = "./docs/"
-app_config.llm_model_path = "/data/users/searchgpt/pretrained_models/chatglm3-6b/"
+app_config.llm_model_path = "/data/users/searchgpt/pretrained_models/glm-4-9b-chat"
 
 retriever_config = DenseRetrieverConfig(
     model_name_or_path="/data/users/searchgpt/pretrained_models/bge-large-zh-v1.5",
@@ -174,7 +174,7 @@ with gr.Blocks(theme="soft") as demo:
             # )
         with gr.Column(scale=4):
             with gr.Row():
-                chatbot = gr.Chatbot(label='Gomate Application').style(height=400)
+                chatbot = gr.Chatbot(label='Gomate Application').style(height=650)
             with gr.Row():
                 message = gr.Textbox(label='请输入问题')
             with gr.Row():
