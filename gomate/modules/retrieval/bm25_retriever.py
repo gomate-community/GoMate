@@ -264,7 +264,8 @@ class BM25Retriever(BaseRetriever):
             raise ValueError('Algorithm not supported')
 
     def retrieve(self, query: str='',top_k:int=3) -> List[Dict]:
-        tokenized_query = " ".join(self.tokenizer(query))
+        # tokenized_query = " ".join(self.tokenizer(query))
+        tokenized_query= self.tokenizer(query)
         search_docs = self.bm25.get_top_n(tokenized_query, self.corpus, n=top_k)
         return search_docs
 
