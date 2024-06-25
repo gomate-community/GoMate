@@ -52,7 +52,7 @@ class PdfParserUsingPyMuPDF():
                 final_tables.append(tab)
 
             text = page.get_text()
-            print(text)
+            # print(text)
             # clean up text for any problematic characters
             text = re.sub("\n", " ", text).strip()
             # text = text.encode("ascii", errors="ignore").decode("ascii")

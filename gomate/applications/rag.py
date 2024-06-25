@@ -7,34 +7,50 @@
 @time: 2024/05/20
 @contact: yanqiangmiffy@gamil.com
 """
-from gomate.modules.document.reader import ReadFiles
+import os
+
+from gomate.modules.document.common_parser import CommonParser
 from gomate.modules.generator.llm import GLMChat
-from gomate.modules.retrieval.embedding import BgeEmbedding
-from gomate.modules.store import VectorStore
+from gomate.modules.reranker.bge_reranker import BgeRerankerConfig,BgeReranker
+from gomate.modules.retrieval.dense_retriever import DenseRetrieverConfig,DenseRetriever
+
+
+class ApplicationConfig():
+    def __init__(self):
+        self.retriever_config=None
+        self.rerank_config=None
 
 class RagApplication():
     def __init__(self, config):
-        self.config=config
-        self.vector_store = VectorStore([])
-        self.llm = GLMChat(config.llm_model_name)
-        self.reader = ReadFiles(config.docs_path)
-        self.embedding_model = BgeEmbedding(config.embedding_model_name)
+        self.config = config
+        self.parser = CommonParser()
+        self.retriever = DenseRetriever(self.config.retriever_config)
+        self.reranker = BgeReranker(self.config.rerank_config)
+        self.llm = GLMChat(self.config.llm_model_path)
+
     def init_vector_store(self):
-        docs=self.reader.get_content(max_token_len=600, cover_content=150)
-        self.vector_store.document=docs
-        self.vector_store.get_vector(EmbeddingModel=self.embedding_model)
-        self.vector_store.persist(path='storage')  # 将向量和文档内容保存到storage目录下，下次再用就可以直接加载本地的数据库
-        self.vector_store.load_vector(path='storage')  # 加
+        """
+
+        """
+        print("init_vector_store ... ")
+        chunks = []
+        for filename in os.listdir(self.config.docs_path):
+            file_path = os.path.join(self.config.docs_path, filename)
+            chunks.extend(self.parser.parser(file_path))
+        self.retriever.build_from_texts(chunks)
+        print("init_vector_store done! ")
+        self.retriever.save_index(self.config.retriever_config.index_dir)
     def load_vector_store(self):
-        self.vector_store.load_vector(path=self.config.vector_store_path)  # 加载本地的数据库
+        self.retriever.load_index(self.config.retriever_config.index_dir)
 
     def add_document(self, file_path):
-        docs = self.reader.get_content_by_file(file=file_path, max_token_len=512, cover_content=60)
-        self.vector_store.add_documents(self.config.vector_store_path, docs, self.embedding_model)
+        chunks = self.parser.parser(file_path)
+        for chunk in chunks:
+            self.retriever.add_text(chunk)
 
-    def chat(self, question: str = '', topk: int = 5):
-        contents = self.vector_store.query(question, EmbeddingModel=self.embedding_model, k=topk)
-        content = '\n'.join(contents[:5])
+    def chat(self, question: str = '', top_k: int = 5):
+        contents = self.retriever.retrieve(query=question, top_k=top_k)
+        content = '\n'.join([content['text'] for content in contents])
         print(contents)
         response, history = self.llm.chat(question, [], content)
-        return response, history,contents
+        return response, history, contents

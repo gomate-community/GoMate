@@ -9,41 +9,51 @@
 """
 import os
 import shutil
-import gradio as gr
-from gomate.applications.rag import RagApplication
 
+import gradio as gr
+
+from gomate.applications.rag import RagApplication, ApplicationConfig
+from gomate.modules.reranker.bge_reranker import BgeRerankerConfig
+from gomate.modules.retrieval.dense_retriever import DenseRetrieverConfig
 
 # 修改成自己的配置！！！
-class ApplicationConfig:
-    llm_model_name = '/data/users/searchgpt/pretrained_models/chatglm3-6b'  # 本地模型文件 or huggingface远程仓库
-    embedding_model_name = '/data/users/searchgpt/pretrained_models/bge-reranker-large'  # 检索模型文件 or huggingface远程仓库
-    vector_store_path = './storage'
-    docs_path = './data/docs'
+app_config = ApplicationConfig()
+app_config.docs_path="./docs/"
+app_config.llm_model_path="/data/users/searchgpt/pretrained_models/chatglm3-6b/"
 
+retriever_config = DenseRetrieverConfig(
+    model_name_or_path="/data/users/searchgpt/pretrained_models/bge-large-zh-v1.5",
+    dim=1024,
+    index_dir='/data/users/searchgpt/yq/GoMate/examples/retrievers/dense_cache'
+)
+rerank_config = BgeRerankerConfig(
+    model_name_or_path="/data/users/searchgpt/pretrained_models/bge-reranker-large"
+)
 
-config = ApplicationConfig()
-application = RagApplication(config)
+app_config.retriever_config = retriever_config
+app_config.rerank_config = rerank_config
+application = RagApplication(app_config)
 application.init_vector_store()
 
 
 def get_file_list():
-    if not os.path.exists("./docs"):
+    if not os.path.exists(app_config.docs_path):
         return []
-    return [f for f in os.listdir("./docs")]
+    return [f for f in os.listdir(app_config.docs_path)]
 
 
 file_list = get_file_list()
 
 
 def upload_file(file):
-    cache_base_dir = './docs/'
+    cache_base_dir = app_config.docs_path
     if not os.path.exists(cache_base_dir):
         os.mkdir(cache_base_dir)
     filename = os.path.basename(file.name)
     shutil.move(file.name, cache_base_dir + filename)
     # file_list首位插入新上传的文件
     file_list.insert(0, filename)
-    application.add_document("./docs/" + filename)
+    application.add_document(app_config.docs_path + filename)
     return gr.Dropdown.update(choices=file_list, value=filename)
 
 
@@ -74,7 +84,7 @@ def predict(input,
         history = []
 
     if use_web == '使用':
-        web_content = application.source_service.search_web(query=input)
+        web_content = application.retriever.search_web(query=input)
     else:
         web_content = ''
     search_text = ''
@@ -85,9 +95,9 @@ def predict(input,
         return '', history, history, search_text
 
     else:
-        response, _,contents = application.chat(
+        response, _, contents = application.chat(
             question=input,
-            topk=top_k,
+            top_k=top_k,
         )
         history.append((input, response))
         for idx, source in enumerate(contents[:5]):
