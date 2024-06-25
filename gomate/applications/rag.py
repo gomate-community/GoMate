@@ -53,6 +53,7 @@ class RagApplication():
 
     def chat(self, question: str = '', top_k: int = 5):
         contents = self.retriever.retrieve(query=question, top_k=top_k)
+        contents=self.reranker.rerank(query=question,documents=[content['text'] for content in contents])
         content = '\n'.join([content['text'] for content in contents])
         print(contents)
         response, history = self.llm.chat(question, [], content)
