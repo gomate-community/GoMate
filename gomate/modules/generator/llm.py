@@ -10,12 +10,11 @@
 @description: coding..
 """
 import os
-from typing import Dict, List, Optional, Tuple, Union, Any
+from typing import Dict, List, Any
+
 import torch
-from transformers import AutoTokenizer, AutoModelForCausalLM
-import torch
-from transformers import AutoTokenizer, AutoModelForCausalLM
 from openai import OpenAI
+from transformers import AutoTokenizer, AutoModelForCausalLM
 
 PROMPT_TEMPLATE = dict(
     RAG_PROMPT_TEMPALTE="""使用以上下文来回答用户的问题。如果你不知道答案，就说你不知道。总是使用中文回答。
@@ -92,18 +91,22 @@ class InternLMChat(BaseModel):
         return response
 
     def load_model(self):
-
         self.tokenizer = AutoTokenizer.from_pretrained(self.path, trust_remote_code=True)
         self.model = AutoModelForCausalLM.from_pretrained(self.path, torch_dtype=torch.float16,
                                                           trust_remote_code=True).cuda()
+
+
 class GLMChat(BaseModel):
     def __init__(self, path: str = '') -> None:
         super().__init__(path)
         self.load_model()
 
-    def chat(self, prompt: str, history: List = [], content: str = '') -> tuple[Any, Any]:
-        prompt = PROMPT_TEMPLATE['GLM_PROMPT_TEMPALTE'].format(question=prompt, context=content)
-        response, history = self.model.chat(self.tokenizer, prompt, history)
+    def chat(self, prompt: str, history: List = [], content: str = '', llm_only: bool = False) -> tuple[Any, Any]:
+        if llm_only:
+            prompt = prompt
+        else:
+            prompt = PROMPT_TEMPLATE['GLM_PROMPT_TEMPALTE'].format(question=prompt, context=content)
+        response, history = self.model.chat(self.tokenizer, prompt, history,max_length= 32000, num_beams=1, do_sample=True, top_p=0.8, temperature=0.2,)
         return response, history
 
     def load_model(self):
@@ -111,6 +114,7 @@ class GLMChat(BaseModel):
         self.tokenizer = AutoTokenizer.from_pretrained(self.path, trust_remote_code=True)
         self.model = AutoModelForCausalLM.from_pretrained(self.path, torch_dtype=torch.float16,
                                                           trust_remote_code=True).cuda()
+
 
 class DashscopeChat(BaseModel):
     def __init__(self, path: str = '', model: str = "qwen-turbo") -> None:
