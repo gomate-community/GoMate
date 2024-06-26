@@ -1,41 +1,13 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
+import os
 
-"""
-@author: yanqiangmiffy
-@contact:1185918903@qq.com
-@license: Apache Licence
-@time: 2024/5/31 1:23
-@reference:https://github.com/texttron/hyde/blob/main/src/hyde/generator.py
-"""
 import pandas as pd
 from tqdm import tqdm
-import os
+
+from gomate.modules.document.common_parser import CommonParser
 from gomate.modules.generator.llm import GLMChat
 from gomate.modules.retrieval.dense_retriever import DenseRetriever, DenseRetrieverConfig
-from gomate.modules.rewriter.base import BaseRewriter
+from gomate.modules.rewriter.hyde_rewriter import HydeRewriter
 from gomate.modules.rewriter.promptor import Promptor
-from gomate.modules.document.common_parser import CommonParser
-
-class HydeRewriter(BaseRewriter):
-    def __init__(self, promptor, generator, retriever):
-        self.promptor = promptor
-        self.generator = generator
-        self.retriever = retriever
-
-    def prompt(self, query):
-        return self.promptor.build_prompt(query)
-
-    def rewrite(self, query):
-        prompt = self.promptor.build_prompt(query)
-        hypothesis_document, _ = self.generator.chat(prompt, llm_only=True)
-        return hypothesis_document
-
-    def retrieve(self, query, top_k=5):
-        hypothesis_document = self.rewrite(query)
-        hits = self.retriever.retrieve(hypothesis_document, top_k=top_k)
-        return {'hypothesis_document': hypothesis_document, 'retrieve_result': hits}
-
 
 if __name__ == '__main__':
     promptor = Promptor(task="WEB_SEARCH", language="zh")
@@ -49,9 +21,8 @@ if __name__ == '__main__':
     retriever = DenseRetriever(config=retriever_config)
     parser = CommonParser()
 
-
     chunks = []
-    docs_path='/data/users/searchgpt/yq/GoMate_dev/data/docs'
+    docs_path = '/data/users/searchgpt/yq/GoMate_dev/data/docs'
     for filename in os.listdir(docs_path):
         file_path = os.path.join(docs_path, filename)
         try:
@@ -90,7 +61,7 @@ if __name__ == '__main__':
     print("==================dense_answer=================\n")
     print(dense_answer)
 
-    print("****"*20)
+    print("****" * 20)
 
     hypothesis_document = hyde.rewrite("数据集类型有哪些？")
     print("==================hypothesis_document=================\n")
@@ -110,8 +81,7 @@ if __name__ == '__main__':
     print("==================dense_answer=================\n")
     print(dense_answer)
 
-    print("****"*20)
-
+    print("****" * 20)
 
     hypothesis_document = hyde.rewrite("Sklearn可以使用的数据集有哪些？")
     print("==================hypothesis_document=================\n")

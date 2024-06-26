@@ -18,7 +18,7 @@ from gomate.modules.retrieval.dense_retriever import DenseRetrieverConfig
 
 # 修改成自己的配置！！！
 app_config = ApplicationConfig()
-app_config.docs_path = "./docs/"
+app_config.docs_path = "/data/users/searchgpt/yq/GoMate_dev/data/docs/"
 app_config.llm_model_path = "/data/users/searchgpt/pretrained_models/glm-4-9b-chat"
 
 retriever_config = DenseRetrieverConfig(
@@ -155,7 +155,7 @@ with gr.Blocks(theme="soft") as demo:
                 value='知识库问答',
                 interactive=False)
 
-            kg_name = gr.Radio(["伊朗新闻"],
+            kg_name = gr.Radio(["文档知识库"],
                                label="知识库",
                                value=None,
                                info="使用知识库问答，请加载知识库",

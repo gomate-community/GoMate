@@ -9,11 +9,12 @@
 """
 import os
 
+from gomate.modules.citation.match_citation import MatchCitation
 from gomate.modules.document.common_parser import CommonParser
 from gomate.modules.generator.llm import GLMChat
 from gomate.modules.reranker.bge_reranker import BgeReranker
 from gomate.modules.retrieval.dense_retriever import DenseRetriever
-from gomate.modules.citation.match_citation import MatchCitation
+
 
 class ApplicationConfig():
     def __init__(self):
@@ -28,7 +29,8 @@ class RagApplication():
         self.retriever = DenseRetriever(self.config.retriever_config)
         self.reranker = BgeReranker(self.config.rerank_config)
         self.llm = GLMChat(self.config.llm_model_path)
-        self.mc=MatchCitation()
+        self.mc = MatchCitation()
+
     def init_vector_store(self):
         """
 
@@ -37,7 +39,10 @@ class RagApplication():
         chunks = []
         for filename in os.listdir(self.config.docs_path):
             file_path = os.path.join(self.config.docs_path, filename)
-            chunks.extend(self.parser.parse(file_path))
+            try:
+                chunks.extend(self.parser.parse(file_path))
+            except:
+                pass
         self.retriever.build_from_texts(chunks)
         print("init_vector_store done! ")
         self.retriever.save_index(self.config.retriever_config.index_dir)
@@ -53,7 +58,7 @@ class RagApplication():
 
     def chat(self, question: str = '', top_k: int = 5):
         contents = self.retriever.retrieve(query=question, top_k=top_k)
-        contents=self.reranker.rerank(query=question,documents=[content['text'] for content in contents])
+        contents = self.reranker.rerank(query=question, documents=[content['text'] for content in contents])
         content = '\n'.join([content['text'] for content in contents])
         print(contents)
         response, history = self.llm.chat(question, [], content)
