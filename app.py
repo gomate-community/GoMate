@@ -11,6 +11,7 @@ import os
 import shutil
 
 import gradio as gr
+import loguru
 
 from gomate.applications.rag import RagApplication, ApplicationConfig
 from gomate.modules.reranker.bge_reranker import BgeRerankerConfig
@@ -105,9 +106,11 @@ def predict(input,
         for idx, source in enumerate(contents[:5]):
             sep = f'----------【搜索结果{idx + 1}：】---------------\n'
             search_text += f'{sep}\n{source}\n\n'
-        print(search_text)
+        # print(search_text)
         search_text += "----------【网络检索内容】-----------\n"
         search_text += web_content
+        print("--------------------【模型回答】----------------\n")
+        print(response)
         return '', history, history, search_text
 
 
