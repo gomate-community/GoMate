@@ -1,7 +1,6 @@
 import re
 
 import loguru
-import magic
 
 from gomate.modules.document.chunk import TextChunker
 from gomate.modules.document.docx_parser import DocxParser
@@ -23,9 +22,10 @@ class CommonParser():
             content = f.read()
         # bytes_io = BytesIO(content)
         # 检测文件类型
-        mime = magic.Magic(mime=True)
-        file_type = mime.from_buffer(content)
-        loguru.logger.info(filename, file_type, mime)
+        # mime = magic.Magic(mime=True)
+        # file_type = mime.from_buffer(content)
+        # loguru.logger.info(filename, file_type, mime)
+        loguru.logger.info(filename)
         if re.search(r"\.docx$", filename, re.IGNORECASE):
             parser = DocxParser()
         elif re.search(r"\.pdf$", filename, re.IGNORECASE):
