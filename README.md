@@ -174,5 +174,7 @@ app后台日志：
 
 [![Star History Chart](https://api.star-history.com/svg?repos=gomate-community/GoMate&type=Date)](https://star-history.com/#gomate-community/GoMate&Date)
 
-## 技术咨询
-WeChat:1185918903
+## 研究与开发团队
+本项目由网络数据科学与技术重点实验室[`GoMate`](https://github.com/gomate-community)团队完成，团队指导老师为郭嘉丰、范意兴研究员。
+
+GoMate技术交流群可添加：1185918903（微信）
