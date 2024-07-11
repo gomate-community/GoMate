@@ -19,6 +19,7 @@ sys.path.append('/data/users/searchgpt/yq/GoMate')
 from apps.app import create_app
 from apps.config.app_config import AppConfig
 from apps.core.rerank.views import rerank_router
+from apps.core.judge.views import bge_judger
 from apps.core.parser.views import parse_router
 from apps.core.citation.views import citation_router
 from apps.core.refiner.views import refiner_router
