@@ -2,7 +2,7 @@ import os
 
 os.environ["TOKENIZERS_PARALLELISM"] = "false"
 from typing import List, Any
-
+from scipy.special import expit
 import torch
 from transformers import AutoTokenizer, AutoModelForSequenceClassification
 
@@ -12,7 +12,7 @@ from gomate.modules.judger.base import BaseJudger
 class BgeJudgerConfig:
     """
     Configuration class for setting up a BERT-based judger.
-
+    https://github.com/FlagOpen/FlagEmbedding/blob/master/FlagEmbedding/flag_reranker.py
     Attributes:
         model_name_or_path (str): Path or model identifier for the pretrained model from Hugging Face's model hub.
         device (str): Device to load the model onto ('cuda' or 'cpu').
@@ -59,14 +59,14 @@ class BgeJudger(BaseJudger):
             inputs = self.judge_tokenizer(pairs, padding=True, truncation=True, return_tensors='pt',
                                           max_length=512).to(self.device)
             scores = self.judge_model(**inputs, return_dict=True).logits.view(-1).float().cpu().tolist()
-
+            scores = [expit(score) for score in scores]
         # Pair documents with their scores, sort by scores in descending order
         # top_docs = [{'text': doc, 'score': score} for doc, score in zip(documents, scores)]
         judge_docs = [
             {
                 'text': doc,
                 'score': score,
-                'label': 1 if score >= 0 else 0
+                'label': 1 if score >= 0.5 else 0
             }
             for doc, score in zip(documents, scores)
         ]
