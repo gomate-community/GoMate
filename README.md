@@ -28,6 +28,7 @@ GoMate框架的设计核心在于其**高度的可配置性和模块化**，使�
 - 支持多种文件解析并且模块化目前支持解析的文件类型包括：`text`,`docx`,`ppt`,`excel`,`html`,`pdf`,`md`等
 - 优化了`DenseRetriever`，支持索引构建，增量追加以及索引保存，保存内容包括文档、向量以及索引
 - 添加`ReRank`的BGE排序、Rewriter的`HyDE`
+- 添加`Judge`的BgeJudge,判断文章是否有用 `20240711`
 ## 🚀快速上手
 
 ### 安装环境

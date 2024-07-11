@@ -22,12 +22,12 @@ citation_router = APIRouter()
 
 # Create
 @citation_router.post("/citation/", response_model=None, summary="答案引用")
-async def rerank(citation_body: CitationBody):
+async def citation(citation_body: CitationBody):
     response = citation_body.response
     evidences = citation_body.evidences
     selected_idx=citation_body.selected_idx
-    loguru.logger.info(response)
-    loguru.logger.info(evidences)
+    # loguru.logger.info(response)
+    # loguru.logger.info(evidences)
     citation_response = mc.ground_response(
         response=response,
         evidences=evidences,

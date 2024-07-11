@@ -25,8 +25,9 @@ compressor = LLMCompressApi()
 async def rerank(rerank_body: RerankBody):
     contexts = rerank_body.contexts
     query = rerank_body.query
-    loguru.logger.info(query)
-    loguru.logger.info(contexts)
+    # loguru.logger.info(query)
+    # loguru.logger.info(contexts)
     response = compressor.compress(query, contexts)
     data = {'compress_content': response['response']}
+    loguru.logger.info(data)
     return ApiResponse(data, message="重构文档成功")
