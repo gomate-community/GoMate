@@ -19,7 +19,7 @@ sys.path.append('/data/users/searchgpt/yq/GoMate')
 from apps.app import create_app
 from apps.config.app_config import AppConfig
 from apps.core.rerank.views import rerank_router
-from apps.core.judge.views import bge_judger
+from apps.core.judge.views import judge_router
 from apps.core.parser.views import parse_router
 from apps.core.citation.views import citation_router
 from apps.core.refiner.views import refiner_router
@@ -28,6 +28,7 @@ import uvicorn
 app_config = AppConfig()
 app = create_app()
 app.include_router(rerank_router, prefix="/gomate_tool", tags=["rerank"])
+app.include_router(judge_router, prefix="/gomate_tool", tags=["judger"])
 app.include_router(parse_router, prefix="/gomate_tool", tags=["parser"])
 app.include_router(citation_router, prefix="/gomate_tool", tags=["citation"])
 app.include_router(refiner_router, prefix="/gomate_tool", tags=["refiner"])
