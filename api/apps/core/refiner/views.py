@@ -12,7 +12,7 @@
 import loguru
 from fastapi import APIRouter
 
-from api.apps.core.rerank.bodys import RerankBody
+from api.apps.core.refiner.bodys import RefinerBody
 from api.apps.handle.response.json_response import ApiResponse
 from gomate.modules.refiner.compressor import LLMCompressApi
 
@@ -22,9 +22,9 @@ compressor = LLMCompressApi()
 
 # Create
 @refiner_router.post("/refiner/", response_model=None, summary="压缩文档")
-async def rerank(rerank_body: RerankBody):
-    contexts = rerank_body.contexts
-    query = rerank_body.query
+async def refiner(refiner_body: RefinerBody):
+    contexts = refiner_body.contexts
+    query = refiner_body.query
     # loguru.logger.info(query)
     # loguru.logger.info(contexts)
     response = compressor.compress(query, contexts)
