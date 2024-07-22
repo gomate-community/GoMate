@@ -23,7 +23,7 @@ from gomate.modules.document.html_parser import HtmlParser
 from gomate.modules.document.pdf_parser import PdfSimParser
 from gomate.modules.document.ppt_parser import PptParser
 from gomate.modules.document.txt_parser import TextParser
-
+from gomate.modules.document.json_parser import JsonParser
 tc = TextChunker()
 parse_router = APIRouter()
 
@@ -53,12 +53,14 @@ async def parser(file: UploadFile = File(...),chunk_size=512):
             parser = HtmlParser()
         elif re.search(r"\.doc$", filename, re.IGNORECASE):
             parser = DocxParser()
+        elif re.search(r"\.json$", filename, re.IGNORECASE):
+            parser = JsonParser()
         else:
             parser = DocxParser()
             raise NotImplementedError(
                 "file type not supported yet(pdf, xlsx, doc, docx, txt supported)")
         contents = parser.parse(content)
-        loguru.logger.info(contents)
+        loguru.logger.info(contents[0])
         contents = tc.chunk_sentences(contents, chunk_size=512)
         # 返回成功响应
         return JSONResponse(content=contents, status_code=200)
