@@ -45,3 +45,4 @@ PyMuPDF==1.24.5
 hanziconv==0.3.2
 PyPDF2==3.0.1
 gradio===3.50.2
+loguru==0.5.3
