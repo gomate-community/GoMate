@@ -1,3 +1,4 @@
+import difflib
 import re
 from abc import ABC
 from typing import List
@@ -144,7 +145,34 @@ class MatchCitation(ABC):
                     final_response.append({'type': 'default', 'texts': [line_break]})
         if markdown:
             final_response = ''.join(final_response)
+        final_response=self.insert_evidence(final_response,evidences)
         return final_response
+
+    def insert_evidence(self, response, evidences, threshold=0.11):
+        # 将response拆分成句子
+        sentences = response.split('。')
+        result = []
+
+        for sentence in sentences:
+            best_match = None
+            best_ratio = 0
+
+            for evidence in evidences:
+                # 使用difflib计算相似度
+                ratio = difflib.SequenceMatcher(None, sentence, evidence).ratio()
+                print(ratio)
+                if ratio > best_ratio:
+                    best_ratio = ratio
+                    best_match = evidence
+
+            # 如果最佳匹配超过阈值，插入原文
+            if best_ratio > threshold:
+                result.append(f"{sentence}。\n\n```\n{best_match}\n```\n\n")
+            else:
+                result.append(f"{sentence}。")
+
+        # 重新组合结果
+        return ''.join(result).strip()
 
     def concatenate_citations(self, result: list[dict] = None):
         """
@@ -192,3 +220,4 @@ if __name__ == '__main__':
     # ]
     # response=mc.concatenate_citations(result)
     # print(response)
+

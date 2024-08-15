@@ -21,7 +21,7 @@ class LLMCompressApi():
         """
         # self.api_url = ''
         # 根据自己api地址修改
-        self.api_url = 'http://127.0.0.1:8888'
+        self.api_url = 'http://10.208.63.29:8888'
 
     def compress(self, query, contexts):
         prompt = self.prompt_template.format(query=query, contexts=contexts)
