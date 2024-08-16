@@ -33,3 +33,7 @@ class CitationBody(BaseModel):
         [1,2],
         description="文档对应的索引"
     )
+    show_code:bool=Field(
+        default=True,
+        description="是否显示引用代码块"
+    )

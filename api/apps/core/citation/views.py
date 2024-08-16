@@ -25,14 +25,16 @@ citation_router = APIRouter()
 async def citation(citation_body: CitationBody):
     response = citation_body.response
     evidences = citation_body.evidences
-    selected_idx=citation_body.selected_idx
+    selected_idx = citation_body.selected_idx
+    show_code = citation_body.show_code
     # loguru.logger.info(response)
     # loguru.logger.info(evidences)
     citation_response = mc.ground_response(
         response=response,
         evidences=evidences,
         selected_idx=selected_idx,
-        markdown=True
+        markdown=True,
+        show_code=show_code
     )
     loguru.logger.info(citation_response)
     return ApiResponse(citation_response, message="答案引用成功")
