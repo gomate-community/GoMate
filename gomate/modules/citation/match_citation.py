@@ -24,12 +24,13 @@ class MatchCitation:
     ):
         sentences = self.cut(response)
         final_response = []
-        print(response)
-        print(evidences)
-        print(selected_idx)
+        print("\n==================response===================\n",response)
+        print("\n==================evidences===================\n",evidences)
+        print("\n==================selected_idx===================\n",selected_idx)
         selected_idx=[i-1 for i in selected_idx]
-        print(selected_idx)
-        print(len(evidences))
+        print("\n==================selected_idx===================\n", selected_idx)
+        print("\n==================len(evidences)===================\n", len(evidences))
+
         for sentence in sentences:
             if not sentence.strip():
                 continue
@@ -58,7 +59,7 @@ class MatchCitation:
             threshold = 0.7 if len(sentence) > 20 else 0.6
 
             if best_ratio > threshold:
-                final_response.append(f"{sentence}。[{best_idx}]")
+                final_response.append(f"{sentence}。[{best_idx+1}]")
                 if show_code:
                     final_response.append(f"\n```\n{best_match}。\n```\n")
             else:
