@@ -37,3 +37,7 @@ class CitationBody(BaseModel):
         default=True,
         description="是否显示引用代码块"
     )
+    selected_docs:List[dict]=Field(
+        default=[]
+
+    )

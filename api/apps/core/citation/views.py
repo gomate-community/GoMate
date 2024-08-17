@@ -27,6 +27,7 @@ async def citation(citation_body: CitationBody):
     evidences = citation_body.evidences
     selected_idx = citation_body.selected_idx
     show_code = citation_body.show_code
+    selected_docs=citation_body.selected_docs
     # loguru.logger.info(response)
     # loguru.logger.info(evidences)
     citation_response = mc.ground_response(
@@ -34,7 +35,8 @@ async def citation(citation_body: CitationBody):
         evidences=evidences,
         selected_idx=selected_idx,
         markdown=True,
-        show_code=show_code
+        show_code=show_code,
+        selected_docs=selected_docs
     )
     loguru.logger.info(citation_response)
     return ApiResponse(citation_response, message="答案引用成功")
