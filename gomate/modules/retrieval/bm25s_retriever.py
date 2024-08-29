@@ -28,14 +28,14 @@ class BM25RetrieverConfig:
 
     def log_config(self):
         config_summary = """
-    		FaissRetrieverConfig:
-    			Tokenizer: {tokenizer},
-    			K1: {k1},
-    			B: {b},
-    			Epsilon: {epsilon},
-    			Delta: {delta},
-    			Algorithm: {algorithm},
-    		""".format(
+            BM25RetrieverConfig:
+                Tokenizer: {tokenizer},
+                K1: {k1},
+                B: {b},
+                Epsilon: {epsilon},
+                Delta: {delta},
+                Algorithm: {algorithm},
+            """.format(
             tokenizer=self.tokenizer,
             k1=self.k1,
             b=self.b,
@@ -58,12 +58,17 @@ class BM25Retriever(BaseRetriever):
     def build_from_texts(self, corpus):
         self.corpus = corpus
         self.corpus_tokens = bm25s.tokenize(corpus, tokenizer=self.tokenizer)  # Tokenize the corpus
+        
         if self.algorithm == 'Okapi':
             self.bm25 = bm25s.BM25(corpus=self.corpus_tokens, method='BM25Okapi', k1=self.k1, b=self.b)
         elif self.algorithm == 'BM25L':
             self.bm25 = bm25s.BM25(corpus=self.corpus_tokens, method='BM25L', k1=self.k1, b=self.b, delta=self.delta)
         elif self.algorithm == 'BM25Plus':
             self.bm25 = bm25s.BM25(corpus=self.corpus_tokens, method='BM25Plus', k1=self.k1, b=self.b, delta=self.delta)
+        elif self.algorithm == 'ATIRE':
+            self.bm25 = bm25s.BM25(corpus=self.corpus_tokens, method='atire', k1=self.k1, b=self.b)
+        elif self.algorithm == 'Lucene':
+            self.bm25 = bm25s.BM25(corpus=self.corpus_tokens, method='lucene', k1=self.k1, b=self.b)
         else:
             raise ValueError('Algorithm not supported')
 
