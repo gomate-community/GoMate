@@ -16,23 +16,17 @@ class JsonParser(object):
         if not isinstance(fnm, str):
             encoding = find_codec(fnm)
             txt = fnm.decode(encoding, errors="ignore")
-            json_lines = txt.split('}\n')
-            # print("json_parser", json_lines[0] + '}')
         else:
             with open(fnm, "r", encoding=get_encoding(fnm)) as f:
                 txt = f.read()
-        json_lines = json.loads(txt)
-        # print(len(json_lines))
-        # print("json_parser", json_lines[0] + '}')
+        # print(txt)
+        data = json.loads(txt)
         sections = []
-        # for sec in txt.split("\n"):
-        #     sections.append(sec)
-        for line in json_lines:
-            try:
-                sections.append(line['title'] + line['content'])
-            except:
-                pass
-        print(len(sections),len(json_lines))
+        try:
+            sections.append(data['title'] +'\n'+data['content'])
+        except:
+            pass
+        # print(len(sections),len(json_lines))
         return sections
 
     def crop(self, ck, need_position):
@@ -45,5 +39,5 @@ class JsonParser(object):
 
 if __name__ == '__main__':
     jp = JsonParser()
-    data = jp.parse('/data/users/searchgpt/yq/GoMate_dev/data/docs/JSON格式/习语录1_list.json')
+    data = jp.parse(r'H:\Projects\GoMate\data\modified_demo.json')
     print(data[0])

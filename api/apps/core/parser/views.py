@@ -60,8 +60,9 @@ async def parser(file: UploadFile = File(...),chunk_size=512):
             raise NotImplementedError(
                 "file type not supported yet(pdf, xlsx, doc, docx, txt supported)")
         contents = parser.parse(content)
-        loguru.logger.info(contents[0])
+        # loguru.logger.info(contents[0])
         contents = tc.chunk_sentences(contents, chunk_size=512)
+        loguru.logger.info(len(contents))
         # 返回成功响应
         return JSONResponse(content=contents, status_code=200)
     except Exception as e:

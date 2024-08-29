@@ -7,19 +7,59 @@ class TextChunker:
     def __init__(self, ):
         self.tokenizer = rag_tokenizer
 
+    # def split_sentences(self, text):
+    #     # 使用正则表达式按中英文标点符号进行分句
+    #     sentence_endings = re.compile(r'([。！？])')
+    #     sentences = sentence_endings.split(text)
+    #
+    #     # 将标点符号和前面的句子合并
+    #     sentences = ["".join(i) for i in zip(sentences[0::2], sentences[1::2])] + sentences[2::2]
+    #     sentences=[sentence.strip() for sentence in sentences if sentence.strip()]
+    #     return sentences
+
     def split_sentences(self, text):
-        # 使用正则表达式按中英文标点符号进行分句
+        # 使用正则表达式按中文标点符号进行分句
         sentence_endings = re.compile(r'([。！？])')
         sentences = sentence_endings.split(text)
 
         # 将标点符号和前面的句子合并
-        sentences = ["".join(i) for i in zip(sentences[0::2], sentences[1::2])] + sentences[2::2]
-        sentences=[sentence.strip() for sentence in sentences if sentence.strip()]
-        return sentences
+        result = []
+        for i in range(0, len(sentences) - 1, 2):
+            if sentences[i]:
+                result.append(sentences[i] + sentences[i + 1])
+
+        # 处理最后一个可能没有标点的句子
+        if sentences[-1]:
+            result.append(sentences[-1])
+
+        # 去除空白并过滤空句子
+        result = [sentence.strip() for sentence in result if sentence.strip()]
+
+        return result
+
+    def process_text_chunks(self, chunks):
+        processed_chunks = []
+        for chunk in chunks:
+            # 处理连续的四个及以上换行符
+            while '\n\n\n\n' in chunk:
+                chunk = chunk.replace('\n\n\n\n', '\n\n')
+
+            # 处理连续的四个及以上空格
+            while '    ' in chunk:
+                chunk = chunk.replace('    ', '  ')
+
+            processed_chunks.append(chunk)
+
+        return processed_chunks
 
     def chunk_sentences(self, paragraphs, chunk_size):
         """
         将段落列表按照指定的块大小进行分块。
+
+        首先对拼接的paragraphs进行分句，然后按照句子token个数拼接成chunk
+
+        如果小于chunk_size，添加下一个句子，直到超过chunk_size，那么形成一个chunk
+        依次生成新的chuank
 
         参数:
         paragraphs (list): 要分块的段落列表。
@@ -32,8 +72,10 @@ class TextChunker:
 
         # 分句
         sentences = self.split_sentences(text)
-        if len(sentences)==0:
-            sentences=paragraphs
+        # print(sentences)
+
+        if len(sentences) == 0:
+            sentences = paragraphs
         chunks = []
         current_chunk = []
         current_chunk_tokens = 0
@@ -50,7 +92,7 @@ class TextChunker:
 
         if current_chunk:
             chunks.append(''.join(current_chunk))
-
+        chunks = self.process_text_chunks(chunks)
         return chunks
 
 
@@ -208,7 +250,7 @@ if __name__ == '__main__':
                   '[5]欧阳金雨 .及早抓住疫情过后的消费机会 [N].湖南日报 ,2020', '-02-23(003).',
                   '作者简介 ：谭诗怡（1999.10- ），女，籍贯:湖南湘乡 ，湘潭大学，本', '科在读，研究方向 :电子商务',
                   '11Copyright©博看网 www.bookan.com.cn. All Rights Reserved.']
-    paragraphs=['Hello!\nHi!\nGoodbye!']
+    paragraphs = ['Hello!\nHi!\nGoodbye!']
     tc = TextChunker()
     chunk_size = 512
     chunks = tc.chunk_sentences(paragraphs, chunk_size)
