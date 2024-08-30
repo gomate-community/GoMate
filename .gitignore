@@ -15,3 +15,5 @@ data/competitions/*
 data/docs
 data/nltk_data
 huqie
+dist
+build
