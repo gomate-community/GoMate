@@ -10,18 +10,11 @@
 import os
 
 from gomate.modules.document.common_parser import CommonParser
-from gomate.modules.retrieval.bm25s_retriever import BM25RetrieverConfig, BM25Retriever, tokenizer
+from gomate.modules.retrieval.bm25s_retriever import BM25Retriever
 
 if __name__ == '__main__':
-    bm25_retriever_config = BM25RetrieverConfig(
-        tokenizer=tokenizer,
-        k1=1.5,
-        b=0.75,
-        epsilon=0.25,
-        delta=0.5,
-        algorithm='Okapi'
-    )
-    bm25_retriever = BM25Retriever(bm25_retriever_config)
+
+
     corpus = []
 
     new_files = [
@@ -35,8 +28,10 @@ if __name__ == '__main__':
     for filename in new_files:
         chunks = parser.parse(filename)
         corpus.extend(chunks)
-
-    bm25_retriever.build_from_texts(corpus)
-    query = "新冠肺炎疫情"
+    bm25_retriever = BM25Retriever(method="lucene",
+                                   index_path="indexs/description_bm25.index",
+                                   rebuild_index=True,
+                                   corpus=corpus)
+    query = "新冠疫情"
     search_docs = bm25_retriever.retrieve(query)
     print(search_docs)
