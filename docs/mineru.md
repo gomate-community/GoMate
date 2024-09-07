@@ -5,6 +5,29 @@
 
 支持一键启动，已经打包到镜像中，自带模型权重，支持GPU推理加速，GPU速度相比CPU每页解析要快几十倍不等
 
+## 主要功能
+- 删除页眉、页脚、脚注、页码等元素，保持语义连贯
+- 对多栏输出符合人类阅读顺序的文本
+- 保留原文档的结构，包括标题、段落、列表等
+- 提取图像、图片标题、表格、表格标题
+- 自动识别文档中的公式并将公式转换成latex
+- 自动识别文档中的表格并将表格转换成latex
+- 乱码PDF自动检测并启用OCR
+- 支持CPU和GPU环境
+- 支持windows/linux/mac平台
+
+## 具体原理
+请见`PDF-Extract-Kit`:https://github.com/opendatalab/PDF-Extract-Kit/blob/main/README-zh_CN.md
+PDF文档中包含大量知识信息，然而提取高质量的PDF内容并非易事。为此，我们将PDF内容提取工作进行拆解：
+
+- 布局检测：使用`LayoutLMv3`模型进行区域检测，如图像，表格,标题,文本等；
+- 公式检测：使用`YOLOv8`进行公式检测，包含行内公式和行间公式；
+- 公式识别：使用`UniMERNet`进行公式识别；
+- 表格识别：使用`StructEqTable`进行表格识别；
+- 光学字符识别：使用`PaddleOCR`进行文本识别；
+![](https://i-blog.csdnimg.cn/direct/9fe1344768ab407fba31458492454a2b.png)
+
+
 ##   镜像地址：
 
 > 阿里云地址：docker pull registry.cn-beijing.aliyuncs.com/quincyqiang/mineru:0.2-models
