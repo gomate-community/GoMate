@@ -19,10 +19,12 @@ if __name__ == '__main__':
         max_chunk_size=512
     )
 
-    chunks=text_parser.get_chunks(
-        filepath="../../data/docs/制度汇编.txt"
+    # chunks=text_parser.get_chunks(
+    #     filepath="../../data/docs/制度汇编.txt"
+    # )
+    chunks = text_parser.get_chunks(
+        filepath="H:/2024-Xfyun-RAG/data/corpus.txt/corpus.txt"
     )
-
     print(len(chunks))
 
     for chunk in chunks:

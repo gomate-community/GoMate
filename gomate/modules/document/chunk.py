@@ -1,5 +1,5 @@
 import re
-
+from tqdm import tqdm
 from gomate.modules.document import rag_tokenizer
 
 
@@ -80,7 +80,7 @@ class TextChunker:
         current_chunk = []
         current_chunk_tokens = 0
 
-        for sentence in sentences:
+        for sentence in tqdm(sentences, desc='Chunking'):
             tokens = self.tokenizer.tokenize(sentence)
             if current_chunk_tokens + len(tokens) <= chunk_size:
                 current_chunk.append(sentence)

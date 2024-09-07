@@ -10,11 +10,25 @@
 @description: coding..
 """
 import os
+import pathlib
 import re
 
 import tiktoken
 
-PROJECT_BASE = '/data/users/searchgpt/yq/GoMate'
+# 获取当前文件所在的路径
+current_path = pathlib.Path(__file__).resolve()
+
+# 找到根目录，这里假设项目的根目录为 'GoMate'
+project_root = current_path
+while project_root.name != 'GoMate':
+    project_root = project_root.parent
+
+# 在 Windows 中输出带反斜杠的路径
+project_root_str = str(project_root)
+
+print(f"项目根目录为: {project_root_str}")
+
+PROJECT_BASE = project_root_str
 all_codecs = [
     'utf-8', 'gb2312', 'gbk', 'utf_16', 'ascii', 'big5', 'big5hkscs',
     'cp037', 'cp273', 'cp424', 'cp437',
@@ -123,8 +137,9 @@ def findMaxTm(fnm):
     except Exception as e:
         pass
     return m
+
+
 # https://stackoverflow.com/questions/76106366/how-to-use-tiktoken-in-offline-mode-computer
-import tiktoken_ext.openai_public
 tiktoken_cache_dir = "/data/users/searchgpt/yq/GoMate/data/docs"
 os.environ["TIKTOKEN_CACHE_DIR"] = tiktoken_cache_dir
 encoder = tiktoken.get_encoding("cl100k_base")
@@ -139,6 +154,3 @@ def num_tokens_from_string(string: str) -> int:
 def truncate(string: str, max_len: int) -> int:
     """Returns truncated text if the length of text exceed max_len."""
     return encoder.decode(encoder.encode(string)[:max_len])
-
-
-

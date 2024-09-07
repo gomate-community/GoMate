@@ -17,3 +17,6 @@ data/nltk_data
 huqie
 dist
 build
+data/huqie.zip
+data/nltk_data.zip
+examples/retrievers/indexs

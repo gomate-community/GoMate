@@ -1,5 +1,5 @@
 import chardet
-
+from tqdm import tqdm
 from gomate.modules.document.utils import find_codec
 
 
@@ -19,7 +19,7 @@ class TextParser(object):
                 txt = f.read()
 
         sections = []
-        for sec in txt.split("\n"):
+        for sec in tqdm(txt.split("\n"),desc="Parsing"):
             sections.append(sec)
         return sections
 
