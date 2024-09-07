@@ -3,9 +3,19 @@
     - MinerU的GPU镜像构建
     - 基于FastAPI的PDF解析接口
 
+支持一键启动，已经打包到镜像中，自带模型权重，支持GPU推理加速，GPU速度相比CPU每页解析要快几十倍不等
+
+##   镜像地址：
+
+> 阿里云地址：docker pull registry.cn-beijing.aliyuncs.com/quincyqiang/mineru:0.2-models
+
+> dockerhub地址：docker pull quincyqiang/mineru:0.2-models
+
+
 ##  启动命令：
 
-```docker run -itd --name=mineru_server --gpus=all -p 8888:8000 quincyqiang/mineru:0.1-models```
+
+```docker run -itd --name=mineru_server --gpus=all -p 8888:8000 quincyqiang/mineru:0.2-models```
 
 ![](https://i-blog.csdnimg.cn/direct/bcff4f524ea5400db14421ba7cec4989.png)
 
@@ -30,10 +40,14 @@
 
 ![](https://i-blog.csdnimg.cn/direct/a54dcae834ae48d498fb595aca4212c3.png)
 
+返回内容字段包括:dict_keys(['layout', 'info', 'content'])
+其中content是一个字典列表：
+```json
+{
+  'type': 'text', 
+  'text': '现在我们知道：价值实体就是劳动；劳动量的尺度就是劳动持续时间。', 
+  'page_idx': 5
+}
+```
 
 
-##   镜像地址：
-
-> 阿里云地址：docker pull registry.cn-beijing.aliyuncs.com/quincyqiang/mineru:0.1-models
-
-> dockerhub地址：docker pull quincyqiang/mineru:0.1-models
