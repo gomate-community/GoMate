@@ -16,9 +16,8 @@ langchain-text-splitters==0.2.1
 langchain-huggingface==0.0.3
 langchain-openai==0.1.8
 langsmith>=0.1.61
-transformers == 4.41.1
-torch == 2.2.0
-pandas == 2.0.0
+transformers
+pandas
 nltk == 3.8.1
 sentencepiece==0.2.0
 PyPDF2==3.0.1
@@ -41,8 +40,11 @@ tortoise==0.1.1
 python-magic==0.4.27
 html_text==0.6.2
 readability==0.3.1
-PyMuPDF==1.24.5
+PyMuPDF
 hanziconv==0.3.2
-PyPDF2==3.0.1
-gradio===3.50.2
-loguru==0.5.3
+PyPDF2
+gradio
+loguru
+xgboost
+bm25s
+jieba

@@ -10,11 +10,11 @@
 @description: coding..
 """
 import re
+from io import BytesIO
 
 import fitz
-from langchain_core.documents.base import Document
 from tqdm import tqdm
-from io import BytesIO
+
 
 class PdfParserUsingPyMuPDF():
     """
