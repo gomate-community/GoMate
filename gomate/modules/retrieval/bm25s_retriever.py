@@ -90,14 +90,14 @@ class BM25Retriever():
             stopwords=None,
             stemmer=self.stemmer_fn
         )
-        print(query_tokens)
+        # print(query_tokens)
         # query_tokens = bm25s.tokenize(query, stopwords=None,stemmer=None)
         # print(query_tokens)
         # Get top-k results as a tuple of (doc ids, scores). Both are arrays of shape (n_queries, k)
         # results, scores = retriever.retrieve(query_tokens, corpus=corpus, k=5)
         indexs, scores = self.retriever.retrieve(query_tokens, k=top_k)
         # print(indexs,type(indexs))
-        print(scores)
+        # print(scores)
         indices = []
         similarities = []
         for i in range(indexs.shape[1]):

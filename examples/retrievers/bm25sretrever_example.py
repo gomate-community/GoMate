@@ -18,11 +18,12 @@ if __name__ == '__main__':
     corpus = []
 
     new_files = [
-        f'{PROJECT_BASE}/data/docs/伊朗.txt',
-        f'{PROJECT_BASE}/data/docs/伊朗总统罹难事件.txt',
-        f'{PROJECT_BASE}/data/docs/伊朗总统莱希及多位高级官员遇难的直升机事故.txt',
-        f'{PROJECT_BASE}/data/docs/伊朗问题.txt',
-        f'{PROJECT_BASE}/data/docs/汽车操作手册.pdf',
+        # f'{PROJECT_BASE}/data/docs/伊朗.txt',
+        # f'{PROJECT_BASE}/data/docs/伊朗总统罹难事件.txt',
+        # f'{PROJECT_BASE}/data/docs/伊朗总统莱希及多位高级官员遇难的直升机事故.txt',
+        # f'{PROJECT_BASE}/data/docs/伊朗问题.txt',
+        # f'{PROJECT_BASE}/data/docs/汽车操作手册.pdf',
+        r'H:\2024-Xfyun-RAG\data\corpus.txt'
     ]
     parser = CommonParser()
     for filename in new_files:

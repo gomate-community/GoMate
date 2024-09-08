@@ -80,7 +80,7 @@ class TextChunker:
         current_chunk = []
         current_chunk_tokens = 0
 
-        for sentence in tqdm(sentences, desc='Chunking'):
+        for sentence in sentences:
             tokens = self.tokenizer.tokenize(sentence)
             if current_chunk_tokens + len(tokens) <= chunk_size:
                 current_chunk.append(sentence)
