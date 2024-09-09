@@ -8,7 +8,7 @@
 """
 import logging
 from multiprocessing import Pool, cpu_count
-
+import numpy as np
 import bm25s
 import jieba
 from tqdm import tqdm
@@ -60,7 +60,7 @@ class BM25RetrieverConfig(BaseConfig):
 
 
 class BM25Retriever(BaseRetriever):
-    def __init__(self,config):
+    def __init__(self, config):
         super().__init__()
         self.method = config.method
         self.index_path = config.index_path
@@ -84,7 +84,9 @@ class BM25Retriever(BaseRetriever):
         self.retriever.save(self.index_path, corpus=self.corpus)
 
     def load_index(self):
+        self.load_mode = True
         self.retriever = bm25s.BM25.load(self.index_path, load_corpus=True)
+        self.corpus = self.retriever.corpus
 
     def build_from_texts(self, corpus):
         print("build_from_texts...")
@@ -101,9 +103,9 @@ class BM25Retriever(BaseRetriever):
         self.retriever.index(corpus_tokens)
         # You can save the corpus along with the model
         # self.retriever = bm25s.BM25.load(self.index_path, load_corpus=True)
+        self.load_mode = False
 
     def retrieve(self, query: str = None, top_k: int = 5):
-        # Query the corpus
         query = process_sentence(query)
         query_tokens = bm25s.tokenize(
             query,
@@ -111,33 +113,25 @@ class BM25Retriever(BaseRetriever):
             stopwords=None,
             stemmer=self.stemmer_fn
         )
-        # print(query_tokens)
-        # query_tokens = bm25s.tokenize(query, stopwords=None,stemmer=None)
-        # print(query_tokens)
-        # Get top-k results as a tuple of (doc ids, scores). Both are arrays of shape (n_queries, k)
-        # results, scores = retriever.retrieve(query_tokens, corpus=corpus, k=5)
+
         indexes, scores = self.retriever.retrieve(query_tokens, k=top_k)
-        # print(indexes, type(indexes))
-        indexes = indexes.tolist()
 
-        print(indexes[0], type(indexes[0]))
-        # print(scores)
-        indices = []
-        similarities = []
-        # 判断 indexes 是二维结构还是 list[dict] 结构,load_index模式
-        if isinstance(indexes[0], dict):
-            # 如果 indexes 是 list[dict] 结构
-            for i in range(len(indexes)):
-                doc, score = indexes[i], scores[i]
-                indices.append(doc['id'])
-                similarities.append(score)
-        else:
-            #
-            # 如果 indexes 是嵌套列表
-            for i in range(len(indexes[0])):  # 使用 len(indexes[0]) 来获取内层列表的长度
-                doc_id, score = indexes[0][i], scores[0][i]
-                indices.append(doc_id)
-                similarities.append(score)
+        # Flatten and convert to list
+        indexes = indexes.flatten().tolist() if isinstance(indexes, np.ndarray) else indexes[0]
+        scores = scores.flatten().tolist() if isinstance(scores, np.ndarray) else scores[0]
 
-        # 返回一个包含文档文本和得分的列表
-        return [{'text': self.corpus[indices[i]], 'score': similarities[i]} for i in range(len(indices))]
+        result = []
+        for i, (index, score) in enumerate(zip(indexes, scores)):
+            if isinstance(index, dict):
+                doc_id = index['id']
+            else:
+                doc_id = index
+
+            if self.load_mode:
+                text = self.corpus[doc_id]['text']
+            else:
+                text = self.corpus[doc_id]
+
+            result.append({'text': text, 'score': score})
+
+        return result

@@ -1,4 +1,4 @@
-## 检索器
+## Retriever
 
 ### BM25Retriever
 
