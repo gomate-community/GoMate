@@ -28,6 +28,14 @@ def generate_chunks():
 
 if __name__ == '__main__':
 
+    # test_path="H:/2024-Xfyun-RAG/data/test_question.csv"
+    # embedding_model_path="H:/pretrained_models/mteb/bge-m3"
+    # llm_model_path="H:/pretrained_models/llm/Qwen2-1.5B-Instruct"
+
+    test_path = "/data/users/searchgpt/yq/GoMate_dev/data/competitions/xunfei/test_question.csv"
+    embedding_model_path = "/data/users/searchgpt/pretrained_models/bge-large-zh-v1.5"
+    llm_model_path = "/data/users/searchgpt/pretrained_models/Qwen2-7B-Instruct"
+
     with open(f'{PROJECT_BASE}/output/chunks.pkl', 'rb') as f:
         chunks = pickle.load(f)
     corpus = []
@@ -44,7 +52,7 @@ if __name__ == '__main__':
     print(bm25_config.log_config())
 
     dense_config = DenseRetrieverConfig(
-        model_name_or_path="H:/pretrained_models/mteb/bge-m3",
+        model_name_or_path=embedding_model_path,
         dim=1024,
         index_path='indexs/dense_cache'
     )
@@ -60,7 +68,7 @@ if __name__ == '__main__':
     )
     hybrid_retriever = HybridRetriever(config=hybrid_config)
     hybrid_retriever.build_from_texts(corpus)
-
+    hybrid_retriever.save_index()
     # Query
     query = "新冠肺炎疫情"
     results = hybrid_retriever.retrieve(query, top_k=3)
@@ -70,9 +78,9 @@ if __name__ == '__main__':
         print(f"Text: {result['text']}, Score: {result['score']}")
 
         # 对话
-        qwen_chat = QwenChat('H:/pretrained_models/llm/Qwen2-1.5B-Instruct')
+        qwen_chat = QwenChat(llm_model_path)
 
-    test = pd.read_csv(r'H:/2024-Xfyun-RAG/data/test_question.csv')
+    test = pd.read_csv(test_path)
     answers = []
     for question in tqdm(test['question'], total=len(test)):
         search_docs = hybrid_retriever.retrieve(question)
@@ -83,4 +91,4 @@ if __name__ == '__main__':
         print("************************************/n")
     test['answer'] = answers
 
-    test[['answer']].to_csv(r'H:/2024-Xfyun-RAG/bm25_v2.csv', index=False)
+    test[['answer']].to_csv(f'{PROJECT_BASE}/output/bm25_v2.csv', index=False)
