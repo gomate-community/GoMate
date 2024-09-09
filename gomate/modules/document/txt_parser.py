@@ -7,7 +7,7 @@ def get_encoding(file):
         return tmp['encoding']
 
 class TextParser(object):
-    def parse(self, fnm, encoding=None, from_page=0, to_page=100000, **kwargs):
+    def parse(self, fnm, encoding="utf-8", from_page=0, to_page=100000, **kwargs):
         # 如果 fnm 不是字符串（假设是字节流等），则使用 find_codec 找到编码
         if not isinstance(fnm, str):
             encoding = get_encoding(fnm) if encoding is None else encoding

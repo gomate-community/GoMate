@@ -9,12 +9,13 @@
 """
 
 from typing import List, Dict
-from gomate.modules.retrieval.base import BaseRetriever
-from bm25s_retriever import BM25Retriever, BM25RetrieverConfig
-from dense_retriever import DenseRetriever, DenseRetrieverConfig
+
+from gomate.modules.retrieval.bm25s_retriever import BM25Retriever, BM25RetrieverConfig
+from gomate.modules.retrieval.dense_retriever import DenseRetriever, DenseRetrieverConfig
+from gomate.modules.retrieval.base import BaseRetriever, BaseConfig
 
 
-class HybridRetrieverConfig:
+class HybridRetrieverConfig(BaseConfig):
     """
         Configuration class for setting up a hybrid retriever.
 
@@ -30,16 +31,6 @@ class HybridRetrieverConfig:
         self.dense_config = dense_config
         self.bm25_weight = bm25_weight
         self.dense_weight = dense_weight
-
-    def log_config(self):
-        config_summary = f"""
-        HybridRetrieverConfig:
-        BM25 Config: {self.bm25_config.log_config()}
-        Dense Config: {self.dense_config.log_config()}
-        BM25 Weight: {self.bm25_weight}
-        Dense Weight: {self.dense_weight}
-        """
-        return config_summary
 
 
 class HybridRetriever(BaseRetriever):
@@ -57,6 +48,14 @@ class HybridRetriever(BaseRetriever):
         self.dense_retriever = DenseRetriever(config.dense_config)
         self.bm25_weight = config.bm25_weight
         self.dense_weight = config.dense_weight
+
+    def save_index(self):
+        self.bm25_retriever.save_index()
+        self.dense_retriever.save_index()
+
+    def load_index(self):
+        self.bm25_retriever.load_index()
+        self.dense_retriever.load_index()
 
     def build_from_texts(self, texts: List[str] = None):
         """Build indexes for both BM25 and dense retrievers."""
