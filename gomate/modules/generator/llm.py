@@ -39,13 +39,21 @@ PROMPT_TEMPLATE = dict(
         如果给定的上下文无法让你做出回答，请回答数据库中没有这个内容，你不知道。
         有用的回答:""",
     GLM_PROMPT_TEMPALTE="""请结合参考的上下文内容回答用户问题，如果上下文不能支撑用户问题，那么回答不知道或者我无法根据参考信息回答。
-            问题: {question}
-            可参考的上下文：
-            ···
-            {context}
-            ···
-            如果给定的上下文无法让你做出回答，请回答数据库中没有这个内容，你不知道。
-            有用的回答:"""
+    问题: {question}
+    可参考的上下文：
+    ···
+    {context}
+    ···
+    如果给定的上下文无法让你做出回答，请回答数据库中没有这个内容，你不知道。
+    有用的回答:""",
+    Qwen_PROMPT_TEMPALTE="""请结合参考的上下文内容回答用户问题，如果上下文不能支撑用户问题，尽可能根据自己能力回答或者基于参考上下文进行推理总结。
+    问题: {question}
+    可参考的上下文：
+    ···
+    {context}
+    ···
+    有用的回答:"""
+
 )
 
 
@@ -106,7 +114,8 @@ class GLMChat(BaseModel):
             prompt = prompt
         else:
             prompt = PROMPT_TEMPLATE['GLM_PROMPT_TEMPALTE'].format(question=prompt, context=content)
-        response, history = self.model.chat(self.tokenizer, prompt, history,max_length= 32000, num_beams=1, do_sample=True, top_p=0.8, temperature=0.2,)
+        response, history = self.model.chat(self.tokenizer, prompt, history, max_length=32000, num_beams=1,
+                                            do_sample=True, top_p=0.8, temperature=0.2, )
         return response, history
 
     def load_model(self):
@@ -115,16 +124,19 @@ class GLMChat(BaseModel):
         self.model = AutoModelForCausalLM.from_pretrained(self.path, torch_dtype=torch.float16,
                                                           trust_remote_code=True).cuda()
 
+
 class QwenChat(BaseModel):
     def __init__(self, path: str = '') -> None:
         super().__init__(path)
         self.load_model()
-        self.device='cuda'
+        self.device = 'cuda'
+
     def chat(self, prompt: str, history: List = [], content: str = '', llm_only: bool = False) -> tuple[Any, Any]:
         if llm_only:
             prompt = prompt
         else:
-            prompt = PROMPT_TEMPLATE['GLM_PROMPT_TEMPALTE'].format(question=prompt, context=content)
+            prompt = PROMPT_TEMPLATE['Qwen_PROMPT_TEMPALTE'].format(question=prompt, context=content)
+        print(prompt)
         messages = [
             {"role": "system", "content": "你是一个人工智能助手"},
             {"role": "user", "content": prompt}
@@ -158,6 +170,9 @@ class QwenChat(BaseModel):
             device_map="auto",
             trust_remote_code=True
         )
+        print("load model success")
+
+
 class DashscopeChat(BaseModel):
     def __init__(self, path: str = '', model: str = "qwen-turbo") -> None:
         super().__init__(path)
