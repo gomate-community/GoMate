@@ -194,7 +194,7 @@ app后台日志：
 
 欢迎多提建议、Bad cases，欢迎进群及时交流，也欢迎大家多提PR</br>
 
-<img src="resources/wechat.png" width="180px" height="270px">
+<img src="https://github.com/gomate-community/GoMate/blob/pipeline/resources/wechat.png" width="180px" height="270px">
 
 
 群满或者合作交流可以联系：
