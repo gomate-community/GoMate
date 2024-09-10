@@ -49,3 +49,4 @@ xgboost
 bm25s
 jieba
 accelerate
+FlagEmbedding

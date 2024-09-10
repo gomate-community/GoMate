@@ -52,7 +52,24 @@ PROMPT_TEMPLATE = dict(
     ···
     {context}
     ···
-    有用的回答:"""
+    有用的回答:""",
+    Xunfei_PROMPT_TEMPLATE="""请结合参考的上下文内容回答用户问题，确保答案的准确性、全面性和权威性。如果上下文不能支撑用户问题，或者没有相关信息，请明确说明问题无法回答，避免生成虚假信息。
+    只输出答案，不要输出额外内容，不要过多解释，不要输出额外无关文字以及过多修饰。
+    
+    问题: {question}
+    可参考的上下文： 
+    ··· 
+    {context}
+    ···
+    简明准确的回答：
+    """,
+
+    Xunfei_PROMPT_TEMPLATE2="""请结合下面的资料，回答给定的问题：
+
+    提问：{question}
+    
+    相关资料：{context}
+    """
 
 )
 
@@ -125,6 +142,44 @@ class GLMChat(BaseModel):
                                                           trust_remote_code=True).cuda()
 
 
+class GLM4Chat(BaseModel):
+    def __init__(self, path: str = '') -> None:
+        super().__init__(path)
+        self.load_model()
+
+    def chat(self, prompt: str, history: List = [], content: str = '', llm_only: bool = False) -> tuple[Any, Any]:
+        if llm_only:
+            prompt = prompt
+        else:
+            prompt = PROMPT_TEMPLATE['Qwen_PROMPT_TEMPALTE'].format(question=prompt, context=content)
+        print(prompt)
+        inputs = self.tokenizer.apply_chat_template([{"role": "user", "content": prompt}],
+                                                    add_generation_prompt=True,
+                                                    tokenize=True,
+                                                    return_tensors="pt",
+                                                    return_dict=True
+                                                    )
+
+        inputs = inputs.to('cuda')
+        gen_kwargs = {"max_length": 16000, "do_sample": True, "top_k": 1}
+        with torch.no_grad():
+            outputs = self.model.generate(**inputs, **gen_kwargs)
+            outputs = outputs[:, inputs['input_ids'].shape[1]:]
+            output = self.tokenizer.decode(outputs[0], skip_special_tokens=True)
+            response, history = output, []
+            return response, history
+
+    def load_model(self):
+
+        self.tokenizer = AutoTokenizer.from_pretrained(self.path, trust_remote_code=True)
+        self.model = AutoModelForCausalLM.from_pretrained(
+            self.path,
+            torch_dtype=torch.bfloat16,
+            low_cpu_mem_usage=True,
+            trust_remote_code=True
+        ).cuda().eval()
+
+
 class QwenChat(BaseModel):
     def __init__(self, path: str = '') -> None:
         super().__init__(path)
@@ -135,8 +190,8 @@ class QwenChat(BaseModel):
         if llm_only:
             prompt = prompt
         else:
-            prompt = PROMPT_TEMPLATE['Qwen_PROMPT_TEMPALTE'].format(question=prompt, context=content)
-        print(prompt)
+            prompt = PROMPT_TEMPLATE['Xunfei_PROMPT_TEMPLATE'].format(question=prompt, context=content)
+        # print(prompt)
         messages = [
             {"role": "system", "content": "你是一个人工智能助手"},
             {"role": "user", "content": prompt}

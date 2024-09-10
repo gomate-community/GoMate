@@ -14,7 +14,7 @@ from gomate.modules.reranker.bge_reranker import BgeReranker, BgeRerankerConfig
 
 if __name__ == '__main__':
     reranker_config = BgeRerankerConfig(
-        model_name_or_path="/home/test/pretrained_models/bge-reranker-large"
+        model_name_or_path="/data/users/searchgpt/pretrained_models/bge-reranker-large"
     )
 
     bge_reranker = BgeReranker(reranker_config)

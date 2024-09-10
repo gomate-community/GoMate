@@ -20,8 +20,18 @@
 
 #### 3.提交结果
 
-| 序号 | 方法             | 分数      |
-|----|----------------|---------|
-| 1  | bm25s          | 0.06091 |
-| 1  | bm25s+修改prompt | 0.26175 |
-|    |                |         |
+| 序号 | 方法                                           | 分数    |
+|----|----------------------------------------------|-------|
+| 0  | baseline:glm4_plus                           | 0.34  |
+| 1  | bm25s                                        | 0.06091 |
+| 2  | bm25s+修改prompt                               | 0.26175 |
+| 3  | bm25s+hybrid检索器+qwen27b                      | 0.22371 |
+| 4  | bm25s+hybrid检索器+qwen21.5b                    | 0.23608 |
+| 5  | dense+qwen21.5b                              | 0.24613 |
+| 6  | hybrid检索器                                    | 0.05696 |
+| 7  | hybrid检索器+qwen7b +xunfei prompt              | 0.33623 |
+| 8  | hybrid检索器+top10+qwen7b +xunfei prompt        | 0.32735 |
+| 9  | hybrid检索器+top5+glm4-9b +glm4 prompt          | 0.37147 |
+| 10 | hybrid检索器+top5+glm4-9b +xunfei prompt        | 0.41775 |
+| 11 | hybrid检索器+top5+glm4-9b +xunfei prompt+【无法回答】 | 0.3878 |
+| 11 | hybrid检索器+top5+glm4-9b +xunfei prompt+rerank |   |

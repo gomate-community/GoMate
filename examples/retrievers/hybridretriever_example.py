@@ -55,8 +55,8 @@ if __name__ == '__main__':
         corpus.extend(chunks)
 
     # Build hybrid retriever from texts
-    # hybrid_retriever.build_from_texts(corpus)
-    # hybrid_retriever.save_index()
+    hybrid_retriever.build_from_texts(corpus)
+    hybrid_retriever.save_index()
     hybrid_retriever.load_index()
     # Query
     query = "新冠肺炎疫情"
