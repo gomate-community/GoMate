@@ -6,8 +6,7 @@ from tqdm import tqdm
 from gomate.modules.document.chunk import TextChunker
 from gomate.modules.document.txt_parser import TextParser
 from gomate.modules.document.utils import PROJECT_BASE
-from gomate.modules.generator.llm import GLM4Chat
-from gomate.modules.reranker.bge_reranker import BgeReranker, BgeRerankerConfig
+from gomate.modules.generator.llm import QwenChat
 from gomate.modules.retrieval.bm25s_retriever import BM25RetrieverConfig
 from gomate.modules.retrieval.dense_retriever import DenseRetrieverConfig
 from gomate.modules.retrieval.hybrid_retriever import HybridRetriever, HybridRetrieverConfig
@@ -35,7 +34,7 @@ if __name__ == '__main__':
 
     test_path = "/data/users/searchgpt/yq/GoMate_dev/data/competitions/xunfei/test_question.csv"
     embedding_model_path = "/data/users/searchgpt/pretrained_models/bge-large-zh-v1.5"
-    llm_model_path = "/data/users/searchgpt/pretrained_models/glm-4-9b-chat"
+    llm_model_path = "/data/users/searchgpt/pretrained_models/Qwen2-7B-Instruct"
 
     with open(f'{PROJECT_BASE}/output/chunks.pkl', 'rb') as f:
         chunks = pickle.load(f)
@@ -64,8 +63,8 @@ if __name__ == '__main__':
     hybrid_config = HybridRetrieverConfig(
         bm25_config=bm25_config,
         dense_config=dense_config,
-        bm25_weight=0.7,
-        dense_weight=0.3
+        bm25_weight=0.5,
+        dense_weight=0.5
     )
     hybrid_retriever = HybridRetriever(config=hybrid_config)
     # hybrid_retriever.build_from_texts(corpus)
@@ -73,35 +72,22 @@ if __name__ == '__main__':
     hybrid_retriever.load_index()
     # Query
     query = "新冠肺炎疫情"
-    results = hybrid_retriever.retrieve(query, top_k=5)
+    results = hybrid_retriever.retrieve(query, top_k=3)
 
     # Output results
     for result in results:
         print(f"Text: {result['text']}, Score: {result['score']}")
 
-    reranker_config = BgeRerankerConfig(
-        model_name_or_path="/data/users/searchgpt/pretrained_models/bge-reranker-large"
-    )
-    bge_reranker = BgeReranker(reranker_config)
-
-    # qwen_chat = QwenChat(llm_model_path)
-    glm4_chat = GLM4Chat(llm_model_path)
+        # 对话
 
     test = pd.read_csv(test_path)
     answers = []
     for question in tqdm(test['question'], total=len(test)):
         search_docs = hybrid_retriever.retrieve(question)
-        search_docs = bge_reranker.rerank(
-            query=question,
-            documents=[doc['text'] for idx, doc in enumerate(search_docs)]
-        )
-        print(search_docs)
         content = '/n'.join([f'信息[{idx}]：' + doc['text'] for idx, doc in enumerate(search_docs)])
-        answer = glm4_chat.chat(prompt=question, content=content)
-        answers.append(answer[0])
-        print(question)
-        print(answer[0])
+        answers.append(content)
+        print(content)
         print("************************************/n")
     test['answer'] = answers
 
-    test[['answer']].to_csv(f'{PROJECT_BASE}/output/bm25_v2.csv', index=False)
+    test[['answer']].to_csv(f'{PROJECT_BASE}/output/bm25_v6.csv', index=False)

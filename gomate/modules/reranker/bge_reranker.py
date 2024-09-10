@@ -71,7 +71,7 @@ class BgeReranker(BaseReranker):
         if is_sorted:
             ranked_docs = sorted(zip(documents, scores), key=lambda x: x[1], reverse=True)
             # Return the top k documents
-            top_docs = [{'text': doc, 'score': score} for doc, score in ranked_docs[:k]]
+            top_docs = [{'text': doc, 'score': score} for doc, score in ranked_docs]
         else:
             top_docs = [{'text': doc, 'score': score} for doc, score in zip(documents, scores)]
         return top_docs
