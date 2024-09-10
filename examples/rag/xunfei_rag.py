@@ -37,7 +37,7 @@ if __name__ == '__main__':
     embedding_model_path = "/data/users/searchgpt/pretrained_models/bge-large-zh-v1.5"
     llm_model_path = "/data/users/searchgpt/pretrained_models/glm-4-9b-chat"
     # ====================文件解析+切片=========================
-    generate_chunks()
+    # generate_chunks()
     with open(f'{PROJECT_BASE}/output/chunks.pkl', 'rb') as f:
         chunks = pickle.load(f)
     corpus = []
