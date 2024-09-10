@@ -151,7 +151,7 @@ class GLM4Chat(BaseModel):
         if llm_only:
             prompt = prompt
         else:
-            prompt = PROMPT_TEMPLATE['Qwen_PROMPT_TEMPALTE'].format(question=prompt, context=content)
+            prompt = PROMPT_TEMPLATE['Xunfei_PROMPT_TEMPLATE'].format(question=prompt, context=content)
         print(prompt)
         inputs = self.tokenizer.apply_chat_template([{"role": "user", "content": prompt}],
                                                     add_generation_prompt=True,
