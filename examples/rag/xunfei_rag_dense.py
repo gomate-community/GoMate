@@ -7,9 +7,7 @@ from gomate.modules.document.chunk import TextChunker
 from gomate.modules.document.txt_parser import TextParser
 from gomate.modules.document.utils import PROJECT_BASE
 from gomate.modules.generator.llm import QwenChat
-from gomate.modules.retrieval.bm25s_retriever import BM25RetrieverConfig
-from gomate.modules.retrieval.dense_retriever import DenseRetrieverConfig
-from gomate.modules.retrieval.hybrid_retriever import HybridRetriever, HybridRetrieverConfig
+from gomate.modules.retrieval.dense_retriever import DenseRetrieverConfig,DenseRetriever
 
 
 def generate_chunks():
@@ -41,15 +39,7 @@ if __name__ == '__main__':
     corpus = []
     for chunk in chunks:
         corpus.extend(chunk)
-    # BM25 and Dense Retriever configurations
-    bm25_config = BM25RetrieverConfig(
-        method='lucene',
-        index_path='indexs/description_bm25.index',
-        k1=1.6,
-        b=0.7
-    )
-    bm25_config.validate()
-    print(bm25_config.log_config())
+
 
     dense_config = DenseRetrieverConfig(
         model_name_or_path=embedding_model_path,
@@ -59,19 +49,11 @@ if __name__ == '__main__':
     config_info = dense_config.log_config()
     print(config_info)
 
-    # Hybrid Retriever configuration
-    hybrid_config = HybridRetrieverConfig(
-        bm25_config=bm25_config,
-        dense_config=dense_config,
-        bm25_weight=0.5,
-        dense_weight=0.5
-    )
-    hybrid_retriever = HybridRetriever(config=hybrid_config)
-    hybrid_retriever.build_from_texts(corpus)
-    hybrid_retriever.save_index()
+    dense_retriever = DenseRetriever(dense_config  )
+    dense_retriever.load_index()
     # Query
     query = "新冠肺炎疫情"
-    results = hybrid_retriever.retrieve(query, top_k=3)
+    results = dense_retriever.retrieve(query, top_k=3)
 
     # Output results
     for result in results:
@@ -83,7 +65,7 @@ if __name__ == '__main__':
     test = pd.read_csv(test_path)
     answers = []
     for question in tqdm(test['question'], total=len(test)):
-        search_docs = hybrid_retriever.retrieve(question)
+        search_docs = dense_retriever.retrieve(question)
         content = '/n'.join([f'信息[{idx}]：' + doc['text'] for idx, doc in enumerate(search_docs)])
         answer = qwen_chat.chat(prompt=question, content=content)
         answers.append(answer[0])
