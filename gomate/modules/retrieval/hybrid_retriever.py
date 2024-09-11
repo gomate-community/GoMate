@@ -84,4 +84,4 @@ class HybridRetriever(BaseRetriever):
         sorted_results = sorted(hybrid_scores.items(), key=lambda x: x[1], reverse=True)
 
         # Format the results to include text and score
-        return [{'text': text, 'score': score} for text, score in sorted_results[:top_k]]
+        return [{'text': text, 'score': score} for text, score in sorted_results]

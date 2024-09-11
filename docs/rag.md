@@ -20,18 +20,22 @@
 
 #### 3.提交结果
 
-| 序号 | 方法                                             | 分数      |
-|----|------------------------------------------------|---------|
-| 0  | baseline:glm4_plus                             | 0.34    |
-| 1  | bm25s                                          | 0.06091 |
-| 2  | bm25s+修改prompt                                 | 0.26175 |
-| 3  | bm25s+hybrid检索器+qwen27b                        | 0.22371 |
-| 4  | bm25s+hybrid检索器+qwen21.5b                      | 0.23608 |
-| 5  | dense+qwen21.5b                                | 0.24613 |
-| 6  | hybrid检索器                                      | 0.05696 |
-| 7  | hybrid检索器+qwen7b +xunfei prompt                | 0.33623 |
-| 8  | hybrid检索器+top10+qwen7b +xunfei prompt          | 0.32735 |
-| 9  | hybrid检索器+top5+glm4-9b +glm prompt             | 0.37147 |
-| 10 | hybrid检索器+top5+glm4-9b +xunfei prompt          | 0.41775 |
-| 11 | hybrid检索器+top5+glm4-9b +xunfei prompt+【无法回答】   | 0.3878  |
-| 12 | hybrid检索器+top5+glm4-9b +qwen prompt+rerank :失误 | 0.27884 |
+| 序号 | 方法                                                    | 分数      |
+|----|-------------------------------------------------------|---------|
+| 0  | baseline:glm4_plus                                    | 0.34    |
+| 1  | bm25s                                                 | 0.06091 |
+| 2  | bm25s+修改prompt                                        | 0.26175 |
+| 3  | bm25s+hybrid检索器+qwen27b                               | 0.22371 |
+| 4  | bm25s+hybrid检索器+qwen21.5b                             | 0.23608 |
+| 5  | dense+qwen21.5b                                       | 0.24613 |
+| 6  | hybrid检索器                                             | 0.05696 |
+| 7  | hybrid检索器+qwen7b +xunfei prompt                       | 0.33623 |
+| 8  | hybrid检索器+top10+qwen7b +xunfei prompt                 | 0.32735 |
+| 9  | hybrid检索器+top5+glm4-9b +glm prompt                    | 0.37147 |
+| 10 | hybrid检索器+top5+glm4-9b +xunfei prompt                 | 0.41775 |
+| 11 | hybrid检索器+top5+glm4-9b +xunfei prompt+【无法回答】          | 0.3878  |
+| 12 | hybrid检索器+top5+glm4-9b +qwen prompt+rerank :失误        | 0.27884 |
+| 13 | hybrid检索器+top5+glm4-9b +xunfei2 prompt+rerank         | 0.34919 |
+| 14 | hybrid检索器+top5+glm4-9b +xunfei2 prompt+rerank+【无法回答】  | 0.42125 |
+| 15 | hybrid检索器+top5+glm4-9b +xunfei2 prompt+rerank+recal@8 | 0.42157 |
+| 16 | hybrid检索器+top5+glm4-9b +xunfei2 prompt+rerank+bm25@5  | 0.42567 |
