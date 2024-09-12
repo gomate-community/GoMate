@@ -56,6 +56,8 @@ PROMPT_TEMPLATE = dict(
     Xunfei_PROMPT_TEMPLATE="""请结合参考的上下文内容回答用户问题，确保答案的准确性、全面性和权威性。如果上下文不能支撑用户问题，或者没有相关信息，请明确说明问题无法回答，避免生成虚假信息。
     只输出答案，不要输出额外内容，不要过多解释，不要输出额外无关文字以及过多修饰。
     
+    如果给定的上下文无法让你做出回答，请直接回答：“无法回答。”，不要输出额外内容。
+    
     问题: {question}
     可参考的上下文： 
     ··· 
@@ -161,7 +163,7 @@ class GLM4Chat(BaseModel):
                                                     )
 
         inputs = inputs.to('cuda')
-        gen_kwargs = {"max_length": 16000, "do_sample": True, "top_k": 1}
+        gen_kwargs = {"max_length": 16000, "do_sample": False, "top_k": 1}
         with torch.no_grad():
             outputs = self.model.generate(**inputs, **gen_kwargs)
             outputs = outputs[:, inputs['input_ids'].shape[1]:]

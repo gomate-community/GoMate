@@ -131,7 +131,12 @@ class DocxParser:
         secs=[sec[0] for sec in secs]
         return secs+tbls
 if __name__ == '__main__':
-    dp=DocxParser()
-    secs, tbls=dp.parse('/data/users/searchgpt/yq/GoMate/data/docs/夏至各地习俗.docx')
+    # dp=DocxParser()
+    # secs, tbls=dp.parse('/data/users/searchgpt/yq/GoMate/data/docs/夏至各地习俗.docx')
+    # print(secs)
+    # print(tbls)
+
+    dp = DocxParser()
+    secs, tbls = dp.parse('/data/users/searchgpt/yq/GoMate_dev/data/docs/计算所现行制度汇编202406/人力资源处/00-计算所工作人员年休假实施办法-发文.doc')
     print(secs)
     print(tbls)
