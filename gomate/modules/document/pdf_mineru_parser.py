@@ -19,7 +19,7 @@ class PdfParserWithMinerU:
 
         # 准备文件
         files = {
-            'pdf_file': ('file.pdf', open(pdf_file_path, 'rb'), 'application/pdf')
+            'pdf_file': (pdf_file_path.split('/')[-1], open(pdf_file_path, 'rb'), 'application/pdf')
         }
 
         # 发送POST请求
