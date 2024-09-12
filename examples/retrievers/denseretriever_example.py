@@ -9,35 +9,48 @@
 @software: PyCharm
 @description: coding..
 """
-import pandas as pd
-from tqdm import tqdm
+import os
 
+import pandas as pd
+
+from gomate.modules.document.utils import PROJECT_BASE
 from gomate.modules.retrieval.dense_retriever import DenseRetriever, DenseRetrieverConfig
 
 if __name__ == '__main__':
+    print(PROJECT_BASE)
     retriever_config = DenseRetrieverConfig(
-        model_name_or_path="/data/users/searchgpt/pretrained_models/bge-large-zh-v1.5",
+        model_name_or_path="H:/pretrained_models/mteb/bge-large-zh-v1.5",
         dim=1024,
-        index_path='/data/users/searchgpt/yq/GoMate/examples/retrievers/dense_cache'
+        index_path=os.path.join(PROJECT_BASE, 'output/weibo_dense'),
     )
     config_info = retriever_config.log_config()
     print(config_info)
     retriever = DenseRetriever(config=retriever_config)
-    data = pd.read_json('/data/users/searchgpt/yq/GoMate/data/docs/zh_refine.json', lines=True)[:5]
-    print(data)
-    print(data.columns)
+    # data = pd.read_json('/data/users/searchgpt/yq/GoMate/data/docs/zh_refine.json', lines=True)[:5]
+    # print(data)
+    # print(data.columns)
+    #
+    # corpus = []
+    # for documents in tqdm(data['positive'], total=len(data)):
+    #     for document in documents:
+    #         # retriever.add_text(document)
+    #         corpus.append(document)
+    # for documents in tqdm(data['negative'], total=len(data)):
+    #     for document in documents:
+    #         #     retriever.add_text(document)
+    #         corpus.append(document)
+    # print("len(corpus)", len(corpus))
+    # retriever.build_from_texts(corpus)
+    # result = retriever.retrieve("RCEP具体包括哪些国家")
+    # print(result)
+    # retriever.save_index()
+    data = pd.read_json(
+        os.path.join(PROJECT_BASE, 'data/docs/weibo/2024031123-2feb535f-a4b4-432d-98c6-eb1c60ddcd1f.data'),
+        lines=True)
+    data['text'] = data['title'] + ' ' + data['content']
+    # retriever.build_from_texts(data['text'].tolist())
+    # retriever.save_index()
 
-    corpus = []
-    for documents in tqdm(data['positive'], total=len(data)):
-        for document in documents:
-            # retriever.add_text(document)
-            corpus.append(document)
-    for documents in tqdm(data['negative'], total=len(data)):
-        for document in documents:
-            #     retriever.add_text(document)
-            corpus.append(document)
-    print("len(corpus)",len(corpus))
-    retriever.build_from_texts(corpus)
-    result = retriever.retrieve("RCEP具体包括哪些国家")
+    retriever.load_index()
+    result = retriever.retrieve("演员刘畅")
     print(result)
-    retriever.save_index()

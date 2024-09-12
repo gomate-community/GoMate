@@ -10,11 +10,14 @@
 import gc
 import os
 from typing import List
+
 import faiss
 import numpy as np
 from FlagEmbedding import FlagModel
 from tqdm import tqdm
+
 from gomate.modules.retrieval.base import BaseConfig, BaseRetriever
+
 os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
 
 
@@ -29,10 +32,17 @@ class DenseRetrieverConfig(BaseConfig):
         rebuild_index (bool): Flag to rebuild the index if True.
     """
 
-    def __init__(self, model_name_or_path='sentence-transformers/all-mpnet-base-v2', dim=768, index_path=None):
+    def __init__(
+            self,
+            model_name_or_path='sentence-transformers/all-mpnet-base-v2',
+            dim=768,
+            index_path=None,
+            batch_size=32
+    ):
         self.model_name = model_name_or_path
         self.dim = dim
         self.index_path = index_path
+        self.batch_size = batch_size
 
     def validate(self):
         """Validate Dense configuration parameters."""
@@ -69,6 +79,7 @@ class DenseRetriever(BaseRetriever):
         self.documents = []
         self.num_documents = 0
         self.index_path = config.index_path
+        self.batch_size = config.batch_size
 
     def load_index(self, index_path: str = None):
         """Load the FAISS index from the specified path."""
@@ -97,22 +108,30 @@ class DenseRetriever(BaseRetriever):
             faiss.write_index(self.index, os.path.join(index_path, 'fassis.index'))
             print("Index saved successfully to", index_path)
 
-    def get_embedding(self, sentences):
-        return self.model.encode(sentences=sentences, batch_size=32)
+    def get_embedding(self, sentences: List[str]) -> np.ndarray:
+        """Generate embeddings for a list of sentences."""
+        return self.model.encode(sentences=sentences, batch_size=self.batch_size)  # Using configured batch_size
 
-    def add_text(self, text):
-        # Ensure single document is processed as a list
-        embedding = self.get_embedding([text])
-        self.index.add(embedding)
-        self.documents.append(text)
-        self.embeddings.append(embedding)
-        self.num_documents += 1
+    def add_texts(self, texts: List[str]):
+        """Add multiple texts to the index."""
+        embeddings = self.get_embedding(texts)
+        self.index.add(embeddings)
+        self.documents.extend(texts)
+        self.embeddings.extend(embeddings)
+        self.num_documents += len(texts)
 
-    def build_from_texts(self, corpus: List[str] = None):
-        if corpus is None:
+    def add_text(self, text: str):
+        """Add a single text to the index."""
+        self.add_texts([text])
+
+    def build_from_texts(self, corpus: List[str]):
+        """Process and index a list of texts in batches."""
+        if not corpus:
             return
-        for text in tqdm(corpus, desc="build_from_texts.."):
-            self.add_text(text)
+
+        for i in tqdm(range(0, len(corpus), self.batch_size), desc="Building index"):
+            batch = corpus[i:i + self.batch_size]
+            self.add_texts(batch)
 
     def retrieve(self, query: str = None, top_k: int = 5):
         D, I = self.index.search(self.get_embedding([query]), top_k)
