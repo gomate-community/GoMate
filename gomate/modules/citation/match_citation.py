@@ -93,7 +93,7 @@ class MatchCitation:
                         # best_idx = idx + 1
                         final_response.append(f"[{best_idx + 1}]")
                         # todo:返回高亮位置
-                        highlighted_start_end = self.highlight_common_substrings(sentence, evidence_sentence)
+                        highlighted_start_end = self.highlight_common_substrings(sentence, evidence_sentence,evidence)
                         quote_list.append(
                             {
                                 "doc_id": 90564,  # 文件id
@@ -117,7 +117,7 @@ class MatchCitation:
         data={'result':''.join(final_response),'quote_list':quote_list}
         return data
 
-    def highlight_common_substrings(self, str1, str2, min_length=6):
+    def highlight_common_substrings(self, sentence, evidence_sentence, evidence, min_length=6):
         def find_common_substrings(s1, s2, min_len):
             m, n = len(s1), len(s2)
             dp = [[0] * (n + 1) for _ in range(m + 1)]
@@ -132,19 +132,24 @@ class MatchCitation:
                     else:
                         dp[i][j] = 0
 
-            return sorted(substrings, key=lambda x: x[2])  # Sort by start position in str2
+            return sorted(substrings, key=lambda x: x[1] - x[0], reverse=True)  # Sort by length, longest first
 
-        common_substrings = find_common_substrings(str1, str2, min_length)
+        common_substrings = find_common_substrings(sentence, evidence_sentence, min_length)
 
-        # Merge overlapping or adjacent intervals
-        merged = []
-        for start1, end1, start2, end2 in common_substrings:
-            if not merged or start2 > merged[-1][1]:
-                merged.append([start2, end2])
-            else:
-                merged[-1][1] = max(merged[-1][1], end2)
+        if not common_substrings:
+            return []
 
-        return merged
+        # Get the longest common substring
+        _, _, start_evidence_sentence, end_evidence_sentence = common_substrings[0]
+
+        # Find the position of evidence_sentence in evidence
+        evidence_sentence_start = evidence.index(evidence_sentence)
+
+        # Calculate the actual start and end positions in evidence
+        start_evidence = evidence_sentence_start + start_evidence_sentence
+        end_evidence = evidence_sentence_start + end_evidence_sentence
+
+        return [[start_evidence, end_evidence]]
 
 if __name__ == '__main__':
     mc = MatchCitation()
