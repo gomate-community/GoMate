@@ -1,7 +1,8 @@
-import pickle
 from typing import List
 
 import jieba
+
+
 class MatchCitation:
     def __init__(self):
         self.stopwords = ["的"]
@@ -14,270 +15,61 @@ class MatchCitation:
             query = query.replace(word, " ")
         return query
 
-    # def ground_response(
-    #         self,
-    #         response: str,
-    #         evidences: List[str],
-    #         selected_idx: List[int],
-    #         markdown: bool = True,
-    #         show_code=True,
-    #         selected_docs=List[dict]
-    # ):
-    #     """
-    #      # selected_docs:[ {"file_name": 'source', "content":'xxxx' , "chk_id": 1,"doc_id": '11', "newsinfo": {'title':'xxx','source':'xxx','date':'2024-08-25'}}]
-    #         # if best_ratio > threshold:
-    #         #     final_response.append(f"{sentence}[{best_idx+1}]。")
-    #         #     if show_code:
-    #         #         final_response.append(f"\n```\n{best_match}。\n```\n")
-    #         # else:
-    #         #     final_response.append(f"{sentence}。")
-    #     """
-    #     # selected_idx[-1]=selected_idx[-1]-1
-    #     print(selected_idx)
-    #     sentences = self.cut(response)
-    #     final_response = []
-    #     print("\n==================response===================\n",response)
-    #     print("\n==================evidences===================\n",evidences)
-    #     print("\n==================selected_idx===================\n",selected_idx)
-    #     selected_idx=[i-1 for i in selected_idx]
-    #     print("\n==================selected_idx===================\n", selected_idx)
-    #     print("\n==================len(evidences)===================\n", len(evidences))
-    #     print("\n==================len(selected_docs)===================\n", len(selected_docs))
-    #
-    #     for sentence in sentences:
-    #         if not sentence.strip():
-    #             continue
-    #
-    #         sentence_seg_cut = set(jieba.lcut(self.remove_stopwords(sentence)))
-    #         sentence_seg_cut_length = len(sentence_seg_cut)
-    #
-    #         best_match = None
-    #         best_ratio = 0
-    #         best_idx = None
-    #         best_i=None
-    #         for i,idx in enumerate(selected_idx):
-    #             evidence = evidences[i]
-    #             evidence_sentences = self.cut(evidence)
-    #
-    #             for evidence_sentence in evidence_sentences:
-    #                 evidence_seg_cut = set(jieba.lcut(self.remove_stopwords(evidence_sentence)))
-    #                 overlap = sentence_seg_cut.intersection(evidence_seg_cut)
-    #                 ratio = len(overlap) / sentence_seg_cut_length
-    #
-    #                 if ratio > best_ratio:
-    #                     best_ratio = ratio
-    #                     best_match = evidence_sentence
-    #                     best_idx = idx + 1
-    #                     best_i=i
-    #         threshold = 0.7 if len(sentence) > 20 else 0.6
-    #
-    #
-    #         if best_ratio > threshold:
-    #             final_response.append(f"{sentence}[{best_idx+1}]。")
-    #             if show_code:
-    #                 doc_info = selected_docs[best_i]
-    #                 newsinfo = doc_info.get('newsinfo', {})
-    #                 source = newsinfo.get('source', '')
-    #                 date = newsinfo.get('date', '')
-    #                 title = newsinfo.get('title', '')
-    #
-    #                 info_string = f"来源: {source}, 日期: {date}, 标题: {title}"
-    #                 final_response.append(f"\n```python\n{info_string}\n\n{best_match}。\n```\n")
-    #         else:
-    #             final_response.append(f"{sentence}。")
-    #
-    #     return ''.join(final_response)
-
-    # def highlight_matching_segments(self, sentence, text):
-    #     # 将句子和文本分词
-    #     sentence_words = jieba.lcut(sentence)
-    #     text_words = jieba.lcut(text)
-    #
-    #     # 找出匹配的词
-    #     matching_words = set(sentence_words) & set(text_words)
-    #
-    #     # 高亮匹配的词
-    #     highlighted_words = []
-    #     for word in text_words:
-    #         if word in matching_words:
-    #             highlighted_words.append(f"\033[1;33m{word}\033[0m")  # 黄色高亮
-    #         else:
-    #             highlighted_words.append(word)
-    #
-    #     return ''.join(highlighted_words)
-    # def ground_response(
-    #         self,
-    #         response: str,
-    #         evidences: List[str],
-    #         selected_idx: List[int],
-    #         markdown: bool = True,
-    #         show_code=True,
-    #         selected_docs=List[dict]
-    # ):
-    #     sentences = self.cut(response)
-    #     final_response = []
-    #     selected_idx = [i - 1 for i in selected_idx]
-    #
-    #     for sentence in sentences:
-    #         if not sentence.strip():
-    #             continue
-    #
-    #         sentence_seg_cut = set(jieba.lcut(self.remove_stopwords(sentence)))
-    #         sentence_seg_cut_length = len(sentence_seg_cut)
-    #
-    #         best_match = None
-    #         best_ratio = 0
-    #         best_idx = None
-    #         best_i = None
-    #
-    #         for i, idx in enumerate(selected_idx):
-    #             evidence = evidences[i]
-    #             evidence_sentences = self.cut(evidence)
-    #
-    #             for j, evidence_sentence in enumerate(evidence_sentences):
-    #                 evidence_seg_cut = set(jieba.lcut(self.remove_stopwords(evidence_sentence)))
-    #                 overlap = sentence_seg_cut.intersection(evidence_seg_cut)
-    #                 ratio = len(overlap) / sentence_seg_cut_length
-    #
-    #                 if ratio > best_ratio:
-    #                     best_ratio = ratio
-    #                     best_match = evidence_sentence
-    #                     best_idx = idx + 1
-    #                     best_i = i
-    #                     best_j = j
-    #
-    #         threshold = 0.7 if len(sentence) > 20 else 0.6
-    #
-    #         if best_ratio > threshold:
-    #             final_response.append(f"{sentence}[{best_idx + 1}]。")
-    #             if show_code:
-    #                 doc_info = selected_docs[best_i]
-    #                 newsinfo = doc_info.get('newsinfo', {})
-    #                 source = newsinfo.get('source', '')
-    #                 date = newsinfo.get('date', '')
-    #                 title = newsinfo.get('title', '')
-    #
-    #                 info_string = f"来源: {source}, 日期: {date}, 标题: {title}"
-    #
-    #                 # 优化1: 如果best_match长度小于80，拼接上下文
-    #                 evidence_sentences = self.cut(evidences[best_i])
-    #                 if len(best_match) < 80:
-    #                     start = max(0, best_j - 1)
-    #                     end = min(len(evidence_sentences), best_j + 2)
-    #                     best_match = ' '.join(evidence_sentences[start:end])
-    #
-    #                 # 优化2: 高亮匹配片段
-    #                 highlighted_match = self.highlight_matching_segments(sentence, best_match)
-    #
-    #                 # 优化3: 灰色显示info_string
-    #                 final_response.append(f"\n```python\n\033[90m{info_string}\033[0m\n\n{highlighted_match}。\n```\n")
-    #         else:
-    #             final_response.append(f"{sentence}。")
-    #
-    #     return ''.join(final_response)
-
-    # def ground_response(
-    #         self,
-    #         response: str,
-    #         evidences: List[str],
-    #         selected_idx: List[int],
-    #         markdown: bool = True,
-    #         show_code=True,
-    #         selected_docs=List[dict]
-    # ):
-    #     sentences = self.cut(response)
-    #     final_response = []
-    #     selected_idx = [i - 1 for i in selected_idx]
-    #
-    #     for sentence in sentences:
-    #         if not sentence.strip():
-    #             continue
-    #
-    #         sentence_seg_cut = set(jieba.lcut(self.remove_stopwords(sentence)))
-    #         sentence_seg_cut_length = len(sentence_seg_cut)
-    #
-    #         best_match = None
-    #         best_ratio = 0
-    #         best_idx = None
-    #         best_i = None
-    #
-    #         for i, idx in enumerate(selected_idx):
-    #             evidence = evidences[i]
-    #             evidence_sentences = self.cut(evidence)
-    #
-    #             for j, evidence_sentence in enumerate(evidence_sentences):
-    #                 evidence_seg_cut = set(jieba.lcut(self.remove_stopwords(evidence_sentence)))
-    #                 overlap = sentence_seg_cut.intersection(evidence_seg_cut)
-    #                 ratio = len(overlap) / sentence_seg_cut_length
-    #
-    #                 if ratio > best_ratio:
-    #                     best_ratio = ratio
-    #                     best_match = evidence_sentence
-    #                     best_idx = idx + 1
-    #                     best_i = i
-    #                     best_j = j
-    #
-    #         threshold = 0.7 if len(sentence) > 20 else 0.6
-    #
-    #         if best_ratio > threshold:
-    #             final_response.append(f"{sentence}[{best_idx + 1}]。")
-    #             if show_code:
-    #                 doc_info = selected_docs[best_i]
-    #                 newsinfo = doc_info.get('newsinfo', {})
-    #                 source = newsinfo.get('source', '')
-    #                 date = newsinfo.get('date', '')
-    #                 title = newsinfo.get('title', '')
-    #
-    #                 info_string = f"来源: {source}, 日期: {date}, 标题: {title}"
-    #
-    #                 # 优化1: 如果best_match长度小于80，拼接上下文
-    #                 evidence_sentences = self.cut(evidences[best_i])
-    #                 if len(best_match) < 80:
-    #                     start = max(0, best_j - 1)
-    #                     end = min(len(evidence_sentences), best_j + 2)
-    #                     best_match = ' '.join(evidence_sentences[start:end])
-    #
-    #                 # 优化2: 使用下划线标记匹配片段
-    #                 highlighted_match = self.underline_matching_segments(sentence, best_match)
-    #
-    #                 # 优化3: 使用 markdown 语法为 info_string 添加灰色
-    #                 final_response.append(f"\n```python\n*{info_string}*\n\n{highlighted_match}。\n```\n")
-    #         else:
-    #             final_response.append(f"{sentence}。")
-    #
-    #     return ''.join(final_response)
-    #
-    # def underline_matching_segments(self, sentence, text):
-    #     # 将句子和文本分词
-    #     sentence_words = jieba.lcut(sentence)
-    #     text_words = jieba.lcut(text)
-    #
-    #     # 找出匹配的词
-    #     matching_words = set(sentence_words) & set(text_words)
-    #
-    #     # 为匹配的词添加下划线
-    #     underlined_words = []
-    #     for word in text_words:
-    #         if word in matching_words:
-    #             underlined_words.append(f"__{word}__")  # 使用双下划线标记
-    #         else:
-    #             underlined_words.append(word)
-    #
-    #     return ''.join(underlined_words)
-
     def ground_response(
             self,
             response: str,
             evidences: List[str],
             selected_idx: List[int],
             markdown: bool = True,
-            show_code=True,
+            show_code=False,
             selected_docs=List[dict]
     ):
+        """
+         data: {
+        result: '中国共产党是中国工人阶级的先锋队，同时是中国人民和中华民族的先锋队，是中国特色社会主义事业的领导核心，代表中国先进生产力的发展要求，代表中国先进文化的前进方向，代表中国最广大人民的根本利益。[1][2][3][4][5]党的最高理想和最终目标是实现共产主义。[3][4][5]中国共产党以马克思列宁主义、毛泽东思想、邓小平理论、“三个代表”重要思想、科学发展观、习近平新时代中国特色社会主义思想作为自己的行动指南。[3][4][5]党必须适应形势的发展和情况的变化，完善领导体制，改进领导方式，增强执政能力。[5]共产党员必须同党外群众亲密合作，共同为建设中国特色社会主义而奋斗。[3][4][5]',
+        quote_list: [
+            // 文内第一个引用
+            {
+                "doc_id": 90564, // 文件id
+                "chk_id":3， // 切片索引（从0开始）
+                // 非文内溯源知识集合无需返回
+                "doc_source": "新闻来源",
+                // 新闻时间， 非文内溯源知识集合无需返回
+                "doc_date": "2021-10-19",
+                // 非文内溯源知识集合无需返回
+                "doc_title": "新闻标题",
+                // 非文内溯源知识集合无需返回
+                "chk_content":"切片文本",
+                // 非文内溯源知识集合无需返回
+                // 高亮文本在chk_content中的起始索引（从0开始）
+                "highlight":[10， 21] ,
+            },
+            // 文内第二个引用
+            {
+                "doc_id": 90564, // 文件id
+                "chk_id":4， // 切片索引（从0开始）
+                // 非文内溯源知识集合无需返回
+                "doc_source": "新闻来源",
+                // 新闻时间， 非文内溯源知识集合无需返回
+                "doc_date": "2021-10-19",
+                // 非文内溯源知识集合无需返回
+                "doc_title": "新闻标题",
+                // 非文内溯源知识集合无需返回
+                "chk_content":"切片文本",
+                // 非文内溯源知识集合无需返回
+                // 高亮文本在chk_content中的起始索引（从0开始）
+                "highlight":[10， 21] ,
+            },
+            // ....
+        ]
+      },
+        """
         sentences = self.cut(response)
         final_response = []
         selected_idx = [i - 1 for i in selected_idx]
 
+        quote_list = []
+        best_idx=0
         for sentence in sentences:
             if not sentence.strip():
                 continue
@@ -285,102 +77,46 @@ class MatchCitation:
             sentence_seg_cut = set(jieba.lcut(self.remove_stopwords(sentence)))
             sentence_seg_cut_length = len(sentence_seg_cut)
 
-            best_match = None
-            best_ratio = 0
-            best_idx = None
-            best_i = None
+            threshold = 0.7 if len(sentence) > 20 else 0.6
+            final_response.append(f"{sentence}")
 
             for i, idx in enumerate(selected_idx):
                 evidence = evidences[i]
                 evidence_sentences = self.cut(evidence)
-
                 for j, evidence_sentence in enumerate(evidence_sentences):
                     evidence_seg_cut = set(jieba.lcut(self.remove_stopwords(evidence_sentence)))
                     overlap = sentence_seg_cut.intersection(evidence_seg_cut)
                     ratio = len(overlap) / sentence_seg_cut_length
-
-                    if ratio > best_ratio:
+                    if ratio > threshold:
                         best_ratio = ratio
-                        best_match = evidence_sentence
-                        best_idx = idx + 1
-                        best_i = i
-                        best_j = j
+                        # best_match = evidence_sentence
+                        # best_idx = idx + 1
+                        final_response.append(f"[{best_idx + 1}]")
+                        # todo:返回高亮位置
+                        highlighted_start_end = self.highlight_common_substrings(sentence, evidence_sentence)
+                        quote_list.append(
+                            {
+                                "doc_id": 90564,  # 文件id
+                                "chk_id": best_idx,  # 切片索引（从0开始）
+                                # 非文内溯源知识集合无需返回
+                                "doc_source": "新闻来源",
+                                # 新闻时间, 非文内溯源知识集合无需返回
+                                "doc_date": "2021-10-19",
+                                # 非文内溯源知识集合无需返回
+                                "doc_title": "新闻标题",
+                                # 非文内溯源知识集合无需返回
+                                "chk_content": evidence,
+                                "best_ratio": best_ratio,
+                                # 非文内溯源知识集合无需返回
+                                # 高亮文本在chk_content中的起始索引（从0开始） [10， 21]
+                                "highlight": highlighted_start_end,
+                            }
+                        )
+                        best_idx+=1
+            final_response.append("。")
+        data={'result':''.join(final_response),'quote_list':quote_list}
+        return data
 
-            threshold = 0.7 if len(sentence) > 20 else 0.6
-
-            if best_ratio > threshold:
-                final_response.append(f"{sentence}[{best_idx + 1}]。")
-                if show_code:
-                    doc_info = selected_docs[best_i]
-                    newsinfo = doc_info.get('newsinfo', {})
-                    source = newsinfo.get('source', '')
-                    date = newsinfo.get('date', '')
-                    title = newsinfo.get('title', '')
-
-                    info_string = f"来源: {source}, 日期: {date}, 标题: {title}"
-
-                    #  如果best_match长度小于80，拼接上下文
-                    evidence_sentences = self.cut(evidences[best_i])
-                    print(best_match)
-                    print(len(best_match))
-                    if best_match and len(best_match) < 80:
-                        start = max(0, best_j - 1)
-                        end = min(len(evidence_sentences), best_j + 2)
-                        best_match = ' '.join(evidence_sentences[start:end])
-                        print(f"Extended Best Match: {best_match}")
-
-                    # 优化2: 使用HTML标签标记匹配片段
-                    highlighted_match = self.highlight_common_substrings(sentence, best_match)
-
-                    # 优化3: 使用HTML标签为info_string添加灰色
-                    final_response.append(
-                        f"\n> <span style='color:gray'>{info_string}</span>\n>\n> {highlighted_match}。\n\n")
-            else:
-                final_response.append(f"{sentence}。")
-
-        return ''.join(final_response)
-
-    # def highlight_common_substrings(self, str1, str2, min_length=6):
-    #     def find_common_substrings(s1, s2, min_len):
-    #         m, n = len(s1), len(s2)
-    #         dp = [[0] * (n + 1) for _ in range(m + 1)]
-    #         substrings = []
-    #
-    #         for i in range(1, m + 1):
-    #             for j in range(1, n + 1):
-    #                 if s1[i - 1] == s2[j - 1]:
-    #                     dp[i][j] = dp[i - 1][j - 1] + 1
-    #                     if dp[i][j] >= min_len:
-    #                         substrings.append((i - dp[i][j], i, j - dp[i][j], j))
-    #                 else:
-    #                     dp[i][j] = 0
-    #
-    #         return sorted(substrings, key=lambda x: x[2], reverse=True)  # 按str2中的起始位置排序
-    #
-    #     common_substrings = find_common_substrings(str1, str2, min_length)
-    #
-    #     # 标记需要高亮的部分
-    #     marked_positions = [0] * len(str2)
-    #     for _, _, start2, end2 in common_substrings:
-    #         for i in range(start2, end2):
-    #             marked_positions[i] = 1
-    #
-    #     # 构建带有高亮标记的字符串
-    #     result = []
-    #     in_mark = False
-    #     for i, char in enumerate(str2):
-    #         if marked_positions[i] and not in_mark:
-    #             result.append("<mark>")
-    #             in_mark = True
-    #         elif not marked_positions[i] and in_mark:
-    #             result.append("</mark>")
-    #             in_mark = False
-    #         result.append(char)
-    #
-    #     if in_mark:
-    #         result.append("</mark>")
-    #
-    #     return ''.join(result)
     def highlight_common_substrings(self, str1, str2, min_length=6):
         def find_common_substrings(s1, s2, min_len):
             m, n = len(s1), len(s2)
@@ -396,32 +132,20 @@ class MatchCitation:
                     else:
                         dp[i][j] = 0
 
-            return sorted(substrings, key=lambda x: x[2], reverse=True)  # 按str2中的起始位置排序
+            return sorted(substrings, key=lambda x: x[2])  # Sort by start position in str2
 
         common_substrings = find_common_substrings(str1, str2, min_length)
 
-        # 标记需要高亮的部分
-        marked_positions = [0] * len(str2)
-        for _, _, start2, end2 in common_substrings:
-            for i in range(start2, end2):
-                marked_positions[i] = 1
+        # Merge overlapping or adjacent intervals
+        merged = []
+        for start1, end1, start2, end2 in common_substrings:
+            if not merged or start2 > merged[-1][1]:
+                merged.append([start2, end2])
+            else:
+                merged[-1][1] = max(merged[-1][1], end2)
 
-        # 构建带有蓝色高亮标记的字符串
-        result = []
-        in_mark = False
-        for i, char in enumerate(str2):
-            if marked_positions[i] and not in_mark:
-                result.append("<span style='color:blue;text-decoration:underline'>")
-                in_mark = True
-            elif not marked_positions[i] and in_mark:
-                result.append("</span>")
-                in_mark = False
-            result.append(char)
+        return merged
 
-        if in_mark:
-            result.append("</span>")
-
-        return ''.join(result)
 if __name__ == '__main__':
     mc = MatchCitation()
 
