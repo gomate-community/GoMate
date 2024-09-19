@@ -20,7 +20,7 @@ from gomate.modules.retrieval.dense_retriever import DenseRetrieverConfig
 # 修改成自己的配置！！！
 app_config = ApplicationConfig()
 app_config.llm_model_path = "H:/pretrained_models/llm/glm-4-9b-chat"
-app_config.docs_path = 'H:/Projects/GoMate/data/docs/weibo'
+app_config.docs_path = 'H:/Projects/Weibo Insight/data/docs/weibo'
 retriever_config = DenseRetrieverConfig(
     model_name_or_path="H:/pretrained_models/mteb/bge-large-zh-v1.5",
     dim=1024,
@@ -119,7 +119,7 @@ def predict(input,
 
 
 with gr.Blocks(theme="soft") as demo:
-    gr.Markdown("""<h1><center>交互式微博舆情问答系统</center></h1>
+    gr.Markdown("""<h1><center>交互式微博舆情问答助手</center></h1>
         <center><font size=3>
         </center></font>
         """)
@@ -137,10 +137,10 @@ with gr.Blocks(theme="soft") as demo:
 
             large_language_model = gr.Dropdown(
                 [
-                    "ChatGLM3-6B",
+                    "ChatGLM3-9B",
                 ],
                 label="large language model",
-                value="ChatGLM3-6B")
+                value="ChatGLM3-9B")
 
             top_k = gr.Slider(1,
                               20,
@@ -162,7 +162,7 @@ with gr.Blocks(theme="soft") as demo:
                 value='知识库问答',
                 interactive=False)
 
-            kg_name = gr.Radio(["文档知识库"],
+            kg_name = gr.Radio(["微博知识库"],
                                label="知识库",
                                value=None,
                                info="使用知识库问答，请加载知识库",
@@ -181,7 +181,7 @@ with gr.Blocks(theme="soft") as demo:
             # )
         with gr.Column(scale=4):
             with gr.Row():
-                chatbot = gr.Chatbot(label='Gomate Application').style(height=650)
+                chatbot = gr.Chatbot(label='Weibo Insight Application',height=650)
             with gr.Row():
                 message = gr.Textbox(label='请输入问题')
             with gr.Row():
@@ -189,8 +189,8 @@ with gr.Blocks(theme="soft") as demo:
                 send = gr.Button("🚀 发送")
             with gr.Row():
                 gr.Markdown("""提醒：<br>
-                                        [Gomate Application](https://github.com/gomate-community/GoMate) <br>
-                                        有任何使用问题[Github Issue区](https://github.com/gomate-community/GoMate)进行反馈. 
+                                        [Weibo Insight](https://github.com/Weibo-Insight/WeiboInsight) <br>
+                                        有任何使用问题[Github Issue区](https://github.com/Weibo-Insight/WeiboInsight)进行反馈. 
                                         <br>
                                         """)
         with gr.Column(scale=2):
@@ -238,12 +238,12 @@ with gr.Blocks(theme="soft") as demo:
                        ],
                        outputs=[message, chatbot, state, search])
 
-demo.queue(concurrency_count=2).launch(
+demo.queue().launch(
     server_name='0.0.0.0',
     server_port=7860,
     share=True,
     show_error=True,
     debug=True,
-    enable_queue=True,
+    # enable_queue=True,
     inbrowser=False,
 )

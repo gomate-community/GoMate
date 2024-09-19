@@ -71,24 +71,24 @@ class WeiboRagApplication():
         return result, history, contents
 
 
-if __name__ == '__main__':
-    # 修改成自己的配置！！！
-    app_config = ApplicationConfig()
-    app_config.llm_model_path = "H:/pretrained_models/llm/glm-4-9b-chat"
-
-    retriever_config = DenseRetrieverConfig(
-        model_name_or_path="H:/pretrained_models/mteb/bge-large-zh-v1.5",
-        dim=1024,
-        index_path=os.path.join(PROJECT_BASE, 'output/weibo_dense')
-    )
-    rerank_config = BgeRerankerConfig(
-        model_name_or_path="H:/pretrained_models/mteb/bge-reranker-large"
-    )
-
-    app_config.retriever_config = retriever_config
-    app_config.rerank_config = rerank_config
-    application = WeiboRagApplication(app_config)
-    # application.init_vector_store()
-    application.load_vector_store()
-    result, history, contents = application.chat("刘畅演员最近有什么活动")
-    print(result, history, contents)
+# if __name__ == '__main__':
+#     # 修改成自己的配置！！！
+#     app_config = ApplicationConfig()
+#     app_config.llm_model_path = "H:/pretrained_models/llm/glm-4-9b-chat"
+#
+#     retriever_config = DenseRetrieverConfig(
+#         model_name_or_path="H:/pretrained_models/mteb/bge-large-zh-v1.5",
+#         dim=1024,
+#         index_path=os.path.join(PROJECT_BASE, 'output/weibo_dense')
+#     )
+#     rerank_config = BgeRerankerConfig(
+#         model_name_or_path="H:/pretrained_models/mteb/bge-reranker-large"
+#     )
+#
+#     app_config.retriever_config = retriever_config
+#     app_config.rerank_config = rerank_config
+#     application = WeiboRagApplication(app_config)
+#     # application.init_vector_store()
+#     application.load_vector_store()
+#     result, history, contents = application.chat("刘畅演员最近有什么活动")
+#     print(result, history, contents)
