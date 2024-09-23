@@ -1,47 +1,47 @@
-tqdm >= 4.23.4
-hyperopt >= 0.1.1
-h5py >= 2.8.0
-coverage >= 4.3.4
-codecov >= 2.0.15
-pytest >= 3.7.4
-pytest-cov >= 2.4.0
-flake8 == 7.0.0
-flake8_docstrings == 1.7.0
-pydocstyle == 2.1
-openai == 1.33.0
-datasets == 2.16.1
-langchain==0.2.0
-langchain-core==0.2.5
-langchain-text-splitters==0.2.1
-langchain-huggingface==0.0.3
-langchain-openai==0.1.8
-langsmith>=0.1.61
+tqdm
+hyperopt
+h5py
+coverage
+codecov
+pytest
+pytest-cov
+flake8
+flake8_docstrings
+pydocstyle
+openai
+datasets
+langchain
+langchain-core
+langchain-text-splitters
+langchain-huggingface
+langchain-openai
+langsmith
 transformers
 pandas
-nltk == 3.8.1
-sentencepiece==0.2.0
-PyPDF2==3.0.1
-html2text==2024.2.26
-beautifulsoup4==4.12.3
-faiss-cpu==1.8.0
-umap-learn==0.5.5
-sentence_transformers==3.0.0
-threadpoolctl==3.5.0
-PyMuPDF==1.24.5
-hanziconv==0.3.2
-datrie==0.8.2
-xpinyin==0.7.6
-python-pptx==0.6.23
-pdfplumber==0.11.0
-readability==0.3.1
-html_text==0.6.2
-python-docx==1.1.2
-tortoise==0.1.1
-python-magic==0.4.27
-html_text==0.6.2
-readability==0.3.1
+nltk
+sentencepiece
+PyPDF2
+html2text
+beautifulsoup4
+faiss-cpu
+umap-learn
+sentence_transformers
+threadpoolctl
 PyMuPDF
-hanziconv==0.3.2
+hanziconv
+datrie
+xpinyin
+python-pptx
+pdfplumber
+readability
+html_text
+python-docx
+tortoise
+python-magic
+html_text
+readability
+PyMuPDF
+hanziconv
 PyPDF2
 gradio
 loguru
