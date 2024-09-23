@@ -22,3 +22,4 @@ data/nltk_data.zip
 examples/retrievers/indexs
 output
 examples/rag/indexs
+examples/rag/mobile_rag.py

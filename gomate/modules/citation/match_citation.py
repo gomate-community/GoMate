@@ -64,6 +64,7 @@ class MatchCitation:
         ]
       },
         """
+        print(selected_docs)
         sentences = self.cut(response)
         final_response = []
         selected_idx = [i - 1 for i in selected_idx]
@@ -96,14 +97,14 @@ class MatchCitation:
                         highlighted_start_end = self.highlight_common_substrings(sentence, evidence_sentence,evidence)
                         quote_list.append(
                             {
-                                "doc_id": 90564,  # 文件id
-                                "chk_id": best_idx,  # 切片索引（从0开始）
+                                "doc_id": selected_docs[i]["doc_id"],  # 文件id
+                                "chk_id": selected_docs[i]["chk_id"],  # 切片索引（从0开始）
                                 # 非文内溯源知识集合无需返回
-                                "doc_source": "新闻来源",
+                                "doc_source": selected_docs[i]["newsinfo"]["source"],
                                 # 新闻时间, 非文内溯源知识集合无需返回
-                                "doc_date": "2021-10-19",
+                                "doc_date": selected_docs[i]["newsinfo"]["date"],
                                 # 非文内溯源知识集合无需返回
-                                "doc_title": "新闻标题",
+                                "doc_title": selected_docs[i]["newsinfo"]["title"],
                                 # 非文内溯源知识集合无需返回
                                 "chk_content": evidence,
                                 "best_ratio": best_ratio,

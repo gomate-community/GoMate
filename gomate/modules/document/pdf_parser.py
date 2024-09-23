@@ -1173,5 +1173,5 @@ class PdfSimParser(object):
 
 if __name__ == "__main__":
     pp=PdfSimParser()
-    contents=pp.parse('/data/users/searchgpt/yq/GoMate_dev/data/docs/新冠肺炎疫情.pdf')
+    contents=pp.parse('/data/users/searchgpt/yq/GoMate_dev/data/competitions/df/A_document/AZ06.pdf')
     print(contents)

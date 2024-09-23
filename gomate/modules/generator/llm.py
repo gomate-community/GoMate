@@ -71,7 +71,19 @@ PROMPT_TEMPLATE = dict(
     提问：{question}
     
     相关资料：{context}
-    """
+    """,
+    DF_PROMPT_TEMPLATE="""请结合参考的上下文内容回答用户问题，确保答案的准确性、全面性和权威性。如果上下文不能支撑用户问题，或者没有相关信息，请明确说明问题无法回答，避免生成虚假信息。
+    只输出答案，尽量包括关键词，不要输出额外内容，不要过多解释，不要输出额外无关文字以及过多修饰。
+
+    如果给定的上下文无法让你做出回答，请直接回答：“无法回答。”，不要输出额外内容。
+
+    问题: {question}
+    可参考的上下文： 
+    ··· 
+    {context}
+    ···
+    简明准确的回答：
+    """,
 
 )
 
@@ -153,8 +165,10 @@ class GLM4Chat(BaseModel):
         if llm_only:
             prompt = prompt
         else:
-            prompt = PROMPT_TEMPLATE['Xunfei_PROMPT_TEMPLATE'].format(question=prompt, context=content)
+            prompt = PROMPT_TEMPLATE['Xunfei_PROMPT_TEMPLATE2'].format(question=prompt, context=content)
+        prompt=prompt.encode("utf-8", 'ignore').decode('utf-8','ignore')
         print(prompt)
+
         inputs = self.tokenizer.apply_chat_template([{"role": "user", "content": prompt}],
                                                     add_generation_prompt=True,
                                                     tokenize=True,
@@ -163,7 +177,7 @@ class GLM4Chat(BaseModel):
                                                     )
 
         inputs = inputs.to('cuda')
-        gen_kwargs = {"max_length": 16000, "do_sample": False, "top_k": 1}
+        gen_kwargs = {"max_length": 20000, "do_sample": False, "top_k": 1}
         with torch.no_grad():
             outputs = self.model.generate(**inputs, **gen_kwargs)
             outputs = outputs[:, inputs['input_ids'].shape[1]:]

@@ -26,10 +26,10 @@ from gomate.modules.document.utils import get_project_base_directory
 
 class RagTokenizer:
     def key_(self, line):
-        return str(line.lower().encode("utf-8"))[2:-1]
+        return str(line.lower().encode("utf-8", 'ignore'))[2:-1]
 
     def rkey_(self, line):
-        return str(("DD" + (line[::-1].lower())).encode("utf-8"))[2:-1]
+        return str(("DD" + (line[::-1].lower())).encode("utf-8", 'ignore'))[2:-1]
 
     def loadDict_(self, fnm):
         print("[HUQIE]:Build trie", fnm, file=sys.stderr)
