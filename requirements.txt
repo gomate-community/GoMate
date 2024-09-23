@@ -50,3 +50,5 @@ bm25s
 jieba
 accelerate
 FlagEmbedding
+chardet
+openpyxl

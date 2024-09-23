@@ -140,20 +140,20 @@ class GLMChat(BaseModel):
         super().__init__(path)
         self.load_model()
 
-    def chat(self, prompt: str, history: List = [], content: str = '', llm_only: bool = False) -> tuple[Any, Any]:
+    def chat(self, prompt: str, history: List[Any] = [], content: str = '', llm_only: bool = False) -> tuple[Any, Any]:
         if llm_only:
             prompt = prompt
         else:
             prompt = PROMPT_TEMPLATE['GLM_PROMPT_TEMPALTE'].format(question=prompt, context=content)
         response, history = self.model.chat(self.tokenizer, prompt, history, max_length=32000, num_beams=1,
-                                            do_sample=True, top_p=0.8, temperature=0.2, )
+                                            do_sample=True, top_p=0.8, temperature=0.2)
         return response, history
 
     def load_model(self):
-
         self.tokenizer = AutoTokenizer.from_pretrained(self.path, trust_remote_code=True)
         self.model = AutoModelForCausalLM.from_pretrained(self.path, torch_dtype=torch.float16,
                                                           trust_remote_code=True).cuda()
+
 
 
 class GLM4Chat(BaseModel):
