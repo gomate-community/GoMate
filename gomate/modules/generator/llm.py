@@ -140,7 +140,9 @@ class GLMChat(BaseModel):
         super().__init__(path)
         self.load_model()
 
-    def chat(self, prompt: str, history: List[Any] = [], content: str = '', llm_only: bool = False) -> tuple[Any, Any]:
+    def chat(self, prompt: str, history=None, content: str = '', llm_only: bool = False) -> tuple[Any, Any]:
+        if history is None:
+            history = []
         if llm_only:
             prompt = prompt
         else:
@@ -161,7 +163,7 @@ class GLM4Chat(BaseModel):
         super().__init__(path)
         self.load_model()
 
-    def chat(self, prompt: str, history: List = [], content: str = '', llm_only: bool = False) -> tuple[Any, Any]:
+    def chat(self, prompt: str, history=None, content: str = '', llm_only: bool = False) -> tuple[Any, Any]:
         if llm_only:
             prompt = prompt
         else:
