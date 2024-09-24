@@ -105,7 +105,13 @@ PROMPT_TEMPLATE = dict(
 
     问题：{question}
 
-    回答："""
+    回答：""",
+    DF_QWEN_PROMPT_TEMPLATE="""
+        支撑信息：{context}
+    
+        问题：{question}
+    
+        回答："""
 
 )
 
@@ -229,10 +235,10 @@ class QwenChat(BaseModel):
         if llm_only:
             prompt = prompt
         else:
-            prompt = PROMPT_TEMPLATE['Xunfei_PROMPT_TEMPLATE'].format(question=prompt, context=content)
+            prompt = PROMPT_TEMPLATE['DF_QWEN_PROMPT_TEMPLATE'].format(question=prompt, context=content)
         # print(prompt)
         messages = [
-            {"role": "system", "content": "你是一个人工智能助手"},
+            {"role": "system", "content": SYSTEM_PROMPT},
             {"role": "user", "content": prompt}
         ]
         text = self.tokenizer.apply_chat_template(
@@ -240,11 +246,12 @@ class QwenChat(BaseModel):
             tokenize=False,
             add_generation_prompt=True
         )
+        print(text)
         model_inputs = self.tokenizer([text], return_tensors="pt").to(self.device)
 
         generated_ids = self.model.generate(
             model_inputs.input_ids,
-            max_new_tokens=512
+            max_new_tokens=1024
         )
         generated_ids = [
             output_ids[len(input_ids):] for input_ids, output_ids in zip(model_inputs.input_ids, generated_ids)
