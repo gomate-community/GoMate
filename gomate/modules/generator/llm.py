@@ -16,6 +16,20 @@ import torch
 from openai import OpenAI
 from transformers import AutoTokenizer, AutoModelForCausalLM
 
+SYSTEM_PROMPT = """你是一个专门用于回答中国电信运营商相关问题的AI助手。你的任务是基于提供的支撑信息，对用户的问题给出准确、相关且简洁的回答。请遵循以下指南：
+
+1. 答案必须完全基于提供的支撑信息，不要添加任何不在支撑信息中的内容。
+2. 尽可能使用支撑信息中的原文，保持答案的准确性。
+3. 确保你的回答包含问题中要求的所有关键信息。
+4. 保持回答简洁，尽量不要超过支撑信息的1.5倍长度。绝对不要超过2.5倍长度。
+5. 如果问题涉及数字、日期或具体数据，务必在回答中准确包含这些信息。
+6. 对于表格中的数据或需要综合多个段落的问题，请确保回答全面且准确。
+7. 如果支撑信息不足以回答问题，请直接说明"根据提供的信息无法回答该问题"。
+8. 不要使用"根据提供的信息"、"支撑信息显示"等前缀，直接给出答案。
+9. 保持答案的连贯性和逻辑性，使用恰当的转折词和连接词。
+
+记住，你的目标是提供一个既准确又简洁的回答，以获得最高的评分。"""
+
 PROMPT_TEMPLATE = dict(
     RAG_PROMPT_TEMPALTE="""使用以上下文来回答用户的问题。如果你不知道答案，就说你不知道。总是使用中文回答。
         问题: {question}
@@ -84,6 +98,14 @@ PROMPT_TEMPLATE = dict(
     ···
     简明准确的回答：
     """,
+    DF_PROMPT_TEMPLATE2="""
+    系统提示：{system_prompt}
+
+    支撑信息：{context}
+
+    问题：{question}
+
+    回答："""
 
 )
 
@@ -157,7 +179,6 @@ class GLMChat(BaseModel):
                                                           trust_remote_code=True).cuda()
 
 
-
 class GLM4Chat(BaseModel):
     def __init__(self, path: str = '') -> None:
         super().__init__(path)
@@ -167,8 +188,8 @@ class GLM4Chat(BaseModel):
         if llm_only:
             prompt = prompt
         else:
-            prompt = PROMPT_TEMPLATE['Xunfei_PROMPT_TEMPLATE2'].format(question=prompt, context=content)
-        prompt=prompt.encode("utf-8", 'ignore').decode('utf-8','ignore')
+            prompt = PROMPT_TEMPLATE['DF_PROMPT_TEMPLATE2'].format(system_prompt=SYSTEM_PROMPT,question=prompt, context=content)
+        prompt = prompt.encode("utf-8", 'ignore').decode('utf-8', 'ignore')
         print(prompt)
 
         inputs = self.tokenizer.apply_chat_template([{"role": "user", "content": prompt}],
@@ -179,7 +200,7 @@ class GLM4Chat(BaseModel):
                                                     )
 
         inputs = inputs.to('cuda')
-        gen_kwargs = {"max_length": 20000, "do_sample": False, "top_k": 1}
+        gen_kwargs = {"max_length": 30000, "do_sample": False, "top_k": 10}
         with torch.no_grad():
             outputs = self.model.generate(**inputs, **gen_kwargs)
             outputs = outputs[:, inputs['input_ids'].shape[1]:]

@@ -56,7 +56,7 @@ class BgeReranker(BaseReranker):
         self.device = config.device
         print('Successful load rerank model')
 
-    def rerank(self, query: str, documents: List[str], k: int = 5, is_sorted: bool = False) -> list[dict[str, Any]]:
+    def rerank(self, query: str, documents: List[str], k: int = 5, is_sorted: bool = True) -> list[dict[str, Any]]:
         # Process input documents for uniqueness and formatting
         # documents = list(set(documents))
         pairs = [[query, d] for d in documents]
