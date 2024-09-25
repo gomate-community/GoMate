@@ -84,7 +84,7 @@ def generate_chunks():
     with open(f'{PROJECT_BASE}/output/chunks.pkl', 'wb') as f:
         pickle.dump(chunks, f)
 ```
->corpus.txt每行为一段新闻，可以自行选取paragraph读取的逻辑
+>corpus.txt每行为一段新闻，可以自行选取paragraph读取的逻辑,语料来自[大模型RAG智能问答挑战赛](https://challenge.xfyun.cn/topic/info?type=RAG-quiz&option=zpsm)
 
 `TextChunker`为文本块切块程序，主要特点使用[InfiniFlow/huqie](https://huggingface.co/InfiniFlow/huqie)作为文本检索的分词器，适合RAG场景。
 
