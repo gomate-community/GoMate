@@ -25,8 +25,9 @@ GoMate框架的设计核心在于其**高度的可配置性和模块化**，使�
 
 可靠的输入，可信的输出
 
-## 🏗️ 更新记录
+## 🎉 更新记录
 
+- gomate打包构建，支持pip和source两种方式安装
 - 添加[MinerU文档解析](https://github.com/gomate-community/GoMate/blob/main/docs/mineru.md)
   ：一站式开源高质量数据提取工具，支持PDF/网页/多格式电子书提取`[20240907] `
 - RAPTOR:递归树检索器实现
