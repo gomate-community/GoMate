@@ -16,6 +16,20 @@ import torch
 from openai import OpenAI
 from transformers import AutoTokenizer, AutoModelForCausalLM
 
+SYSTEM_PROMPT = """你是一个专门用于回答中国电信运营商相关问题的AI助手。你的任务是基于提供的支撑信息，对用户的问题给出准确、相关且简洁的回答。请遵循以下指南：
+
+1. 答案必须完全基于提供的支撑信息，不要添加任何不在支撑信息中的内容。
+2. 尽可能使用支撑信息中的原文，保持答案的准确性。
+3. 确保你的回答包含问题中要求的所有关键信息。
+4. 保持回答简洁，尽量不要超过支撑信息的1.5倍长度。绝对不要超过2.5倍长度。
+5. 如果问题涉及数字、日期或具体数据，务必在回答中准确包含这些信息。
+6. 对于表格中的数据或需要综合多个段落的问题，请确保回答全面且准确。
+7. 如果支撑信息不足以回答问题，请直接说明"根据提供的信息无法回答该问题"。
+8. 不要使用"根据提供的信息"、"支撑信息显示"等前缀，直接给出答案。
+9. 保持答案的连贯性和逻辑性，使用恰当的转折词和连接词。
+
+记住，你的目标是提供一个既准确又简洁的回答，以获得最高的评分。"""
+
 PROMPT_TEMPLATE = dict(
     RAG_PROMPT_TEMPALTE="""使用以上下文来回答用户的问题。如果你不知道答案，就说你不知道。总是使用中文回答。
         问题: {question}
@@ -84,7 +98,37 @@ PROMPT_TEMPLATE = dict(
     ···
     简明准确的回答：
     """,
+    DF_PROMPT_TEMPLATE2="""
+    系统提示：{system_prompt}
 
+    支撑信息：{context}
+
+    问题：{question}
+
+    回答：""",
+    DF_QWEN_PROMPT_TEMPLATE="""
+        支撑信息：{context}
+    
+        问题：{question}
+    
+        回答：""",
+    DF_QWEN_PROMPT_TEMPLATE2 = """基于以下问题，从给定的文档中检索并抽取最相关的文本块：
+    
+    问题: {question}
+    
+    文档内容:
+    {context}
+    
+    请按照以下指南进行检索和抽取：
+    1. 识别并抽取包含问题答案的关键文本块。
+    2. 如果答案分散在多个段落或需要整合多个信息，请提取所有相关文本块并按逻辑顺序组织。
+    3. 对于表格数据，请完整提取包含答案的表格部分。
+    4. 尽量保持原文表述，避免改写或总结。
+    5. 确保提取的文本长度适中，理想情况下不超过原文相关部分的1.5倍。
+    6. 只提取与问题直接相关的信息，避免包含无关内容。
+    
+    请提供检索到的文本块：
+    """
 )
 
 
@@ -140,17 +184,18 @@ class GLMChat(BaseModel):
         super().__init__(path)
         self.load_model()
 
-    def chat(self, prompt: str, history: List = [], content: str = '', llm_only: bool = False) -> tuple[Any, Any]:
+    def chat(self, prompt: str, history=None, content: str = '', llm_only: bool = False) -> tuple[Any, Any]:
+        if history is None:
+            history = []
         if llm_only:
             prompt = prompt
         else:
             prompt = PROMPT_TEMPLATE['GLM_PROMPT_TEMPALTE'].format(question=prompt, context=content)
         response, history = self.model.chat(self.tokenizer, prompt, history, max_length=32000, num_beams=1,
-                                            do_sample=True, top_p=0.8, temperature=0.2, )
+                                            do_sample=True, top_p=0.8, temperature=0.2)
         return response, history
 
     def load_model(self):
-
         self.tokenizer = AutoTokenizer.from_pretrained(self.path, trust_remote_code=True)
         self.model = AutoModelForCausalLM.from_pretrained(self.path, torch_dtype=torch.float16,
                                                           trust_remote_code=True).cuda()
@@ -161,12 +206,12 @@ class GLM4Chat(BaseModel):
         super().__init__(path)
         self.load_model()
 
-    def chat(self, prompt: str, history: List = [], content: str = '', llm_only: bool = False) -> tuple[Any, Any]:
+    def chat(self, prompt: str, history=None, content: str = '', llm_only: bool = False) -> tuple[Any, Any]:
         if llm_only:
             prompt = prompt
         else:
-            prompt = PROMPT_TEMPLATE['Xunfei_PROMPT_TEMPLATE2'].format(question=prompt, context=content)
-        prompt=prompt.encode("utf-8", 'ignore').decode('utf-8','ignore')
+            prompt = PROMPT_TEMPLATE['DF_PROMPT_TEMPLATE2'].format(system_prompt=SYSTEM_PROMPT,question=prompt, context=content)
+        prompt = prompt.encode("utf-8", 'ignore').decode('utf-8', 'ignore')
         print(prompt)
 
         inputs = self.tokenizer.apply_chat_template([{"role": "user", "content": prompt}],
@@ -177,7 +222,7 @@ class GLM4Chat(BaseModel):
                                                     )
 
         inputs = inputs.to('cuda')
-        gen_kwargs = {"max_length": 20000, "do_sample": False, "top_k": 1}
+        gen_kwargs = {"max_length": 30000, "do_sample": False, "top_k": 10}
         with torch.no_grad():
             outputs = self.model.generate(**inputs, **gen_kwargs)
             outputs = outputs[:, inputs['input_ids'].shape[1]:]
@@ -206,10 +251,10 @@ class QwenChat(BaseModel):
         if llm_only:
             prompt = prompt
         else:
-            prompt = PROMPT_TEMPLATE['Xunfei_PROMPT_TEMPLATE'].format(question=prompt, context=content)
+            prompt = PROMPT_TEMPLATE['DF_QWEN_PROMPT_TEMPLATE2'].format(question=prompt, context=content)
         # print(prompt)
         messages = [
-            {"role": "system", "content": "你是一个人工智能助手"},
+            {"role": "system", "content": "你是一个专门用于回答中国电信运营商相关问题的AI助手。"},
             {"role": "user", "content": prompt}
         ]
         text = self.tokenizer.apply_chat_template(
@@ -217,11 +262,14 @@ class QwenChat(BaseModel):
             tokenize=False,
             add_generation_prompt=True
         )
+        print(text)
         model_inputs = self.tokenizer([text], return_tensors="pt").to(self.device)
 
         generated_ids = self.model.generate(
             model_inputs.input_ids,
-            max_new_tokens=512
+            max_new_tokens=1024,
+            do_sample=True,
+            top_k=10
         )
         generated_ids = [
             output_ids[len(input_ids):] for input_ids, output_ids in zip(model_inputs.input_ids, generated_ids)
