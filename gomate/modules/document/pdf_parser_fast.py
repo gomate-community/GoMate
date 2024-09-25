@@ -11,10 +11,10 @@
 """
 import re
 from io import BytesIO
-
+from PyPDF2 import PdfReader as pdf2_read
 import fitz
 from tqdm import tqdm
-
+import logging
 
 class PdfParserUsingPyMuPDF():
     """
@@ -63,6 +63,40 @@ class PdfParserUsingPyMuPDF():
 
         return final_texts + final_tables
 
+class PdfSimParser(object):
+    def parse(self, filename, from_page=0, to_page=100000, **kwargs):
+        self.outlines = []
+        lines = []
+        try:
+            self.pdf = pdf2_read(
+                filename if isinstance(
+                    filename, str) else BytesIO(filename))
+            for page in self.pdf.pages[from_page:to_page]:
+                lines.extend([t for t in page.extract_text().split("\n")])
+
+            outlines = self.pdf.outline
+
+            def dfs(arr, depth):
+                for a in arr:
+                    if isinstance(a, dict):
+                        self.outlines.append((a["/Title"], depth))
+                        continue
+                    dfs(a, depth + 1)
+
+            dfs(outlines, 0)
+        except Exception as e:
+            logging.warning(f"Outlines exception: {e}")
+        if not self.outlines:
+            logging.warning(f"Miss outlines")
+
+        return lines
+
+    def crop(self, ck, need_position):
+        raise NotImplementedError
+
+    @staticmethod
+    def remove_tag(txt):
+        raise NotImplementedError
 
 if __name__ == '__main__':
     pdf_parser = PdfParserUsingPyMuPDF()

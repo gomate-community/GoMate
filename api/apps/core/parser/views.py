@@ -20,7 +20,7 @@ from gomate.modules.document.chunk import TextChunker
 from gomate.modules.document.docx_parser import DocxParser
 from gomate.modules.document.excel_parser import ExcelParser
 from gomate.modules.document.html_parser import HtmlParser
-from gomate.modules.document.pdf_parser import PdfSimParser
+from gomate.modules.document.pdf_parser_fast import PdfSimParser
 from gomate.modules.document.ppt_parser import PptParser
 from gomate.modules.document.txt_parser import TextParser
 from gomate.modules.document.json_parser import JsonParser
