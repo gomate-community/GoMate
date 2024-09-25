@@ -145,18 +145,18 @@ def findMaxTm(fnm):
     return m
 
 
-# https://stackoverflow.com/questions/76106366/how-to-use-tiktoken-in-offline-mode-computer
-tiktoken_cache_dir = "/data/users/searchgpt/yq/GoMate/data/docs"
-os.environ["TIKTOKEN_CACHE_DIR"] = tiktoken_cache_dir
-encoder = tiktoken.get_encoding("cl100k_base")
-
-
-def num_tokens_from_string(string: str) -> int:
-    """Returns the number of tokens in a text string."""
-    num_tokens = len(encoder.encode(string))
-    return num_tokens
-
-
-def truncate(string: str, max_len: int) -> int:
-    """Returns truncated text if the length of text exceed max_len."""
-    return encoder.decode(encoder.encode(string)[:max_len])
+# # https://stackoverflow.com/questions/76106366/how-to-use-tiktoken-in-offline-mode-computer
+# tiktoken_cache_dir = "/data/users/searchgpt/yq/GoMate/data/docs"
+# os.environ["TIKTOKEN_CACHE_DIR"] = tiktoken_cache_dir
+# encoder = tiktoken.get_encoding("cl100k_base")
+#
+#
+# def num_tokens_from_string(string: str) -> int:
+#     """Returns the number of tokens in a text string."""
+#     num_tokens = len(encoder.encode(string))
+#     return num_tokens
+#
+#
+# def truncate(string: str, max_len: int) -> int:
+#     """Returns truncated text if the length of text exceed max_len."""
+#     return encoder.decode(encoder.encode(string)[:max_len])
