@@ -21,13 +21,17 @@ from hanziconv import HanziConv
 from nltk import word_tokenize
 from nltk.stem import PorterStemmer, WordNetLemmatizer
 
-from gomate.modules.document.utils import get_project_base_directory
+# from gomate.modules.document.utils import get_project_base_directory
 
 _get_module_path = lambda path: os.path.normpath(os.path.join(os.getcwd(),
-                                                 os.path.dirname(__file__), path))
+                                                              os.path.dirname(__file__), path))
 DEFAULT_IDF = _get_module_path("huqie.txt")
+DEFAULT_IDF_TRIE = _get_module_path("huqie.txt.trie")
 
-print("RAG Vocab:",DEFAULT_IDF)
+print("RAG Vocab:", DEFAULT_IDF)
+print("RAG Trie:", DEFAULT_IDF_TRIE)
+
+
 class RagTokenizer:
     def key_(self, line):
         return str(line.lower().encode("utf-8", 'ignore'))[2:-1]
@@ -60,24 +64,24 @@ class RagTokenizer:
         self.DENOMINATOR = 1000000
         self.trie_ = datrie.Trie(string.printable)
         # self.DIR_ = os.path.join(get_project_base_directory(), "rag/res", "huqie")
-        self.DIR_ = os.path.join(get_project_base_directory(), "data/huqie", "huqie")
+        # self.DIR_ = os.path.join(get_project_base_directory(), "data/huqie", "huqie")
 
         self.stemmer = PorterStemmer()
         self.lemmatizer = WordNetLemmatizer()
 
         self.SPLIT_CHAR = r"([ ,\.<>/?;'\[\]\\`!@#$%^&*\(\)\{\}\|_+=《》，。？、；‘’：“”【】~！￥%……（）——-]+|[a-z\.-]+|[0-9,\.-]+)"
         try:
-            self.trie_ = datrie.Trie.load(self.DIR_ + ".txt.trie")
+            self.trie_ = datrie.Trie.load(DEFAULT_IDF_TRIE)
             return
         except Exception as e:
             print("[HUQIE]:Build default trie", file=sys.stderr)
             self.trie_ = datrie.Trie(string.printable)
 
-        self.loadDict_(self.DIR_ + ".txt")
+        self.loadDict_(DEFAULT_IDF)
 
     def loadUserDict(self, fnm):
         try:
-            self.trie_ = datrie.Trie.load(fnm + ".trie")
+            self.trie_ = datrie.Trie.load(DEFAULT_IDF_TRIE)
             return
         except Exception as e:
             self.trie_ = datrie.Trie(string.printable)

@@ -21,20 +21,20 @@ import pathlib
 current_path = pathlib.Path(__file__).resolve()
 print(current_path)
 
-# 找到根目录，这里假设项目的根目录为 'GoMate' 或 'GoMate_dev'
-project_root = current_path
-while project_root.name != 'GoMate' and project_root.name != 'GoMate_dev':
-    project_root = project_root.parent
-    # 如果到达根目录还没找到项目根目录，则可能路径有问题，防止死循环
-    if project_root == project_root.parent:
-        raise Exception("项目根目录未找到")
+# # 找到根目录，这里假设项目的根目录为 'GoMate' 或 'GoMate_dev'
+# project_root = current_path
+# while project_root.name != 'GoMate' and project_root.name != 'GoMate_dev':
+#     project_root = project_root.parent
+#     # 如果到达根目录还没找到项目根目录，则可能路径有问题，防止死循环
+#     if project_root == project_root.parent:
+#         raise Exception("项目根目录未找到")
+#
+# # 在 Windows 中输出带反斜杠的路径
+# project_root_str = str(project_root)
+# print(f"项目根目录为: {project_root_str}")
 
-# 在 Windows 中输出带反斜杠的路径
-project_root_str = str(project_root)
-print(f"项目根目录为: {project_root_str}")
 
-
-PROJECT_BASE = project_root_str
+# PROJECT_BASE = project_root_str
 all_codecs = [
     'utf-8', 'gb2312', 'gbk', 'utf_16', 'ascii', 'big5', 'big5hkscs',
     'cp037', 'cp273', 'cp424', 'cp437',
@@ -59,20 +59,20 @@ def contains_text(text):
     return any(char.isalnum() for char in text)
 
 
-def get_project_base_directory(*args):
-    global PROJECT_BASE
-    if PROJECT_BASE is None:
-        PROJECT_BASE = os.path.abspath(
-            os.path.join(
-                os.path.dirname(os.path.realpath(__file__)),
-                os.pardir,
-                os.pardir,
-            )
-        )
-
-    if args:
-        return os.path.join(PROJECT_BASE, *args)
-    return PROJECT_BASE
+# def get_project_base_directory(*args):
+#     global PROJECT_BASE
+#     if PROJECT_BASE is None:
+#         PROJECT_BASE = os.path.abspath(
+#             os.path.join(
+#                 os.path.dirname(os.path.realpath(__file__)),
+#                 os.pardir,
+#                 os.pardir,
+#             )
+#         )
+#
+#     if args:
+#         return os.path.join(PROJECT_BASE, *args)
+#     return PROJECT_BASE
 
 
 def find_codec(blob):
