@@ -23,7 +23,11 @@ from nltk.stem import PorterStemmer, WordNetLemmatizer
 
 from gomate.modules.document.utils import get_project_base_directory
 
+_get_module_path = lambda path: os.path.normpath(os.path.join(os.getcwd(),
+                                                 os.path.dirname(__file__), path))
+DEFAULT_IDF = _get_module_path("huqie.txt")
 
+print("RAG Vocab:",DEFAULT_IDF)
 class RagTokenizer:
     def key_(self, line):
         return str(line.lower().encode("utf-8", 'ignore'))[2:-1]

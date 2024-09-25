@@ -111,8 +111,24 @@ PROMPT_TEMPLATE = dict(
     
         问题：{question}
     
-        回答："""
-
+        回答：""",
+    DF_QWEN_PROMPT_TEMPLATE2 = """基于以下问题，从给定的文档中检索并抽取最相关的文本块：
+    
+    问题: {question}
+    
+    文档内容:
+    {context}
+    
+    请按照以下指南进行检索和抽取：
+    1. 识别并抽取包含问题答案的关键文本块。
+    2. 如果答案分散在多个段落或需要整合多个信息，请提取所有相关文本块并按逻辑顺序组织。
+    3. 对于表格数据，请完整提取包含答案的表格部分。
+    4. 尽量保持原文表述，避免改写或总结。
+    5. 确保提取的文本长度适中，理想情况下不超过原文相关部分的1.5倍。
+    6. 只提取与问题直接相关的信息，避免包含无关内容。
+    
+    请提供检索到的文本块：
+    """
 )
 
 
@@ -235,10 +251,10 @@ class QwenChat(BaseModel):
         if llm_only:
             prompt = prompt
         else:
-            prompt = PROMPT_TEMPLATE['DF_QWEN_PROMPT_TEMPLATE'].format(question=prompt, context=content)
+            prompt = PROMPT_TEMPLATE['DF_QWEN_PROMPT_TEMPLATE2'].format(question=prompt, context=content)
         # print(prompt)
         messages = [
-            {"role": "system", "content": SYSTEM_PROMPT},
+            {"role": "system", "content": "你是一个专门用于回答中国电信运营商相关问题的AI助手。"},
             {"role": "user", "content": prompt}
         ]
         text = self.tokenizer.apply_chat_template(
@@ -251,7 +267,9 @@ class QwenChat(BaseModel):
 
         generated_ids = self.model.generate(
             model_inputs.input_ids,
-            max_new_tokens=1024
+            max_new_tokens=1024,
+            do_sample=True,
+            top_k=10
         )
         generated_ids = [
             output_ids[len(input_ids):] for input_ids, output_ids in zip(model_inputs.input_ids, generated_ids)
