@@ -9,10 +9,12 @@ with open('requirements.txt') as f:
     required = f.read().splitlines()
 
 setup(
-    name="GoMate",
+    name="gomate",
     version=__version__,
     author="gomate-community",
-    packages=find_packages(),
+    packages=['gomate'],
+    package_dir={'gomate': 'gomate'},
+    package_data={'gomate': ['*.*', 'applications/*', 'modules/document/*']},
     install_requires=required,
     author_email="yanqiang@ict.ac.cn",
     description="RAG Framework within Reliable input,Trusted output",
