@@ -52,3 +52,5 @@ accelerate
 FlagEmbedding
 chardet
 openpyxl
+protobuf
+peft
