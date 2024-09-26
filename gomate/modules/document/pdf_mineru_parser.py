@@ -5,7 +5,7 @@ class PdfParserWithMinerU:
 
         # 服务器URL
         self.url = url
-    def parse(self,pdf_file_path):
+    def parse(self,pdf_file_path,output_dir):
 
         # PDF文件路径
         # pdf_file_path = 'path/to/your/file.pdf'
@@ -14,7 +14,7 @@ class PdfParserWithMinerU:
         params = {
             'parse_method': 'auto',
             'is_json_md_dump': 'true',
-            'output_dir': 'output'
+            'output_dir': output_dir
         }
 
         # 准备文件
