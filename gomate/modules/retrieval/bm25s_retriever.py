@@ -8,18 +8,23 @@
 """
 import logging
 from multiprocessing import Pool, cpu_count
-import numpy as np
+
 import bm25s
 import jieba
+import numpy as np
 from tqdm import tqdm
 
+from gomate.modules.document.rag_tokenizer import tokenize
 from gomate.modules.retrieval.base import BaseConfig, BaseRetriever
 
 jieba.setLogLevel(logging.INFO)
 
 
-def process_sentence(sent):
-    return ' '.join([w for w in jieba.cut(sent)])
+def process_sentence(sent='', tokenizer_func='rag'):
+    if tokenizer_func == 'jieba':
+        return ' '.join([w for w in jieba.cut(sent)])
+    else:
+        return ' '.join(tokenize(sent))
 
 
 class BM25RetrieverConfig(BaseConfig):
@@ -39,12 +44,14 @@ class BM25RetrieverConfig(BaseConfig):
             method="lucene",
             index_path="indexs/description_bm25.index",
             k1=1.5,
-            b=0.75
+            b=0.75,
+            tokenizer_func='rag'
     ):
         self.method = method
         self.index_path = index_path
         self.k1 = k1
         self.b = b
+        self.tokenizer_func = tokenizer_func
 
     def validate(self):
         """Validate BM25 configuration parameters."""
