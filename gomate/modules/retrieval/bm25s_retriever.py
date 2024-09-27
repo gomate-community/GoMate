@@ -7,7 +7,7 @@
 @time: 2024/8/27 14:07
 """
 import logging
-from multiprocessing import Pool, cpu_count
+from multiprocessing import Pool
 from typing import List, Union, Callable, Dict, Any
 
 import bm25s
@@ -25,13 +25,13 @@ def process_sentence(sent: str = '', tokenizer_func: str = 'rag') -> str:
     """
     tokenize sentence
     """
+    # print(tokenizer_func)
     if tokenizer_func == 'jieba':
-        return ' '.join(jieba.cut(sent))
+        return ' '.join([w for w in jieba.cut(sent)])
     elif tokenizer_func == 'rag':
         return ' '.join(tokenize(sent))
     else:
         raise ValueError(f"Unsupported tokenizer function: {tokenizer_func}")
-
 
 
 class BM25RetrieverConfig(BaseConfig):
@@ -85,7 +85,6 @@ class BM25RetrieverConfig(BaseConfig):
         print("BM25 configuration is valid.")
 
 
-
 class BM25Retriever(BaseRetriever):
     def __init__(self, config: BM25RetrieverConfig):
         super().__init__()
@@ -97,14 +96,17 @@ class BM25Retriever(BaseRetriever):
         self.corpus: Union[List[str], None] = None
         self.load_mode: bool = False
 
+
     def process_corpus(self, corpus: List[str]) -> List[str]:
+        # print(self.config.tokenizer_func)
+        print("tokenizeing...")
         with Pool(processes=self.config.num_processes) as pool:
-            processed_corpus = list(tqdm(
-                pool.imap(lambda sent: process_sentence(sent, self.config.tokenizer_func), corpus),
-                total=len(corpus),
-                desc="Processing sentences"
-            ))
+            processed_corpus = list(
+                pool.starmap(process_sentence, [(sent, self.config.tokenizer_func) for sent in corpus])
+            )
+        print("tokenized done!")
         return processed_corpus
+
 
     def save_index(self):
         if self.retriever is not None:
