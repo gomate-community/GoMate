@@ -177,7 +177,7 @@ class MatchCitation:
         _, _, start_evidence_sentence, end_evidence_sentence = common_substrings[0]
 
         # Find the position of evidence_sentence in evidence
-        evidence_sentence_start = evidence.index(evidence_sentence)
+        # evidence_sentence_start = evidence.index(evidence_sentence)
 
         # Split evidence into sentences
         evidence_sentences = self.cut(evidence)
@@ -190,14 +190,64 @@ class MatchCitation:
         end_sentence_index = min(len(evidence_sentences) - 1, current_sentence_index + 1)
 
         # Join the sentences
-        highlighted_text = '。'.join(evidence_sentences[start_sentence_index:end_sentence_index + 1]) + '。'
-
+        highlighted_text = '。'.join(evidence_sentences[start_sentence_index:end_sentence_index + 1])
+        print("highlighted_text====>",highlighted_text)
+        print("evidence",evidence)
         # Calculate the new start and end positions
         start_evidence = evidence.index(highlighted_text)
         end_evidence = start_evidence + len(highlighted_text)
 
-        return [[start_evidence, end_evidence-1]]
+        return [[start_evidence, end_evidence]]
+
+    # def highlight_common_substrings(self, sentence, evidence_sentence, evidence, min_length=6):
+    #     def find_common_substrings(s1, s2, min_len):
+    #         m, n = len(s1), len(s2)
+    #         dp = [[0] * (n + 1) for _ in range(m + 1)]
+    #         substrings = []
+    #
+    #         for i in range(1, m + 1):
+    #             for j in range(1, n + 1):
+    #                 if s1[i - 1] == s2[j - 1]:
+    #                     dp[i][j] = dp[i - 1][j - 1] + 1
+    #                     if dp[i][j] >= min_len:
+    #                         substrings.append((i - dp[i][j], i, j - dp[i][j], j))
+    #                 else:
+    #                     dp[i][j] = 0
+    #
+    #         return sorted(substrings, key=lambda x: x[1] - x[0], reverse=True)  # Sort by length, longest first
+    #
+    #     common_substrings = find_common_substrings(sentence, evidence_sentence, min_length)
+    #
+    #     if not common_substrings:
+    #         return []
+    #
+    #     # Get the longest common substring
+    #     _, _, start_evidence_sentence, end_evidence_sentence = common_substrings[0]
+    #
+    #     # Split evidence into sentences
+    #     evidence_sentences = self.cut(evidence)
+    #
+    #     # Find the index of the current sentence
+    #     current_sentence_index = next(i for i, s in enumerate(evidence_sentences) if evidence_sentence == s)
+    #
+    #     # Get surrounding sentences
+    #     start_sentence_index = max(0, current_sentence_index - 1)
+    #     end_sentence_index = min(len(evidence_sentences) - 1, current_sentence_index + 1)
+    #
+    #     # Calculate start_evidence and end_evidence
+    #     start_evidence = sum(len(s) for s in evidence_sentences[:start_sentence_index])
+    #     end_evidence = sum(len(s) for s in evidence_sentences[:end_sentence_index + 1])
+    #
+    #     # Adjust start_evidence and end_evidence to include any separators
+    #     while start_evidence > 0 and evidence[start_evidence - 1] in '。':
+    #         start_evidence -= 1
+    #     while end_evidence < len(evidence) and evidence[end_evidence] in '。':
+    #         end_evidence += 1
+    #
+    #     return [[start_evidence, end_evidence - 1]]
+
 if __name__ == '__main__':
+
     mc = MatchCitation()
 
     result = mc.ground_response(
