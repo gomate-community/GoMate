@@ -60,18 +60,47 @@ PROMPT_TEMPLATE = dict(
     ···
     如果给定的上下文无法让你做出回答，请回答数据库中没有这个内容，你不知道。
     有用的回答:""",
-    Qwen_PROMPT_TEMPALTE="""请结合参考的上下文内容回答用户问题，如果上下文不能支撑用户问题，尽可能根据自己能力回答或者基于参考上下文进行推理总结。
+    # Qwen_PROMPT_TEMPALTE="""请结合参考的上下文内容回答用户问题，如果上下文不能支撑用户问题，尽可能根据自己能力回答或者基于参考上下文进行推理总结。
+    # 问题: {question}
+    # 可参考的上下文：
+    # ···
+    # {context}
+    # ···
+    # 有用的回答:""",
+    Qwen_PROMPT_TEMPLATE="""作为一个精确的RAG系统助手，请严格按照以下指南回答用户问题：
+
+    1. 仔细分析问题，识别关键词和核心概念。
+
+    2. 从提供的上下文中精确定位相关信息，优先使用完全匹配的内容。
+
+    3. 构建回答时，确保包含所有必要的关键词，提高关键词评分(scoreikw)。
+
+    4. 保持回答与原文的语义相似度，以提高向量相似度评分(scoreies)。
+
+    5. 控制回答长度，理想情况下不超过参考上下文长度的1.5倍，最多不超过2.5倍。
+
+    6. 对于表格查询或需要多段落/多文档综合的问题，给予特别关注并提供更全面的回答。
+
+    7. 如果上下文信息不足，可以进行合理推理，但要明确指出推理部分。
+
+    8. 回答应简洁、准确、完整，直接解答问题，避免不必要的解释。
+
+    9. 不要输出“检索到的文本块”、“根据”，“信息”等前缀修饰句，直接输出答案即可
+
+    10. 不要使用"根据提供的信息"、"支撑信息显示"等前缀，直接给出答案。
     问题: {question}
-    可参考的上下文：
+
+    参考上下文：
     ···
     {context}
     ···
-    有用的回答:""",
+
+    请提供准确、相关且简洁的回答：""",
     Xunfei_PROMPT_TEMPLATE="""请结合参考的上下文内容回答用户问题，确保答案的准确性、全面性和权威性。如果上下文不能支撑用户问题，或者没有相关信息，请明确说明问题无法回答，避免生成虚假信息。
     只输出答案，不要输出额外内容，不要过多解释，不要输出额外无关文字以及过多修饰。
-    
+
     如果给定的上下文无法让你做出回答，请直接回答：“无法回答。”，不要输出额外内容。
-    
+
     问题: {question}
     可参考的上下文： 
     ··· 
@@ -83,7 +112,7 @@ PROMPT_TEMPLATE = dict(
     Xunfei_PROMPT_TEMPLATE2="""请结合下面的资料，回答给定的问题：
 
     提问：{question}
-    
+
     相关资料：{context}
     """,
     DF_PROMPT_TEMPLATE="""请结合参考的上下文内容回答用户问题，确保答案的准确性、全面性和权威性。如果上下文不能支撑用户问题，或者没有相关信息，请明确说明问题无法回答，避免生成虚假信息。
@@ -108,17 +137,17 @@ PROMPT_TEMPLATE = dict(
     回答：""",
     DF_QWEN_PROMPT_TEMPLATE="""
         支撑信息：{context}
-    
+
         问题：{question}
-    
+
         回答：""",
-    DF_QWEN_PROMPT_TEMPLATE2 = """基于以下问题，从给定的文档中检索并抽取最相关的文本块：
-    
+    DF_QWEN_PROMPT_TEMPLATE2="""基于以下问题，从给定的文档中检索并抽取最相关的文本块：
+
     问题: {question}
-    
+
     文档内容:
     {context}
-    
+
     请按照以下指南进行检索和抽取：
     1. 识别并抽取包含问题答案的关键文本块。
     2. 如果答案分散在多个段落或需要整合多个信息，请提取所有相关文本块并按逻辑顺序组织。
@@ -126,7 +155,8 @@ PROMPT_TEMPLATE = dict(
     4. 尽量保持原文表述，避免改写或总结。
     5. 确保提取的文本长度适中，理想情况下不超过原文相关部分的1.5倍。
     6. 只提取与问题直接相关的信息，避免包含无关内容。
-    
+    7. 不要输出“检索到的文本块”、“根据”，“信息”等前缀修饰句，直接输出答案即可
+    8. 不要使用"根据提供的信息"、"支撑信息显示"等前缀，直接给出答案。
     请提供检索到的文本块：
     """
 )
@@ -210,7 +240,8 @@ class GLM4Chat(BaseModel):
         if llm_only:
             prompt = prompt
         else:
-            prompt = PROMPT_TEMPLATE['DF_PROMPT_TEMPLATE2'].format(system_prompt=SYSTEM_PROMPT,question=prompt, context=content)
+            prompt = PROMPT_TEMPLATE['Qwen_PROMPT_TEMPALTE'].format(system_prompt=SYSTEM_PROMPT, question=prompt,
+                                                                    context=content)
         prompt = prompt.encode("utf-8", 'ignore').decode('utf-8', 'ignore')
         print(prompt)
 
@@ -268,7 +299,7 @@ class QwenChat(BaseModel):
         generated_ids = self.model.generate(
             model_inputs.input_ids,
             max_new_tokens=1024,
-            do_sample=True,
+            do_sample=False,
             top_k=10
         )
         generated_ids = [
