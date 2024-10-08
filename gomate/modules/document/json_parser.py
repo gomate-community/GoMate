@@ -3,7 +3,7 @@ import json
 import chardet
 
 from gomate.modules.document.utils import find_codec
-
+from gomate.modules.document.utils import PROJECT_BASE
 
 def get_encoding(file):
     with open(file, 'rb') as f:
@@ -21,11 +21,15 @@ class JsonParser(object):
                 txt = f.read()
         # print(txt)
         data = json.loads(txt)
+        # print(data)
         sections = []
         try:
             sections.append(data['title'] +'\n'+data['content'])
         except:
-            pass
+            if 'documents' in data:
+                for document in data['documents']:
+                    for section in document['sections']:
+                        sections.append(section['sec_theme'] + '\n' + section['content'])
         # print(len(sections),len(json_lines))
         return sections
 
@@ -39,5 +43,6 @@ class JsonParser(object):
 
 if __name__ == '__main__':
     jp = JsonParser()
-    data = jp.parse(r'H:\Projects\GoMate\data\modified_demo.json')
+    print(f'{PROJECT_BASE}/data/docs/final_data/《中办通报》.json')
+    data = jp.parse(f'{PROJECT_BASE}/data/docs/final_data/《中办通报》.json')
     print(data[0])
