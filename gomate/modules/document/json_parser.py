@@ -45,6 +45,7 @@ class JsonParser(object):
                                 'date': data['date'],
                                 'sec_num': section['sec_num'],
                                 'content': section['sec_theme'] + '\n' + section['content'],
+                                'chunks': [chunk['content'] for chunk in section['chunks']]
                             }
                         )
         # print(len(sections),len(json_lines))

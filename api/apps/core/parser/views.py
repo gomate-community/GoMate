@@ -31,7 +31,7 @@ parse_router = APIRouter()
 
 
 @parse_router.post("/parse/", response_model=None, summary="文件解析")
-async def parser(file: UploadFile = File(...),chunk_size:int=512):
+async def parser(file: UploadFile = File(...), chunk_size: int = 512):
     try:
         # 读取文件内容
         filename = file.filename
@@ -40,7 +40,7 @@ async def parser(file: UploadFile = File(...),chunk_size:int=512):
         # 检测文件类型
         mime = magic.Magic(mime=True)
         file_type = mime.from_buffer(content)
-        loguru.logger.info(filename,content,mime)
+        loguru.logger.info(filename, content, mime)
         if re.search(r"\.docx$", filename, re.IGNORECASE):
             parser = DocxParser()
         elif re.search(r"\.pdf$", filename, re.IGNORECASE):
@@ -65,19 +65,25 @@ async def parser(file: UploadFile = File(...),chunk_size:int=512):
         results = []
         if re.search(r"\.json$", filename, re.IGNORECASE):
             for section in contents:
-                chunks = tc.chunk_sentences(section['content'], chunk_size=chunk_size)
-                section['chunks']=chunks
+                # chunks = tc.chunk_sentences(section['content'], chunk_size=chunk_size)
+                if 'chunks' not in section:
+                    chunks = tc.chunk_sentences(section['content'], chunk_size=chunk_size)
+                    section['chunks'] = chunks
+                else:
+                    section['chunks'] = section['chunks']
                 results.append(section)
         else:
             chunks = tc.chunk_sentences(contents, chunk_size=chunk_size)
-            results.append(  {
-                                'source': '来源',
-                                'title': '标题',
-                                'date': '20241008',
-                                'sec_num': 0,
-                                'content': ''.join(chunks),
-                                'chunks': chunks,
-                            })
+            results.append(
+                {
+                    'source': '来源',
+                    'title': '标题',
+                    'date': '20241008',
+                    'sec_num': 0,
+                    'content': ''.join(chunks),
+                    'chunks': chunks,
+                }
+            )
 
         loguru.logger.info(len(results))
         # 返回成功响应
