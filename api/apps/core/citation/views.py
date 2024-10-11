@@ -23,6 +23,7 @@ citation_router = APIRouter()
 # Create
 @citation_router.post("/citation/", response_model=None, summary="答案引用")
 async def citation(citation_body: CitationBody):
+    question = citation_body.question
     response = citation_body.response
     evidences = citation_body.evidences
     selected_idx = citation_body.selected_idx
@@ -31,6 +32,7 @@ async def citation(citation_body: CitationBody):
     # loguru.logger.info(response)
     # loguru.logger.info(evidences)
     citation_response = mc.ground_response(
+        question=question,
         response=response,
         evidences=evidences,
         selected_idx=selected_idx,
@@ -38,5 +40,5 @@ async def citation(citation_body: CitationBody):
         show_code=show_code,
         selected_docs=selected_docs
     )
-    loguru.logger.info(citation_response)
+    # loguru.logger.info(citation_response)
     return ApiResponse(citation_response, message="答案引用成功")

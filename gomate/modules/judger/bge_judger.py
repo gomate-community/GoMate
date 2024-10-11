@@ -66,8 +66,9 @@ class BgeJudger(BaseJudger):
             {
                 'text': doc,
                 'score': score,
-                'label': 1 if score >= 0.35 else 0
+                'label': 1 if score >= 0.12 else 0
             }
             for doc, score in zip(documents, scores)
         ]
         return judge_docs
+

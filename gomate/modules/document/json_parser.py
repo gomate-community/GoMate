@@ -2,6 +2,7 @@ import json
 
 import chardet
 
+from gomate.modules.document.utils import PROJECT_BASE
 from gomate.modules.document.utils import find_codec
 
 
@@ -21,11 +22,32 @@ class JsonParser(object):
                 txt = f.read()
         # print(txt)
         data = json.loads(txt)
+        # print(data)
         sections = []
         try:
-            sections.append(data['title'] +'\n'+data['content'])
+            sections.append(
+                {
+                    'source': data['source'],
+                    'title': data['title'],
+                    'date': data['date'],
+                    'sec_num': 0,
+                    'content': data['title'] + '\n' + data['content'],
+                }
+            )
         except:
-            pass
+            if 'sections' in data:
+                # for document in data['documents']:
+                    for section in data['sections']:
+                        sections.append(
+                            {
+                                'source': data['file_name'],
+                                'title': data['title'],
+                                'date': data['date'],
+                                'sec_num': section['sec_num'],
+                                'content': section['sec_theme'] + '\n' + section['content'],
+                                'chunks': [chunk['content'] for chunk in section['chunks']]
+                            }
+                        )
         # print(len(sections),len(json_lines))
         return sections
 
@@ -39,5 +61,6 @@ class JsonParser(object):
 
 if __name__ == '__main__':
     jp = JsonParser()
-    data = jp.parse(r'H:\Projects\GoMate\data\modified_demo.json')
+    print(f'{PROJECT_BASE}/data/docs/final_data/《中办通报》.json')
+    data = jp.parse(f'{PROJECT_BASE}/data/docs/final_data/《中办通报》.json')
     print(data[0])
