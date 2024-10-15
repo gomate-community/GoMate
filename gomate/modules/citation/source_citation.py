@@ -120,12 +120,28 @@ class SourceCitation:
     #         formatted_text += f"```\n{item['title']}\n{item['content']}\n\n{item['source']}\n```\n\n"
     #     return formatted_text.strip()
 
+    # def format_text_data(self, data):
+    #     formatted_text = ""
+    #     for i, item in enumerate(data):
+    #         if i > 0:
+    #             formatted_text += "---\n\n"  # Add Markdown horizontal rule between groups
+    #         formatted_text += f"```\n{item['title']}\n{item['content']}\n\n{item['source']}\n```\n\n"
+    #     return formatted_text.strip()
+
+    def highlight_common_substrings(self, sentence, evidence_sentence, evidence, min_length=6):
+        evidence_sentences = self.cut(evidence)
+        current_sentence_index = next(i for i, s in enumerate(evidence_sentences) if evidence_sentence == s)
+        highlighted_text = evidence_sentences[current_sentence_index]
+        start_evidence = evidence.index(highlighted_text)
+        end_evidence = start_evidence + len(highlighted_text)
+        return [[start_evidence, end_evidence - 1]]
+
     def format_text_data(self, data):
         formatted_text = ""
         for i, item in enumerate(data):
             if i > 0:
                 formatted_text += "---\n\n"  # Add Markdown horizontal rule between groups
-            formatted_text += f"```\n{item['title']}\n{item['content']}\n\n{item['source']}\n```\n\n"
+            formatted_text += f"```\n{item['title']}\n{item['content']}\n```\n\n"
         return formatted_text.strip()
 
     def ground_response(
@@ -148,40 +164,74 @@ class SourceCitation:
             "selected_docs": selected_docs
         }
         response = self.load_response_json(response)
-        print(response)
         contents = response['contents']
+
+        final_response = []
+        quote_list = []
+        best_indices = 0
+
+        new_contents=[]
+        is_content_exists=[]
         for cit_idx, citation in enumerate(contents):
             sentence = citation['title'] + citation['content']
             sentence_seg_cut = set(jieba.lcut(self.remove_stopwords(sentence)))
             sentence_seg_cut_length = len(sentence_seg_cut)
 
-            best_score = 0.0
-            best_idx = -1
+            group_list = []
+
+            best_ratio = 0.0
             best_sentence = ''
+            best_idx=0
+            highlighted_start_end = []
+
             for doc_idx, doc in enumerate(selected_docs):
                 evidence_sentences = self.cut(doc['content'])
                 for es_idx, evidence_sentence in enumerate(evidence_sentences):
                     evidence_seg_cut = set(jieba.lcut(self.remove_stopwords(evidence_sentence)))
                     overlap = sentence_seg_cut.intersection(evidence_seg_cut)
                     ratio = len(overlap) / sentence_seg_cut_length
-                    if ratio > best_score:
-                        best_score = ratio
+                    if ratio > best_ratio:
+                        best_ratio = ratio
                         best_idx = doc_idx
                         best_sentence = evidence_sentence
-            citation['title'] = self.convert_to_chinese(str(cit_idx + 1)) + '、' + citation['title']
+                        highlighted_start_end = self.highlight_common_substrings(sentence, evidence_sentence,doc['content'])
+
             citation['content'] = best_sentence
             citation['best_idx'] = best_idx
-            citation['best_score'] = best_score
-            # citation['newsinfo_title'] = selected_docs[best_idx]['newsinfo']['title']
-            # citation['newsinfo_date'] = selected_docs[best_idx]['newsinfo']['date']
-            # citation['newsinfo_source'] = selected_docs[best_idx]['newsinfo']['source']
-            newsinfo = selected_docs[best_idx]['newsinfo']
-            citation['source'] = '--- ' + newsinfo['title'] + ' ' + newsinfo['date'] + ' ' + newsinfo['source']
-        citation_content = self.format_text_data(contents)
-        response['result'] = citation_content
-        response['quote_list'] = []
-        print(response['result'])
-        return response
+            citation['best_score'] = best_ratio
+            # citation['title'] = self.convert_to_chinese(str(cit_idx + 1)) + '、' + citation['title']
+            # newsinfo = selected_docs[best_idx]['newsinfo']
+            # citation['source'] = '--- ' + newsinfo['title'] + ' ' + newsinfo['date'] + ' ' + newsinfo['source']
+            citation['title'] = self.convert_to_chinese(str(best_indices + 1)) + '、' + citation['title']
+
+            if best_idx not in is_content_exists:
+                new_contents.append(citation)
+
+
+                group_item = {
+                    "doc_id": selected_docs[best_idx]["doc_id"],
+                    "chk_id": selected_docs[best_idx]["chk_id"],
+                    "doc_source": selected_docs[best_idx]["newsinfo"]["source"],
+                    "doc_date": selected_docs[best_idx]["newsinfo"]["date"],
+                    "doc_title": selected_docs[best_idx]["newsinfo"]["title"],
+                    "chk_content": selected_docs[best_idx]['content'],
+                    "best_ratio": best_ratio,
+                    "highlight": highlighted_start_end,
+                }
+                group_list.append(group_item)
+                quote_list.append({
+                    "doc_list": group_list,
+                    "chk_content": group_list[0]["chk_content"],
+                    "highlight": group_list[0]["highlight"],
+                })
+                best_indices += 1
+                final_response.append(f"{citation['title']}\n")
+                final_response.append(f"{citation['content']}\n\n")
+                final_response.append(f"[{best_indices}]")
+
+                is_content_exists.append(best_idx)
+        data = {'result': ''.join(final_response), 'quote_list': quote_list, 'summary': response['summary']}
+        return data
 
 
 if __name__ == '__main__':
