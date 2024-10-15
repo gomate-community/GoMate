@@ -152,8 +152,8 @@ class MatchCitation:
 
             # final_response.append("。")
             # final_response.append("\n")
-        print(''.join(final_response))
-        data = {'result': ''.join(final_response), 'quote_list': quote_list}
+        # print(''.join(final_response))
+        data = {'result': ''.join(final_response), 'quote_list': quote_list,'summary':''}
         return data
 
     def highlight_common_substrings(self, sentence, evidence_sentence, evidence, min_length=6):
