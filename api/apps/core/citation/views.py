@@ -57,6 +57,7 @@ async def citation(citation_body: CitationBody):
                 selected_docs=selected_docs
             )
     except:
+        loguru.logger.error("引文引用报错，使用生成式引用")
         citation_response = mc.ground_response(
             question=question,
             response=response,

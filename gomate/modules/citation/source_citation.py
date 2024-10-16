@@ -3,6 +3,7 @@ import re
 from typing import List
 
 import jieba
+import loguru
 
 from gomate.modules.document.utils import PROJECT_BASE
 
@@ -11,11 +12,7 @@ class SourceCitation:
     def __init__(self):
         self.stopwords = ["的"]
 
-    # def cut(self, para: str):
-    #     return [x for x in para.split("。") if x]
-
     def cut(self, para: str):
-
         # 定义结束符号列表
         end_symbols = ['。', '！', '？', '…', '；', '\n']
 
@@ -108,26 +105,6 @@ class SourceCitation:
 
         return result
 
-    # def format_text_data(self,data):
-    #     formatted_text = ""
-    #     for item in data:
-    #         formatted_text += f"\n{item['title']}\n{item['content']}\n\n{item['source']}\n"
-    #     return formatted_text.strip()
-
-    # def format_text_data(self,data):
-    #     formatted_text = ""
-    #     for item in data:
-    #         formatted_text += f"```\n{item['title']}\n{item['content']}\n\n{item['source']}\n```\n\n"
-    #     return formatted_text.strip()
-
-    # def format_text_data(self, data):
-    #     formatted_text = ""
-    #     for i, item in enumerate(data):
-    #         if i > 0:
-    #             formatted_text += "---\n\n"  # Add Markdown horizontal rule between groups
-    #         formatted_text += f"```\n{item['title']}\n{item['content']}\n\n{item['source']}\n```\n\n"
-    #     return formatted_text.strip()
-
     def highlight_common_substrings(self, sentence, evidence_sentence, evidence, min_length=6):
         evidence_sentences = self.cut(evidence)
         current_sentence_index = next(i for i, s in enumerate(evidence_sentences) if evidence_sentence == s)
@@ -154,89 +131,100 @@ class SourceCitation:
             show_code=False,
             selected_docs=List[dict]
     ):
-
         # Create JSON object
         json_data = {
             "question": question,
             "response": response,
             "evidences": evidences,
             "selected_idx": selected_idx,
-            "selected_docs": selected_docs
+            "selected_docs": selected_docs,
         }
+        output_file = "citation.json"
+        with open("citation.json", 'w', encoding='utf-8') as f:
+            json.dump(json_data, f, ensure_ascii=False, indent=4)
+
         response = self.load_response_json(response)
-        contents = [content  for content in response['contents'] if 'title' in content and 'content' in content]
+        contents = [content for content in response['contents'] if 'title' in content and 'content' in content]
 
-        final_response = []
-        quote_list = []
-        best_indices = 0
-
-        new_contents = []
         for cit_idx, citation in enumerate(contents):
+            citation['citation_content'] = []
+            citation['best_idx'] = []
+            citation['best_ratio'] = []
+            citation['highlighted_start_end'] = []
+            # 生成的答案内容：citation['title']，citation['content']
             sentence = citation['title'] + citation['content']
+            # 答案内容进行分词
             sentence_seg_cut = set(jieba.lcut(self.remove_stopwords(sentence)))
             sentence_seg_cut_length = len(sentence_seg_cut)
 
-            best_ratio = 0.0
-            best_sentence = ''
-            best_idx = 0
-            highlighted_start_end = []
-
+            threshold = 0.2
+            # 检索内容
             for doc_idx, doc in enumerate(selected_docs):
                 evidence_sentences = self.cut(doc['content'])
                 for es_idx, evidence_sentence in enumerate(evidence_sentences):
                     evidence_seg_cut = set(jieba.lcut(self.remove_stopwords(evidence_sentence)))
                     overlap = sentence_seg_cut.intersection(evidence_seg_cut)
                     ratio = len(overlap) / sentence_seg_cut_length
-                    if ratio > best_ratio:
+                    if ratio > threshold:
                         best_ratio = ratio
                         best_idx = doc_idx
                         best_sentence = evidence_sentence
                         highlighted_start_end = self.highlight_common_substrings(sentence, evidence_sentence,
                                                                                  doc['content'])
+                        if best_idx not in citation['best_idx']:
+                            citation['citation_content'].append(doc['content'])
+                            citation['best_idx'].append(best_idx)
+                            citation['best_ratio'].append(best_ratio)
+                            citation['highlighted_start_end'].append(highlighted_start_end)
+        print(contents)
 
-            citation['citation_content'] = best_sentence
-            citation['best_idx'] = best_idx
-            citation['best_ratio'] = best_ratio
-            citation['highlighted_start_end'] = highlighted_start_end
-            # citation['title'] = self.convert_to_chinese(str(cit_idx + 1)) + '、' + citation['title']
-            # newsinfo = selected_docs[best_idx]['newsinfo']
-            # citation['source'] = '--- ' + newsinfo['title'] + ' ' + newsinfo['date'] + ' ' + newsinfo['source']
-
-        # 是否设置标题序号：如果存在多个段落需要设置，如果只有一个段落那么不需要设置
         citation_cnt = 0
-
         is_citation_exists = []
         for citation in contents:
             best_idx = citation['best_idx']
             if best_idx not in is_citation_exists:
-                new_contents.append(citation)
                 is_citation_exists.append(best_idx)
                 citation_cnt += 1
 
+
+
         is_content_exists = []
+        final_response = []
+        quote_list = []
+        best_indices = 0
 
         for citation in contents:
+            is_doc_id_exists = []
             group_list = []
-            best_idx = citation['best_idx']
-            if best_idx not in is_content_exists:
-                if citation_cnt > 1:
-                    citation['title'] = self.convert_to_chinese(str(best_indices + 1)) + '、' + citation['title']
-                    citation['title'] = "**" + citation['title'] + "**"
-                else:
-                    citation['title'] = "**" + citation['title'] + "**"
-                new_contents.append(citation)
 
-                group_item = {
-                    "doc_id": selected_docs[best_idx]["doc_id"],
-                    "chk_id": selected_docs[best_idx]["chk_id"],
-                    "doc_source": selected_docs[best_idx]["newsinfo"]["source"],
-                    "doc_date": selected_docs[best_idx]["newsinfo"]["date"],
-                    "doc_title": selected_docs[best_idx]["newsinfo"]["title"],
-                    "chk_content": selected_docs[best_idx]['content'],
-                    "best_ratio": citation['best_ratio'],
-                    "highlight": citation['highlighted_start_end'],
-                }
-                group_list.append(group_item)
+            if citation_cnt > 1:
+                citation['title'] = self.convert_to_chinese(str(best_indices + 1)) + '、' + citation['title']
+                citation['title'] = "**" + citation['title'] + "**"
+            else:
+                citation['title'] = "**" + citation['title'] + "**"
+
+            best_idxes = citation['best_idx']
+            print(best_idxes)
+
+            # 判断当前一组引用是否被当前段落引用过
+            if best_idxes not in is_content_exists:
+                for idx, best_idx in enumerate(best_idxes):
+                    # 判断当前组是否存在重复文档
+                    if selected_docs[best_idx]["doc_id"] not in is_doc_id_exists:
+                        group_item = {
+                            "doc_id": selected_docs[best_idx]["doc_id"],
+                            "chk_id": selected_docs[best_idx]["chk_id"],
+                            "doc_source": selected_docs[best_idx]["newsinfo"]["source"],
+                            "doc_date": selected_docs[best_idx]["newsinfo"]["date"],
+                            "doc_title": selected_docs[best_idx]["newsinfo"]["title"],
+                            # "chk_content": selected_docs[best_idx]['content'],
+                            "chk_content": citation['citation_content'][idx],
+                            "best_ratio": citation['best_ratio'][idx],
+                            "highlight": citation['highlighted_start_end'][idx],
+                        }
+                        group_list.append(group_item)
+                        is_doc_id_exists.append(selected_docs[best_idx]["doc_id"])
+
                 quote_list.append({
                     "doc_list": group_list,
                     "chk_content": group_list[0]["chk_content"],
@@ -247,8 +235,18 @@ class SourceCitation:
                 # final_response.append(f"{citation['title']}\n")
                 # final_response.append(f"\n{citation['content']}{[best_indices]}\n\n")
 
-                is_content_exists.append(best_idx)
+                is_content_exists.append(best_idxes)
+
         data = {'result': ''.join(final_response), 'quote_list': quote_list, 'summary': response['summary']}
+        # Save to JSON file
+        json_data['result']=''.join(final_response)
+        json_data['quote_list']=quote_list
+        output_file = "citation_res.json"
+        with open("citation_res.json", 'w', encoding='utf-8') as f:
+            json.dump(json_data, f, ensure_ascii=False, indent=4)
+
+        loguru.logger.info(f"Parameters saved to {output_file}")
+        print(json_data)
         return data
 
 
@@ -257,7 +255,7 @@ if __name__ == '__main__':
 
     with open(f'{PROJECT_BASE}/data/docs/citations_samples/sample17.json', 'r', encoding='utf-8') as f:
         input_data = json.load(f)
-    print(input_data)
+    # print(input_data)
     result = mc.ground_response(
         question=input_data["question"],
         response=input_data["response"],
@@ -268,4 +266,4 @@ if __name__ == '__main__':
         selected_docs=input_data["selected_docs"],
     )
 
-    print(result)
+    # print(result)
