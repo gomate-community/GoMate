@@ -40,6 +40,10 @@ class CitationBody(BaseModel):
         default=True,
         description="是否显示引用代码块"
     )
+    show_summary: bool = Field(
+        default=False,
+        description="是否使用原文"
+    )
     selected_docs:List[dict]=Field(
         default=[]
 
