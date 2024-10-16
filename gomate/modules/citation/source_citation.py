@@ -164,7 +164,7 @@ class SourceCitation:
             "selected_docs": selected_docs
         }
         response = self.load_response_json(response)
-        contents = response['contents']
+        contents = [content  for content in response['contents'] if 'title' in content and 'content' in content]
 
         final_response = []
         quote_list = []
@@ -243,8 +243,9 @@ class SourceCitation:
                     "highlight": group_list[0]["highlight"],
                 })
                 best_indices += 1
-                final_response.append(f"{citation['title']}\n")
-                final_response.append(f"\n{citation['content']}{[best_indices]}\n\n")
+                final_response.append(f"{citation['title']}{[best_indices]}\n\n")
+                # final_response.append(f"{citation['title']}\n")
+                # final_response.append(f"\n{citation['content']}{[best_indices]}\n\n")
 
                 is_content_exists.append(best_idx)
         data = {'result': ''.join(final_response), 'quote_list': quote_list, 'summary': response['summary']}
