@@ -168,7 +168,7 @@ class MatchCitation:
 if __name__ == '__main__':
     mc = MatchCitation()
 
-    with open(f'{PROJECT_BASE}/data/docs/citations_samples/sample1.json','r',encoding='utf-8') as f:
+    with open(f'{PROJECT_BASE}/data/docs/citations_samples/sample5.json','r',encoding='utf-8') as f:
         input_data =json.load(f)
     print(input_data)
     result = mc.ground_response(
