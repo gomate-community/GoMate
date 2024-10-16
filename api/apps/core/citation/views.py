@@ -34,19 +34,30 @@ async def citation(citation_body: CitationBody):
     # loguru.logger.info(response)
     loguru.logger.info(show_summary)
     print(show_summary)
-    show_summary=False
-    if not show_summary:
+    try:
+        show_summary=True
+        if not show_summary:
+            citation_response = mc.ground_response(
+                question=question,
+                response=response,
+                evidences=evidences,
+                selected_idx=selected_idx,
+                markdown=True,
+                show_code=show_code,
+                selected_docs=selected_docs
+            )
+        else:
+            citation_response = sc.ground_response(
+                question=question,
+                response=response,
+                evidences=evidences,
+                selected_idx=selected_idx,
+                markdown=True,
+                show_code=show_code,
+                selected_docs=selected_docs
+            )
+    except:
         citation_response = mc.ground_response(
-            question=question,
-            response=response,
-            evidences=evidences,
-            selected_idx=selected_idx,
-            markdown=True,
-            show_code=show_code,
-            selected_docs=selected_docs
-        )
-    else:
-        citation_response = sc.ground_response(
             question=question,
             response=response,
             evidences=evidences,
