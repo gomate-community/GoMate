@@ -171,13 +171,10 @@ class SourceCitation:
         best_indices = 0
 
         new_contents = []
-        is_content_exists = []
         for cit_idx, citation in enumerate(contents):
             sentence = citation['title'] + citation['content']
             sentence_seg_cut = set(jieba.lcut(self.remove_stopwords(sentence)))
             sentence_seg_cut_length = len(sentence_seg_cut)
-
-            group_list = []
 
             best_ratio = 0.0
             best_sentence = ''
@@ -197,18 +194,36 @@ class SourceCitation:
                         highlighted_start_end = self.highlight_common_substrings(sentence, evidence_sentence,
                                                                                  doc['content'])
 
-            citation['content'] = best_sentence
+            citation['citation_content'] = best_sentence
             citation['best_idx'] = best_idx
-            citation['best_score'] = best_ratio
+            citation['best_ratio'] = best_ratio
+            citation['highlighted_start_end'] = highlighted_start_end
             # citation['title'] = self.convert_to_chinese(str(cit_idx + 1)) + '、' + citation['title']
             # newsinfo = selected_docs[best_idx]['newsinfo']
             # citation['source'] = '--- ' + newsinfo['title'] + ' ' + newsinfo['date'] + ' ' + newsinfo['source']
-            if len(contents) > 1:
-                citation['title'] = self.convert_to_chinese(str(best_indices + 1)) + '、' + citation['title']
-                citation['title'] = "**" + citation['title'] + "**"
-            else:
-                citation['title'] = "**" + citation['title'] + "**"
+
+        # 是否设置标题序号：如果存在多个段落需要设置，如果只有一个段落那么不需要设置
+        citation_cnt = 0
+
+        is_citation_exists = []
+        for citation in contents:
+            best_idx = citation['best_idx']
+            if best_idx not in is_citation_exists:
+                new_contents.append(citation)
+                is_citation_exists.append(best_idx)
+                citation_cnt += 1
+
+        is_content_exists = []
+
+        for citation in contents:
+            group_list = []
+            best_idx = citation['best_idx']
             if best_idx not in is_content_exists:
+                if citation_cnt > 1:
+                    citation['title'] = self.convert_to_chinese(str(best_indices + 1)) + '、' + citation['title']
+                    citation['title'] = "**" + citation['title'] + "**"
+                else:
+                    citation['title'] = "**" + citation['title'] + "**"
                 new_contents.append(citation)
 
                 group_item = {
@@ -218,8 +233,8 @@ class SourceCitation:
                     "doc_date": selected_docs[best_idx]["newsinfo"]["date"],
                     "doc_title": selected_docs[best_idx]["newsinfo"]["title"],
                     "chk_content": selected_docs[best_idx]['content'],
-                    "best_ratio": best_ratio,
-                    "highlight": highlighted_start_end,
+                    "best_ratio": citation['best_ratio'],
+                    "highlight": citation['highlighted_start_end'],
                 }
                 group_list.append(group_item)
                 quote_list.append({
@@ -229,7 +244,7 @@ class SourceCitation:
                 })
                 best_indices += 1
                 final_response.append(f"{citation['title']}\n")
-                final_response.append(f"{citation['content']}{[best_indices]}\n\n")
+                final_response.append(f"\n{citation['content']}{[best_indices]}\n\n")
 
                 is_content_exists.append(best_idx)
         data = {'result': ''.join(final_response), 'quote_list': quote_list, 'summary': response['summary']}
