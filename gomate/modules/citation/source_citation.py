@@ -157,7 +157,7 @@ class SourceCitation:
             sentence_seg_cut = set(jieba.lcut(self.remove_stopwords(sentence)))
             sentence_seg_cut_length = len(sentence_seg_cut)
 
-            threshold = 0.2
+            threshold = 0.3
             # 检索内容
             for doc_idx, doc in enumerate(selected_docs):
                 evidence_sentences = self.cut(doc['content'])
@@ -193,19 +193,16 @@ class SourceCitation:
         quote_list = []
         best_indices = 0
 
-        for citation in contents:
-            is_doc_id_exists = []
-            group_list = []
-
+        for citation_idx,citation in enumerate(contents):
             if citation_cnt > 1:
-                citation['title'] = self.convert_to_chinese(str(best_indices + 1)) + '、' + citation['title']
-                citation['title'] = "**" + citation['title'] + "**"
-            else:
-                citation['title'] = "**" + citation['title'] + "**"
+                citation['title'] = self.convert_to_chinese(str(citation_idx + 1)) + '、' + citation['title']
+            citation['title'] = "**" + citation['title'] + "**"
+            final_response.append(f"{citation['title']}")
 
             best_idxes = citation['best_idx']
             print(best_idxes)
-
+            is_doc_id_exists = []
+            group_list = []
             # 判断当前一组引用是否被当前段落引用过
             if best_idxes not in is_content_exists:
                 for idx, best_idx in enumerate(best_idxes):
@@ -224,18 +221,43 @@ class SourceCitation:
                         }
                         group_list.append(group_item)
                         is_doc_id_exists.append(selected_docs[best_idx]["doc_id"])
+                        # 合并引用
+                group_list.sort(key=lambda x: x['best_ratio'], reverse=True)
 
-                quote_list.append({
-                    "doc_list": group_list,
-                    "chk_content": group_list[0]["chk_content"],
-                    "highlight": group_list[0]["highlight"],
-                })
-                best_indices += 1
-                final_response.append(f"{citation['title']}{[best_indices]}\n\n")
-                # final_response.append(f"{citation['title']}\n")
-                # final_response.append(f"\n{citation['content']}{[best_indices]}\n\n")
+                # Merge based on content overlap
+                merged_group_list = []
+                reference = group_list[0]
+                reference_tokens = set(jieba.lcut(self.remove_stopwords(reference['chk_content'])))
+                merged_group = [reference]
+                # print(len(group_list))
+                for item in group_list[1:]:
+                    item_tokens = set(jieba.lcut(self.remove_stopwords(item['chk_content'])))
+                    if len(reference_tokens.intersection(item_tokens)) > 15:
+                        merged_group.append(item)
+                    else:
+                        merged_group_list.append([item])
+                        # merged_group = [item]
+                if merged_group:
+                    print(len(merged_group))
+                    merged_group_list.append(merged_group)
+                for group in merged_group_list:
+                    quote_list.append({
+                        "doc_list": group,
+                        "chk_content": group[0]["chk_content"],
+                        "highlight": group[0]["highlight"],
+                    })
 
-                is_content_exists.append(best_idxes)
+                    best_indices += 1
+                    final_response.append(f"{[best_indices]}")
+                # quote_list.append({
+                #     "doc_list": group_list,
+                #     "chk_content": group_list[0]["chk_content"],
+                #     "highlight": group_list[0]["highlight"],
+                # })
+                # best_indices += 1
+                # final_response.append(f"{citation['title']}{[best_indices]}\n\n")
+                #
+                # is_content_exists.append(best_idxes)
 
         data = {'result': ''.join(final_response), 'quote_list': quote_list, 'summary': response['summary']}
         # Save to JSON file
