@@ -84,29 +84,13 @@ class MatchCitation:
             "selected_idx": selected_idx,
             "selected_docs": selected_docs
         }
-
-        # Log using loguru
-        # loguru.logger.info(f"Response: {response}")
-        # loguru.logger.info(f"Evidences: {evidences}")
-        # loguru.logger.info(f"Selected indices: {selected_idx}")
-        # loguru.logger.info(f"Selected documents: {selected_docs}")
-
         # Save to JSON file
         output_file = "citation_match.json"
         with open(output_file, 'w', encoding='utf-8') as f:
             json.dump(json_data, f, ensure_ascii=False, indent=4)
-
         loguru.logger.info(f"Parameters saved to {output_file}")
-
-        print(response)
         sentences = self.cut(response)
-        print(sentences)
-        selected_idx = [i - 1 for i in selected_idx]
 
-        quote_list = []
-        final_response = []
-        quote_index_map = {}  # To keep track of existing quotes
-        best_idx = 0
         contents = [{"content": sentence} for sentence in sentences]
         for cit_idx, citation in enumerate(contents):
             citation['citation_content'] = []
@@ -153,13 +137,14 @@ class MatchCitation:
         quote_list = []
         best_indices = 0
 
+        is_group_exists=[]
         for citation_idx, citation in enumerate(contents):
             final_response.append(f"{citation['content']}")
 
             best_idxes = citation['best_idx']
-            if len(best_idxes)>0:
-                print(citation)
-                print(best_idxes)
+            if len(best_idxes) > 0:
+                # print(citation)
+                # print(best_idxes)
                 is_doc_id_exists = []
                 group_list = []
                 # 判断当前一组引用是否被当前段落引用过
@@ -180,7 +165,6 @@ class MatchCitation:
                             }
                             group_list.append(group_item)
                             is_doc_id_exists.append(selected_docs[best_idx]["doc_id"])
-
                     # 合并引用
                     group_list.sort(key=lambda x: x['best_ratio'], reverse=True)
 
@@ -190,7 +174,7 @@ class MatchCitation:
                     merged_group = [reference]
                     for item in group_list[1:]:
                         item_tokens = set(jieba.lcut(self.remove_stopwords(item['chk_content'])))
-                        if len(reference_tokens.intersection(item_tokens)) > 15:
+                        if len(reference_tokens.intersection(item_tokens)) > 5:
                             merged_group.append(item)
                         else:
                             merged_group_list.append([item])
@@ -198,21 +182,28 @@ class MatchCitation:
                     if merged_group:
                         merged_group_list.append(merged_group)
                     for group in merged_group_list:
-                        quote_list.append({
-                            "doc_list": group,
-                            "chk_content": group[0]["chk_content"],
-                            "highlight": group[0]["highlight"],
-                        })
-
-                        best_indices += 1
-                        final_response.append(f"{[best_indices]}")
+                        group_data={
+                                "doc_list": group,
+                                "chk_content": group[0]["chk_content"],
+                                "highlight": group[0]["highlight"],
+                            }
+                        doc_id_list=[doc['doc_id'] for doc in group_data['doc_list']]
+                        # print(doc_id_list)
+                        if doc_id_list not in is_group_exists:
+                            quote_list.append(group_data)
+                            best_indices += 1
+                            final_response.append(f"{[best_indices]}")
+                            is_group_exists.append(doc_id_list)
+                        else:
+                            # print("已存在")
+                            final_response.append(f"{[is_group_exists.index(doc_id_list)+1]}")
 
         data = {'result': ''.join(final_response), 'quote_list': quote_list, 'summary': ''}
         # Save to JSON file
         json_data['result'] = ''.join(final_response)
         json_data['quote_list'] = quote_list
-        output_file = "citation_res.json"
-        with open("citation_res.json", 'w', encoding='utf-8') as f:
+        output_file = "citation_match_res.json"
+        with open(output_file, 'w', encoding='utf-8') as f:
             json.dump(json_data, f, ensure_ascii=False, indent=4)
 
         loguru.logger.info(f"Parameters saved to {output_file}")
