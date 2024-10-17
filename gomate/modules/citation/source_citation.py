@@ -221,10 +221,10 @@ class SourceCitation:
                         }
                         group_list.append(group_item)
                         is_doc_id_exists.append(selected_docs[best_idx]["doc_id"])
-                        # 合并引用
+
+                # 合并引用
                 group_list.sort(key=lambda x: x['best_ratio'], reverse=True)
 
-                # Merge based on content overlap
                 merged_group_list = []
                 reference = group_list[0]
                 reference_tokens = set(jieba.lcut(self.remove_stopwords(reference['chk_content'])))
