@@ -102,26 +102,29 @@ class MatchCitation:
             # 答案内容进行分词
             sentence_seg_cut = set(jieba.lcut(self.remove_stopwords(sentence)))
             sentence_seg_cut_length = len(sentence_seg_cut)
-
             threshold = 0.5
             # 检索内容
             for doc_idx, doc in enumerate(selected_docs):
                 evidence_sentences = self.cut(doc['content'])
                 for es_idx, evidence_sentence in enumerate(evidence_sentences):
-                    evidence_seg_cut = set(jieba.lcut(self.remove_stopwords(evidence_sentence)))
-                    overlap = sentence_seg_cut.intersection(evidence_seg_cut)
-                    ratio = len(overlap) / sentence_seg_cut_length
-                    if ratio > threshold:
-                        best_ratio = ratio
-                        best_idx = doc_idx
-                        best_sentence = evidence_sentence
-                        highlighted_start_end = self.highlight_common_substrings(sentence, evidence_sentence,
-                                                                                 doc['content'])
-                        if best_idx not in citation['best_idx']:
-                            citation['citation_content'].append(doc['content'])
-                            citation['best_idx'].append(best_idx)
-                            citation['best_ratio'].append(best_ratio)
-                            citation['highlighted_start_end'].append(highlighted_start_end)
+                    ## 可能存在空的片段
+                    if evidence_sentence.strip() and sentence.strip() :
+                        evidence_seg_cut = set(jieba.lcut(self.remove_stopwords(evidence_sentence)))
+                        overlap = sentence_seg_cut.intersection(evidence_seg_cut)
+                        ratio = len(overlap) / sentence_seg_cut_length
+                        # print(sentence_seg_cut,evidence_seg_cut,ratio)
+
+                        if ratio > threshold:
+                            best_ratio = ratio
+                            best_idx = doc_idx
+                            best_sentence = evidence_sentence
+                            highlighted_start_end = self.highlight_common_substrings(sentence, evidence_sentence,
+                                                                                     doc['content'])
+                            if best_idx not in citation['best_idx']:
+                                citation['citation_content'].append(doc['content'])
+                                citation['best_idx'].append(best_idx)
+                                citation['best_ratio'].append(best_ratio)
+                                citation['highlighted_start_end'].append(highlighted_start_end)
         print(contents)
 
         citation_cnt = 0
@@ -143,8 +146,6 @@ class MatchCitation:
 
             best_idxes = citation['best_idx']
             if len(best_idxes) > 0:
-                # print(citation)
-                # print(best_idxes)
                 is_doc_id_exists = []
                 group_list = []
                 # 判断当前一组引用是否被当前段落引用过
@@ -214,9 +215,8 @@ class MatchCitation:
 if __name__ == '__main__':
     mc = MatchCitation()
 
-    with open(f'{PROJECT_BASE}/data/docs/citations_samples/sample18.json', 'r', encoding='utf-8') as f:
+    with open(f'{PROJECT_BASE}/data/docs/citations_samples/sample19.json', 'r', encoding='utf-8') as f:
         input_data = json.load(f)
-    print(input_data)
     result = mc.ground_response(
         question=input_data["question"],
         response=input_data["response"],
