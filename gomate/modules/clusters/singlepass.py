@@ -123,6 +123,8 @@ class SGCluster(object):
             tv = TfidfVector()
             corpus_vectors = tv.online_transform(corpus=data['text'], max_features=self.max_features,
                                                  n_components=self.n_components, is_svd=True, ngrams=(1, self.ngrams))
+            print(corpus_vectors)
+            print(corpus_vectors.shape)
             np.save(self.vector_file, corpus_vectors)
         else:
             corpus_vectors = np.load(self.vector_file)
@@ -167,14 +169,14 @@ class SGCluster(object):
         print("len(artilceid_clusterid)", len(artilceid_clusterid))
         print("len(clusterid_keywords)", len(clusterid_keywords))
         print(data['id'])
-        print(artilceid_clusterid)
-        print(clusterid_keywords)
+        # print(artilceid_clusterid)
+        # print(clusterid_keywords)
         data['cluster_index'] = data['id'].map(artilceid_clusterid)
         data['cluster_label'] = data['cluster_index'].map(clusterid_keywords)
 
         data['cluster_count'] = data.groupby(by='cluster_index')['id'].transform('count')
         usual_print(self.output_file, "正在保存到")
-        print(data)
+        # print(data)
         save_cols = ['id', 'title', 'content', 'cluster_index', 'cluster_label', 'cluster_count']
         if self.output_file.endswith('xlsx'):
             data[save_cols].to_excel(self.output_file, index=None)
@@ -204,14 +206,17 @@ if __name__ == '__main__':
 
     # file_name = 'result01_2021-06-02_rules.xlsx'
     # data = pd.read_excel('data-zh-main.xlsx', dtype={'id': str})
-    data = pd.DataFrame(documents, columns=['id', 'title', 'content'])
+    # data = pd.DataFrame(documents, columns=['id', 'title', 'content'])
+    data = pd.read_excel('data.xlsx', dtype={'id': str})
+    data=data.drop_duplicates(subset=['title']).reset_index(drop=True)
+    print(data.shape)
     data['id'] = data['id'].astype(str)
     # [id,title,content]
     sc = SGCluster(
         vector_path="vector.npy",
         result_txt_file="result.txt",
         output_file="result.xlsx",
-        threshold=0.5,
+        threshold=0.4,
         max_features=8888,
         n_components=1024,
         ngrams=2,
