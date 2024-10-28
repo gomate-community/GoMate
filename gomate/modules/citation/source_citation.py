@@ -5,7 +5,6 @@ from typing import List
 import jieba
 import loguru
 
-
 from gomate.modules.document.utils import PROJECT_BASE
 
 
@@ -65,7 +64,6 @@ class SourceCitation:
             tuple: (summary, list of dict)
         """
         import re
-        import json
 
         # 提取summary部分
         summary_pattern = r'"summary"\s*:\s*"([^"]+)"'
@@ -91,7 +89,7 @@ class SourceCitation:
 
     def load_response_json(self, response):
         cleaned_response = re.sub(r'^.*?```json\n|```$', '', response, flags=re.DOTALL)
-        print(cleaned_response)
+        print("cleaned_response",cleaned_response)
         try:
             data = json.loads(cleaned_response)
         except:
@@ -224,9 +222,10 @@ class SourceCitation:
             "selected_idx": selected_idx,
             "selected_docs": selected_docs,
         }
+        raw_response = response
         try:
             output_file = "/home/yanqiang/code/citation.json"
-            with open("/home/yanqiang/code/citation.json", 'w', encoding='utf-8') as f:
+            with open(output_file, 'w', encoding='utf-8') as f:
                 json.dump(json_data, f, ensure_ascii=False, indent=4)
         except:
             output_file = "citation.json"
@@ -341,24 +340,31 @@ class SourceCitation:
 
                     best_indices += 1
                     final_response.append(f"{[best_indices]}")
+        result = ''.join(final_response)
+        if not result.strip():
+            # 如果答案为空以及总结内容为空，尝试用原始答案回答
+            try:
+                if not response['summary']:
+                    response['summary'] = raw_response
+            except Exception as e:
+                result = raw_response
+        data = {'result': result, 'quote_list': quote_list, 'summary': response['summary']}
 
-        data = {'result': ''.join(final_response), 'quote_list': quote_list, 'summary': response['summary']}
         # Save to JSON file
-        json_data['result']=''.join(final_response)
-        json_data['quote_list']=quote_list
+        json_data['result'] = result
+        json_data['quote_list'] = quote_list
         output_file = "citation_res.json"
-        with open("citation_res.json", 'w', encoding='utf-8') as f:
+        with open(output_file, 'w', encoding='utf-8') as f:
             json.dump(json_data, f, ensure_ascii=False, indent=4)
-
         loguru.logger.info(f"Parameters saved to {output_file}")
-        print(json_data)
+        print(data)
         return data
 
 
 if __name__ == '__main__':
     mc = SourceCitation()
 
-    with open(f'{PROJECT_BASE}/data/docs/citations_samples/sample17.json', 'r', encoding='utf-8') as f:
+    with open(f'{PROJECT_BASE}/data/docs/citations_samples/无法回答2.json', 'r', encoding='utf-8') as f:
         input_data = json.load(f)
     # print(input_data)
     result = mc.ground_response(
