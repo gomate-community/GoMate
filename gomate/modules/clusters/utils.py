@@ -323,11 +323,11 @@ def insert_mongo_report():
             contents = []
             for level1_index, group1 in df.groupby(by=["cluster_level1_index"]):
                 nodes = []
-                for level2_index, group2 in group1.groupby(by=["cluster_level1_index"]):
+                for level2_index, group2 in group1.groupby(by=["cluster_level2_index"]):
                     nodes.append(
                         {
-                            'title': group1['level2_title'].unique()[0],
-                            'content': group1['level2_content'].unique()[0]
+                            'title': group2['level2_title'].unique()[0],
+                            'content': group2['level2_content'].unique()[0]
                         }
                     )
                 contents.append({
@@ -378,6 +378,6 @@ def main():
 
 def sing_run():
     generate_report()
-    # insert_mongo_report()
+    insert_mongo_report()
 if __name__ == '__main__':
     main()
