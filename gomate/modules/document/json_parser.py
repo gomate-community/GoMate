@@ -37,17 +37,21 @@ class JsonParser(object):
         except:
             if 'sections' in data:
                 # for document in data['documents']:
-                    for section in data['sections']:
-                        sections.append(
-                            {
-                                'source': data['file_name'],
-                                'title': data['title'],
-                                'date': data['date'],
-                                'sec_num': section['sec_num'],
-                                'content': section['sec_theme'] + '\n' + section['content'],
-                                'chunks': [chunk['content'] for chunk in section['chunks']]
-                            }
-                        )
+                for section in data['sections']:
+                    sections.append(
+                        {
+                            'source': data['file_name'],
+                            'title': data['title'],
+                            'date': data['date'],
+                            'sec_num': section['sec_num'],
+                            'content': section['sec_theme'] + '\n' + section['content'],
+                            'chunks': [
+                                data['file_name'] + data['date'] + '\n' +
+                                data['title'] + '\n' + section['sec_theme'] + '\n' +
+                                chunk['content'] for chunk in section['chunks']
+                            ]
+                        }
+                    )
         # print(len(sections),len(json_lines))
         return sections
 

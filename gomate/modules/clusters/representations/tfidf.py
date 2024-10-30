@@ -13,7 +13,7 @@ from sklearn.decomposition import TruncatedSVD
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import Normalizer
-
+import loguru
 jieba.setLogLevel(logging.INFO)
 
 
@@ -48,17 +48,35 @@ class TfidfVector(object):
             X = X.toarray()
         print("原始的tfidf矩阵大小X.shape", X.shape)
         print("词汇量：", len(vec.vocabulary_))  # 词汇量： 76381
-        print(vec.idf_)
+        # print(vec.idf_)
         # print(vec.vocabulary_)
         if is_svd:
             t0 = time.time()
-            svd = TruncatedSVD(n_components=n_components, random_state=42)
-            normalizer = Normalizer(copy=False)
-            lsa = make_pipeline(svd, normalizer, verbose=True)
-            X = lsa.fit_transform(X)
-            # print(X)
+            try:
+                svd = TruncatedSVD(n_components=n_components, random_state=42)
+                normalizer = Normalizer(copy=False)
+                lsa = make_pipeline(svd, normalizer, verbose=True)
+                X = lsa.fit_transform(X)
+
+            except ValueError as e:
+                if "n_components" in str(e):
+                    # 获取实际特征数量
+                    n_features = X.shape[1]
+                    loguru.logger.warning(f"n_components({n_components})大于特征数量({n_features})，自动调整为{n_features - 1}")
+
+                    # 重新设置组件数量为特征数量-1
+                    adjusted_n_components = n_features - 1
+                    svd = TruncatedSVD(n_components=adjusted_n_components, random_state=42)
+                    normalizer = Normalizer(copy=False)
+                    lsa = make_pipeline(svd, normalizer, verbose=True)
+                    X = lsa.fit_transform(X)
+                else:
+                    # 如果是其他ValueError，则向上传递
+                    raise e
+                # 打印结果
             print("通过SVD降维之后的X.shape", X.shape)
             print("done in %fs" % (time.time() - t0))
+
             explained_variance = svd.explained_variance_ratio_.sum()
             print("Explained variance of the SVD step: {}%".format(
                 int(explained_variance * 100)))

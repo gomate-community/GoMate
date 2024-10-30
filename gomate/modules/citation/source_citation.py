@@ -53,10 +53,47 @@ class SourceCitation:
             query = query.replace(word, " ")
         return query
 
+    def extract_content(self, text):
+        """
+        从文本中提取summary和所有的title-content对
+
+        参数:
+            text: 包含summary和多个title-content对的文本
+
+        返回:
+            tuple: (summary, list of dict)
+        """
+        import re
+
+        # 提取summary部分
+        summary_pattern = r'"summary"\s*:\s*"([^"]+)"'
+        summary_match = re.search(summary_pattern, text)
+        summary = summary_match.group(1) if summary_match else ""
+
+        # 提取所有的title-content对
+        pattern = r'{[^{]*?"title"\s*:\s*"([^"]+)"[^{]*?"content"\s*:\s*"([^"]+)"[^}]*?}'
+        matches = re.finditer(pattern, text)
+
+        items = []
+        for match in matches:
+            item = {
+                "title": match.group(1),
+                "content": match.group(2)
+            }
+            items.append(item)
+        result = {
+            "summary": summary,
+            "contents": items
+        }
+        return result
+
     def load_response_json(self, response):
         cleaned_response = re.sub(r'^.*?```json\n|```$', '', response, flags=re.DOTALL)
-        print(cleaned_response)
-        data = json.loads(cleaned_response)
+        print("cleaned_response",cleaned_response)
+        try:
+            data = json.loads(cleaned_response)
+        except:
+            data = self.extract_content(cleaned_response)
         return data
 
     def deduplicate_docs(self, docs):
@@ -121,6 +158,52 @@ class SourceCitation:
             formatted_text += f"```\n{item['title']}\n{item['content']}\n```\n\n"
         return formatted_text.strip()
 
+    def merge_groups(self, groups):
+        """
+        Merge groups based on their highlighted content and chk_content
+
+        Args:
+            groups: List of lists containing document dictionaries
+        Returns:
+            List of merged groups
+        """
+        if not groups:
+            return []
+
+        # Helper function to get highlighted content
+        def get_highlighted_content(doc):
+            if not doc.get("highlight") or not doc.get("chk_content"):
+                return ""
+            highlights = []
+            for start, end in doc["highlight"]:
+                highlights.append(doc["chk_content"][start:end])
+            return "".join(highlights)
+
+        # Initialize merged groups with the first group
+        merged_groups = [groups[0]]
+        highlighted_contents = [get_highlighted_content(groups[0][0])]
+
+        # Iterate through remaining groups
+        for current_group in groups[1:]:
+            current_highlight = get_highlighted_content(current_group[0])
+
+            # Check if current group should be merged with any existing group
+            merged = False
+            for i, (existing_group, existing_highlight) in enumerate(zip(merged_groups, highlighted_contents)):
+                if (current_highlight == existing_highlight and
+                        current_group[0]["chk_content"] == existing_group[0]["chk_content"]):
+                    # Merge groups
+                    merged_groups[i].extend(current_group)
+                    merged = True
+                    break
+
+            # If no merge occurred, add as new group
+            if not merged:
+                merged_groups.append(current_group)
+                highlighted_contents.append(current_highlight)
+
+        return merged_groups
+
     def ground_response(
             self,
             question: str,
@@ -139,13 +222,19 @@ class SourceCitation:
             "selected_idx": selected_idx,
             "selected_docs": selected_docs,
         }
-        output_file = "citation.json"
-        with open("citation.json", 'w', encoding='utf-8') as f:
-            json.dump(json_data, f, ensure_ascii=False, indent=4)
-
+        raw_response = response
+        try:
+            output_file = "/home/yanqiang/code/citation.json"
+            with open(output_file, 'w', encoding='utf-8') as f:
+                json.dump(json_data, f, ensure_ascii=False, indent=4)
+        except:
+            output_file = "citation.json"
+            with open(output_file, 'w', encoding='utf-8') as f:
+                json.dump(json_data, f, ensure_ascii=False, indent=4)
         response = self.load_response_json(response)
         contents = [content for content in response['contents'] if 'title' in content and 'content' in content]
 
+        is_citation_used=[]
         for cit_idx, citation in enumerate(contents):
             citation['citation_content'] = []
             citation['best_idx'] = []
@@ -157,7 +246,7 @@ class SourceCitation:
             sentence_seg_cut = set(jieba.lcut(self.remove_stopwords(sentence)))
             sentence_seg_cut_length = len(sentence_seg_cut)
 
-            threshold = 0.3
+            threshold = 0.25
             # 检索内容
             for doc_idx, doc in enumerate(selected_docs):
                 evidence_sentences = self.cut(doc['content'])
@@ -169,14 +258,19 @@ class SourceCitation:
                         best_ratio = ratio
                         best_idx = doc_idx
                         best_sentence = evidence_sentence
-                        highlighted_start_end = self.highlight_common_substrings(sentence, evidence_sentence,
-                                                                                 doc['content'])
-                        if best_idx not in citation['best_idx']:
-                            citation['citation_content'].append(doc['content'])
-                            citation['best_idx'].append(best_idx)
-                            citation['best_ratio'].append(best_ratio)
-                            citation['highlighted_start_end'].append(highlighted_start_end)
-        print(contents)
+                        highlighted_start_end = self.highlight_common_substrings(sentence, evidence_sentence,doc['content'])
+                        if best_idx not in citation['best_idx'] :
+                            # 跟引用是否被使用过，保障独占式
+                            if  (best_idx,highlighted_start_end) not in is_citation_used:
+                                citation['citation_content'].append(doc['content'])
+                                citation['best_idx'].append(best_idx)
+                                citation['best_ratio'].append(best_ratio)
+                                citation['highlighted_start_end'].append(highlighted_start_end)
+                                is_citation_used.append((best_idx,highlighted_start_end))
+
+        print(len(contents))
+        contents = [content for content in contents if content['best_idx']]
+        print(len(contents))
 
         citation_cnt = 0
         is_citation_exists = []
@@ -186,21 +280,19 @@ class SourceCitation:
                 is_citation_exists.append(best_idx)
                 citation_cnt += 1
 
-
-
         is_content_exists = []
         final_response = []
         quote_list = []
         best_indices = 0
 
-        for citation_idx,citation in enumerate(contents):
+        for citation_idx, citation in enumerate(contents):
             if citation_cnt > 1:
                 citation['title'] = self.convert_to_chinese(str(citation_idx + 1)) + '、' + citation['title']
             citation['title'] = "**" + citation['title'] + "**"
             final_response.append(f"{citation['title']}")
 
             best_idxes = citation['best_idx']
-            print(best_idxes)
+            print("best_idxes", best_idxes)
             is_doc_id_exists = []
             group_list = []
             # 判断当前一组引用是否被当前段落引用过
@@ -225,6 +317,7 @@ class SourceCitation:
                 # 合并引用
                 group_list.sort(key=lambda x: x['best_ratio'], reverse=True)
 
+                # 根据分组内容相似度合并
                 merged_group_list = []
                 reference = group_list[0]
                 reference_tokens = set(jieba.lcut(self.remove_stopwords(reference['chk_content'])))
@@ -238,8 +331,13 @@ class SourceCitation:
                         merged_group_list.append([item])
                         # merged_group = [item]
                 if merged_group:
-                    print(len(merged_group))
+                    # print(len(merged_group))
                     merged_group_list.append(merged_group)
+
+                # 根据分组是否出现合，完全一致 相似内容
+                merged_group_list = self.merge_groups(merged_group_list)
+                # print(merged_group_list)
+
                 for group in merged_group_list:
                     quote_list.append({
                         "doc_list": group,
@@ -249,33 +347,32 @@ class SourceCitation:
 
                     best_indices += 1
                     final_response.append(f"{[best_indices]}")
-                # quote_list.append({
-                #     "doc_list": group_list,
-                #     "chk_content": group_list[0]["chk_content"],
-                #     "highlight": group_list[0]["highlight"],
-                # })
-                # best_indices += 1
-                # final_response.append(f"{citation['title']}{[best_indices]}\n\n")
-                #
-                # is_content_exists.append(best_idxes)
 
-        data = {'result': ''.join(final_response), 'quote_list': quote_list, 'summary': response['summary']}
+        result = ''.join(final_response)
+        if not result.strip():
+            # 如果答案为空以及总结内容为空，尝试用原始答案回答
+            try:
+                if not response['summary']:
+                    response['summary'] = raw_response
+            except Exception as e:
+                result = raw_response
+        data = {'result': result, 'quote_list': quote_list, 'summary': response['summary']}
+
         # Save to JSON file
-        json_data['result']=''.join(final_response)
-        json_data['quote_list']=quote_list
+        json_data['result'] = result
+        json_data['quote_list'] = quote_list
         output_file = "citation_res.json"
-        with open("citation_res.json", 'w', encoding='utf-8') as f:
+        with open(output_file, 'w', encoding='utf-8') as f:
             json.dump(json_data, f, ensure_ascii=False, indent=4)
-
         loguru.logger.info(f"Parameters saved to {output_file}")
-        print(json_data)
+        # print(data)
         return data
 
 
 if __name__ == '__main__':
     mc = SourceCitation()
 
-    with open(f'{PROJECT_BASE}/data/docs/citations_samples/sample17.json', 'r', encoding='utf-8') as f:
+    with open(f'{PROJECT_BASE}/data/docs/citations_samples/重复引用1.json', 'r', encoding='utf-8') as f:
         input_data = json.load(f)
     # print(input_data)
     result = mc.ground_response(

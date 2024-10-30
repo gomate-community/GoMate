@@ -108,7 +108,7 @@ class MatchCitation:
                 evidence_sentences = self.cut(doc['content'])
                 for es_idx, evidence_sentence in enumerate(evidence_sentences):
                     ## 可能存在空的片段
-                    if evidence_sentence.strip() and sentence.strip() :
+                    if evidence_sentence.strip() and sentence.strip():
                         evidence_seg_cut = set(jieba.lcut(self.remove_stopwords(evidence_sentence)))
                         overlap = sentence_seg_cut.intersection(evidence_seg_cut)
                         ratio = len(overlap) / sentence_seg_cut_length
@@ -140,7 +140,7 @@ class MatchCitation:
         quote_list = []
         best_indices = 0
 
-        is_group_exists=[]
+        is_group_exists = []
         for citation_idx, citation in enumerate(contents):
             final_response.append(f"{citation['content']}")
 
@@ -183,12 +183,12 @@ class MatchCitation:
                     if merged_group:
                         merged_group_list.append(merged_group)
                     for group in merged_group_list:
-                        group_data={
-                                "doc_list": group,
-                                "chk_content": group[0]["chk_content"],
-                                "highlight": group[0]["highlight"],
-                            }
-                        doc_id_list=[doc['doc_id'] for doc in group_data['doc_list']]
+                        group_data = {
+                            "doc_list": group,
+                            "chk_content": group[0]["chk_content"],
+                            "highlight": group[0]["highlight"],
+                        }
+                        doc_id_list = [doc['doc_id'] for doc in group_data['doc_list']]
                         # print(doc_id_list)
                         if doc_id_list not in is_group_exists:
                             quote_list.append(group_data)
@@ -197,7 +197,7 @@ class MatchCitation:
                             is_group_exists.append(doc_id_list)
                         else:
                             # print("已存在")
-                            final_response.append(f"{[is_group_exists.index(doc_id_list)+1]}")
+                            final_response.append(f"{[is_group_exists.index(doc_id_list) + 1]}")
 
         data = {'result': ''.join(final_response), 'quote_list': quote_list, 'summary': ''}
         # Save to JSON file
