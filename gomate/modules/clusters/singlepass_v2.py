@@ -168,8 +168,6 @@ class SGCluster(object):
         print("len(artilceid_clusterid)", len(artilceid_clusterid))
         print("len(clusterid_keywords)", len(clusterid_keywords))
         print(data['id'])
-        # print(artilceid_clusterid)
-        # print(clusterid_keywords)
         data['cluster_level1_index'] = data['cluster_index']
         data['cluster_level2_index'] = data['id'].map(artilceid_clusterid)
         data['cluster_label'] = data['cluster_index'].map(clusterid_keywords)

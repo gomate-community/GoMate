@@ -6,6 +6,7 @@
 # description:"do something"
 import collections
 import os
+import warnings
 from collections import Counter
 
 import jieba
@@ -14,7 +15,8 @@ import numpy as np
 import pandas as pd
 from tqdm import tqdm
 
-from gomate.modules.clusters.corpus import documents
+warnings.filterwarnings("ignore")
+
 from gomate.modules.clusters.libraries.display import usual_print
 from gomate.modules.clusters.representations.tfidf import TfidfVector
 
@@ -26,7 +28,10 @@ class SGCluster(object):
                  output_file=None,
                  threshold=0.3,
                  max_features=88888,
-                 n_components=1024, ngrams=2):
+                 n_components=1024,
+                 ngrams=2,
+                 level=1,
+                 ):
         self.vector_file = vector_path
         self.result_path = result_txt_file
         self.output_file = output_file
@@ -34,6 +39,7 @@ class SGCluster(object):
         self.max_features = max_features
         self.n_components = n_components
         self.ngrams = ngrams
+        self.level=level
 
     def tokenize(self, text):
         """
@@ -119,15 +125,12 @@ class SGCluster(object):
         if 'text' not in data:
             data['text'] = (data['title'].astype(str) + ' ' + data['content'].astype(str)).apply(
                 lambda x: self.tokenize(x))
-        if not os.path.exists(self.vector_file):
-            tv = TfidfVector()
-            corpus_vectors = tv.online_transform(corpus=data['text'], max_features=self.max_features,
+        tv = TfidfVector()
+        corpus_vectors = tv.online_transform(corpus=data['text'], max_features=self.max_features,
                                                  n_components=self.n_components, is_svd=True, ngrams=(1, self.ngrams))
-            print(corpus_vectors)
-            print(corpus_vectors.shape)
-            np.save(self.vector_file, corpus_vectors)
-        else:
-            corpus_vectors = np.load(self.vector_file)
+        # print(corpus_vectors)
+        print("矩阵大小：",corpus_vectors.shape)
+        np.save(self.vector_file, corpus_vectors)
 
         index2ids = collections.OrderedDict()
         index2corpus = collections.OrderedDict()
@@ -166,18 +169,31 @@ class SGCluster(object):
                                                                                               cluster_text))
                 file_write.write('\n')
                 file_write.flush()
-        print("len(artilceid_clusterid)", len(artilceid_clusterid))
-        print("len(clusterid_keywords)", len(clusterid_keywords))
-        print(data['id'])
-        # print(artilceid_clusterid)
-        # print(clusterid_keywords)
-        data['cluster_index'] = data['id'].map(artilceid_clusterid)
-        data['cluster_label'] = data['cluster_index'].map(clusterid_keywords)
+        if self.level==1:
 
-        data['cluster_count'] = data.groupby(by='cluster_index')['id'].transform('count')
-        usual_print(self.output_file, "正在保存到")
-        # print(data)
-        save_cols = ['id', 'title', 'content', 'cluster_index', 'cluster_label', 'cluster_count']
+            print("len(artilceid_clusterid)", len(artilceid_clusterid))
+            print("len(clusterid_keywords)", len(clusterid_keywords))
+            # print(artilceid_clusterid)
+            # print(clusterid_keywords)
+            data['cluster_index'] = data['id'].map(artilceid_clusterid)
+            data['cluster_label'] = data['cluster_index'].map(clusterid_keywords)
+
+            data['cluster_count'] = data.groupby(by='cluster_index')['id'].transform('count')
+            usual_print(self.output_file, "正在保存到")
+            # print(data)
+            save_cols = ['id', 'title', 'content', 'cluster_index', 'cluster_label', 'cluster_count']
+        else:
+            print("len(artilceid_clusterid)", len(artilceid_clusterid))
+            print("len(clusterid_keywords)", len(clusterid_keywords))
+            data['cluster_level1_index'] = data['cluster_index']
+            data['cluster_level2_index'] = data['id'].map(artilceid_clusterid)
+            data['cluster_label'] = data['cluster_index'].map(clusterid_keywords)
+
+            data['cluster_count'] = data.groupby(by='cluster_index')['id'].transform('count')
+            usual_print(self.output_file, "正在保存到")
+            # print(data)
+            save_cols = ['id', 'title', 'content', 'cluster_level1_index', 'cluster_level2_index', 'cluster_label',
+                         'cluster_count']
         if self.output_file.endswith('xlsx'):
             data[save_cols].to_excel(self.output_file, index=None)
         elif self.output_file.endswith('csv'):
@@ -208,10 +224,9 @@ if __name__ == '__main__':
     # data = pd.read_excel('data-zh-main.xlsx', dtype={'id': str})
     # data = pd.DataFrame(documents, columns=['id', 'title', 'content'])
     data = pd.read_excel('data.xlsx', dtype={'id': str})
-    data=data.drop_duplicates(subset=['title']).reset_index(drop=True)
+    data = data.drop_duplicates(subset=['title']).reset_index(drop=True)
     print(data.shape)
     data['id'] = data['id'].astype(str)
-    # [id,title,content]
     sc = SGCluster(
         vector_path="vector.npy",
         result_txt_file="result.txt",
