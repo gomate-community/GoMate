@@ -234,6 +234,7 @@ class SourceCitation:
         response = self.load_response_json(response)
         contents = [content for content in response['contents'] if 'title' in content and 'content' in content]
 
+        is_citation_used=[]
         for cit_idx, citation in enumerate(contents):
             citation['citation_content'] = []
             citation['best_idx'] = []
@@ -257,13 +258,16 @@ class SourceCitation:
                         best_ratio = ratio
                         best_idx = doc_idx
                         best_sentence = evidence_sentence
-                        highlighted_start_end = self.highlight_common_substrings(sentence, evidence_sentence,
-                                                                                 doc['content'])
-                        if best_idx not in citation['best_idx']:
-                            citation['citation_content'].append(doc['content'])
-                            citation['best_idx'].append(best_idx)
-                            citation['best_ratio'].append(best_ratio)
-                            citation['highlighted_start_end'].append(highlighted_start_end)
+                        highlighted_start_end = self.highlight_common_substrings(sentence, evidence_sentence,doc['content'])
+                        if best_idx not in citation['best_idx'] :
+                            # 跟引用是否被使用过，保障独占式
+                            if  (best_idx,highlighted_start_end) not in is_citation_used:
+                                citation['citation_content'].append(doc['content'])
+                                citation['best_idx'].append(best_idx)
+                                citation['best_ratio'].append(best_ratio)
+                                citation['highlighted_start_end'].append(highlighted_start_end)
+                                is_citation_used.append((best_idx,highlighted_start_end))
+
         print(len(contents))
         contents = [content for content in contents if content['best_idx']]
         print(len(contents))
@@ -312,6 +316,8 @@ class SourceCitation:
 
                 # 合并引用
                 group_list.sort(key=lambda x: x['best_ratio'], reverse=True)
+
+                # 根据分组内容相似度合并
                 merged_group_list = []
                 reference = group_list[0]
                 reference_tokens = set(jieba.lcut(self.remove_stopwords(reference['chk_content'])))
@@ -327,7 +333,8 @@ class SourceCitation:
                 if merged_group:
                     # print(len(merged_group))
                     merged_group_list.append(merged_group)
-                # print(merged_group_list)
+
+                # 根据分组是否出现合，完全一致 相似内容
                 merged_group_list = self.merge_groups(merged_group_list)
                 # print(merged_group_list)
 
@@ -340,6 +347,7 @@ class SourceCitation:
 
                     best_indices += 1
                     final_response.append(f"{[best_indices]}")
+
         result = ''.join(final_response)
         if not result.strip():
             # 如果答案为空以及总结内容为空，尝试用原始答案回答
@@ -357,14 +365,14 @@ class SourceCitation:
         with open(output_file, 'w', encoding='utf-8') as f:
             json.dump(json_data, f, ensure_ascii=False, indent=4)
         loguru.logger.info(f"Parameters saved to {output_file}")
-        print(data)
+        # print(data)
         return data
 
 
 if __name__ == '__main__':
     mc = SourceCitation()
 
-    with open(f'{PROJECT_BASE}/data/docs/citations_samples/无法回答2.json', 'r', encoding='utf-8') as f:
+    with open(f'{PROJECT_BASE}/data/docs/citations_samples/重复引用1.json', 'r', encoding='utf-8') as f:
         input_data = json.load(f)
     # print(input_data)
     result = mc.ground_response(
