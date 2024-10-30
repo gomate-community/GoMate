@@ -23,4 +23,3 @@ examples/retrievers/indexs
 output
 examples/rag/indexs
 examples/rag/mobile_rag.py
-gomate/modules/clusters
