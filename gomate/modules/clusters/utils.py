@@ -1,4 +1,5 @@
 import sys
+
 sys.path.append("/data/users/searchgpt/yq/GoMate_dev")
 import json
 import os
@@ -15,6 +16,10 @@ from bson import ObjectId
 from tqdm import tqdm
 import loguru
 from singlepass import SGCluster
+from datetime import datetime
+import uuid
+
+
 
 keywords = [
     "美国",
@@ -49,8 +54,8 @@ class MongoCursor(object):
         self.db = self.get_conn()
 
     def get_conn(self):
-        client = pymongo.MongoClient("mongodb://root:golaxyintelligence@10.208.61.115:20000/")
-        # client = pymongo.MongoClient("mongodb://root:golaxyintelligence@10.60.1.145:20000/")
+        # client = pymongo.MongoClient("mongodb://root:golaxyintelligence@10.208.61.115:20000/")
+        client = pymongo.MongoClient("mongodb://root:golaxyintelligence@10.60.1.145:27017/")
         db = client['goinv3_2409']
         return db
 
@@ -172,8 +177,9 @@ def get_es_data():
     os.makedirs("data/", exist_ok=True)
 
     for word in keywords:
-        loguru.logger.info("正在获取es数据："+word)
-        url = f"http://10.208.61.117:9200/document_share_data_30_news/_search?q={word}&size=6000&sort=publish_time:desc"
+        loguru.logger.info("正在获取es数据：" + word)
+        # url = f"http://10.208.61.117:9200/document_share_data_30_news/_search?q={word}&size=6000&sort=publish_time:desc"
+        url = f"http://10.208.61.117:9200/goinv3_document_news/_search?q={word}&sort=publish_time:desc&size=2000"
         response = requests.get(url)
         with open(f"data/{word}_data.json", "w", encoding="utf-8") as f:
             json.dump(response.json(), f, ensure_ascii=False, indent=4)
@@ -193,7 +199,7 @@ def get_es_data():
 def run_cluster_data():
     print("=========一级聚类==========")
     for keyword in keywords:
-        loguru.logger.info("一级聚类："+keyword)
+        loguru.logger.info("一级聚类：" + keyword)
         data = pd.read_excel(f"data/{keyword}_data.xlsx", dtype={"id": str})
         data = data.drop_duplicates(subset=["title"]).reset_index(drop=True)
         data["id"] = data["id"].astype(str)
@@ -211,7 +217,7 @@ def run_cluster_data():
             sc.classify(data)
     print("=========二级聚类==========")
     for keyword in keywords:
-        loguru.logger.info("二级聚类："+keyword)
+        loguru.logger.info("二级聚类：" + keyword)
         data = pd.read_excel(f"result/level1_{keyword}_result.xlsx", dtype={"id": str})
         data = data.drop_duplicates(subset=["title"]).reset_index(drop=True)
         data["id"] = data["id"].astype(str)
@@ -233,9 +239,10 @@ def run_cluster_data():
             except:
                 pass
 
+
 def generate_report():
     for keyword in keywords:
-        loguru.logger.info("正在生成报告:"+keyword)
+        loguru.logger.info("正在生成报告:" + keyword)
         dfs = []
         for file in os.listdir("result"):
             if file.endswith(".xlsx") and keyword in file and 'level2_' in file:
@@ -249,33 +256,35 @@ def generate_report():
         if not os.path.exists(f"result/{keyword}_cluster_level1_index.jsonl"):
             with open(f"result/{keyword}_cluster_level1_index.jsonl", "w", encoding="utf-8") as f:
                 for index, group in tqdm(df.groupby(by=["cluster_level1_index"])):
-                    if len(group)>=3:
+                    if len(group) >= 3:
                         titles = group["title"][:30].tolist()
                         contents = group["title"][:5].tolist()
                         response1 = llm_api.compress(titles, contents)
                         titles = group["title"][:5].tolist()
                         response2 = llm_report.compress(titles, contents)
 
-                        f.write(json.dumps({"cluster_level1_index": index, "level1_title": response1["response"].strip(),
-                                            "level1_content": response2["response"].strip()}, ensure_ascii=False) + "\n")
+                        f.write(
+                            json.dumps({"cluster_level1_index": index, "level1_title": response1["response"].strip(),
+                                        "level1_content": response2["response"].strip()}, ensure_ascii=False) + "\n")
 
             with open(f"result/{keyword}_cluster_level2_index.jsonl", "w", encoding="utf-8") as f:
                 for index, group in tqdm(df.groupby(by=["cluster_level2_index"])):
-                    if len(group)>=3:
+                    if len(group) >= 3:
                         titles = group["title"][:30].tolist()
                         contents = group["title"][:5].tolist()
                         response1 = llm_api.compress(titles, contents)
                         titles = group["title"][:5].tolist()
                         response2 = llm_report.compress(titles, contents)
-                        f.write(json.dumps({"cluster_level2_index": index, "level2_title": response1["response"].strip(),
-                                            "level2_content": response2["response"].strip()}, ensure_ascii=False) + "\n")
+                        f.write(
+                            json.dumps({"cluster_level2_index": index, "level2_title": response1["response"].strip(),
+                                        "level2_content": response2["response"].strip()}, ensure_ascii=False) + "\n")
 
 
 def insert_mongo_report():
     mc = MongoCursor()
-    for idx,keyword in enumerate(keywords):
+    for idx, keyword in enumerate(keywords):
         try:
-            loguru.logger.info("正在插入MongoDB成功："+keyword)
+            loguru.logger.info("正在插入MongoDB成功：" + keyword)
             df = pd.read_excel(f"result/{keyword}_cluster_double.xlsx")
             level1_mapping = {}
             with open(f"result/{keyword}_cluster_level1_index.jsonl", 'r', encoding='utf-8') as f:
@@ -307,9 +316,11 @@ def insert_mongo_report():
             # 查看结果
             # 获取当前日期并格式化为 YYYYMMDD 格式
             current_date = datetime.now().strftime("%Y%m%d")
+            # 生成一个唯一的ID
+            unique_id = f"{current_date}_{uuid.uuid4().hex[:6]}"  # 只取uuid的前6位
             template = {
-                '_id': f'{current_date}_00{idx+1}',
-                'name': f'开源情报每日简报-{current_date}',
+                '_id': f'{current_date}_00{idx + 1}_{unique_id}',
+                'name': f'开源情报每日简报-{current_date}-{keyword}',
                 'description': '',
                 'tags': ['开源', '新闻', keyword],
                 'content': [],
@@ -337,8 +348,9 @@ def insert_mongo_report():
                 })
             template['content'] = contents
             mc.insert_one(template, 'report')
-        except:
-            loguru.logger.error("插入MongoDB失败:"+keyword)
+        except Exception as e:
+            print(e)
+            loguru.logger.error("插入MongoDB失败:" + keyword)
 
 
 def run():
@@ -376,8 +388,13 @@ def main():
     except (KeyboardInterrupt, SystemExit):
         loguru.logger.info("调度器已关闭")
 
-def sing_run():
-    generate_report()
-    insert_mongo_report()
+
+# def sing_run():
+
+    # get_es_data()
+    # run_cluster_data()
+    # generate_report()
+    # insert_mongo_report()
+
 if __name__ == '__main__':
     main()
