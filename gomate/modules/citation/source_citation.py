@@ -326,7 +326,7 @@ class SourceCitation:
                 for item in group_list[1:]:
                     item_tokens = set(jieba.lcut(self.remove_stopwords(item['chk_content'])))
                     if len(reference_tokens.intersection(item_tokens)) >= 12:
-                        # merged_group.append(item)
+                        merged_group.append(item)
                     elif len(set(reference['chk_content']).intersection(set(item['chk_content'])))> 30:
                         # print("***"*20)
                         # print(reference['chk_content'])
