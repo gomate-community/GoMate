@@ -46,8 +46,7 @@ class JsonParser(object):
                             'sec_num': section['sec_num'],
                             'content': section['sec_theme'] + '\n' + section['content'],
                             'chunks': [
-                                data['file_name'] + data['date'] + '\n' +
-                                data['title'] + '\n' + section['sec_theme'] + '\n' +
+                                section['sec_theme'] + '\n' +
                                 chunk['content'] for chunk in section['chunks']
                             ]
                         }

@@ -61,11 +61,11 @@ class RagApplication():
         contents = self.reranker.rerank(query=question, documents=[content['text'] for content in contents])
         content = '\n'.join([content['text'] for content in contents])
         print(contents)
-        response, history = self.llm.chat(question, [], content)
-        result = self.mc.ground_response(
-            response=response,
-            evidences=[content['text'] for content in contents],
-            selected_idx=[idx for idx in range(len(contents))],
-            markdown=True
-        )
+        result, history = self.llm.chat(question, [], content)
+        # result = self.mc.ground_response(
+        #     response=response,
+        #     evidences=[content['text'] for content in contents],
+        #     selected_idx=[idx for idx in range(len(contents))],
+        #     markdown=True
+        # )
         return result, history, contents

@@ -325,7 +325,14 @@ class SourceCitation:
                 # print(len(group_list))
                 for item in group_list[1:]:
                     item_tokens = set(jieba.lcut(self.remove_stopwords(item['chk_content'])))
-                    if len(reference_tokens.intersection(item_tokens)) > 15:
+                    if len(reference_tokens.intersection(item_tokens)) >= 12:
+                        merged_group.append(item)
+                    elif len(set(reference['chk_content']).intersection(set(item['chk_content'])))> 30:
+                        # print("***"*20)
+                        # print(reference['chk_content'])
+                        # print(item['chk_content'])
+                        # print(len(reference_tokens.intersection(item_tokens)))
+                        # print(len(set(reference['chk_content']).intersection(set(item['chk_content']))))
                         merged_group.append(item)
                     else:
                         merged_group_list.append([item])
@@ -372,7 +379,7 @@ class SourceCitation:
 if __name__ == '__main__':
     mc = SourceCitation()
 
-    with open(f'{PROJECT_BASE}/data/docs/citations_samples/重复引用1.json', 'r', encoding='utf-8') as f:
+    with open(f'{PROJECT_BASE}/data/docs/citations_samples/完全内容重复3.json', 'r', encoding='utf-8') as f:
         input_data = json.load(f)
     # print(input_data)
     result = mc.ground_response(
