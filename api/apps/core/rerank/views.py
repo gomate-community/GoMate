@@ -31,12 +31,9 @@ bge_reranker = BgeReranker(reranker_config)
 async def rerank(rerank_body: RerankBody):
     contexts = rerank_body.contexts
     query=rerank_body.query
-    loguru.logger.info(query)
-    loguru.logger.info(contexts)
     top_docs = bge_reranker.rerank(
         query=query,
         documents=contexts,
         is_sorted=False
     )
-    loguru.logger.info(top_docs)
     return ApiResponse(top_docs, message="重排序检索文档成功")
