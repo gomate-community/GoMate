@@ -1,5 +1,7 @@
 import json
 
+import pandas as pd
+
 from gomate.modules.judger.chatgpt_judger import OpenaiJudger, OpenaiJudgerConfig
 
 if __name__ == '__main__':
@@ -16,8 +18,9 @@ if __name__ == '__main__':
         f"标题：{doc['newsinfo']['title']}\n日期：{doc['newsinfo']['date']}\n内容：{doc['newsinfo']['content']}\n" for doc
         in data['selected_docs']
     ]
-    top_docs = openai_judger.judge(
+    judge_docs = openai_judger.judge(
         query="在“一带一路”国际合作高峰论坛上，习近平讲了什么？",
         documents=documents,
     )
-    print(top_docs)
+    # print(judge_docs)
+    print(pd.DataFrame(judge_docs))
