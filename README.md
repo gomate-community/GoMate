@@ -308,3 +308,7 @@ app后台日志：
 群满或者合作交流可以联系：
 
 <img src="https://raw.githubusercontent.com/yanqiangmiffy/Chinese-LangChain/master/images/personal.jpg" width="180px">
+
+## 致谢
+
+- 文档解析主要借鉴和继承了[deepdoc](https://github.com/infiniflow/ragflow/blob/main/deepdoc/README.md)以及PDF解析继承了[MinerU](https://github.com/opendatalab/MinerU  )
