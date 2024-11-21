@@ -76,8 +76,8 @@ async def parser(file: UploadFile = File(...), chunk_size: int = 512):
             chunks = tc.chunk_sentences(contents, chunk_size=chunk_size)
             results.append(
                 {
-                    'source': '来源',
-                    'title': '标题',
+                    'source': filename,
+                    'title': filename,
                     'date': '20241008',
                     'sec_num': 0,
                     'content': ''.join(chunks),

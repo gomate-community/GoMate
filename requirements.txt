@@ -54,3 +54,7 @@ chardet
 openpyxl
 protobuf
 peft
+minio
+bson
+elasticsearch
+pymongo==4.8.0

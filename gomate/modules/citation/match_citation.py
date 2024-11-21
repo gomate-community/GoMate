@@ -85,12 +85,17 @@ class MatchCitation:
             "selected_docs": selected_docs
         }
         # Save to JSON file
-        output_file = "citation_match.json"
-        with open(output_file, 'w', encoding='utf-8') as f:
-            json.dump(json_data, f, ensure_ascii=False, indent=4)
+        try:
+            output_file = "/home/yanqiang/code/citation_match.json"
+            with open(output_file, 'w', encoding='utf-8') as f:
+                json.dump(json_data, f, ensure_ascii=False, indent=4)
+        except Exception as e:
+            output_file = "citation_match.json"
+            with open(output_file, 'w', encoding='utf-8') as f:
+                json.dump(json_data, f, ensure_ascii=False, indent=4)
         loguru.logger.info(f"Parameters saved to {output_file}")
         sentences = self.cut(response)
-
+        # print(sentences)
         contents = [{"content": sentence} for sentence in sentences]
         for cit_idx, citation in enumerate(contents):
             citation['citation_content'] = []
@@ -125,7 +130,7 @@ class MatchCitation:
                                 citation['best_idx'].append(best_idx)
                                 citation['best_ratio'].append(best_ratio)
                                 citation['highlighted_start_end'].append(highlighted_start_end)
-        print(contents)
+        # print(contents)
 
         citation_cnt = 0
         is_citation_exists = []
@@ -143,7 +148,6 @@ class MatchCitation:
         is_group_exists = []
         for citation_idx, citation in enumerate(contents):
             final_response.append(f"{citation['content']}")
-
             best_idxes = citation['best_idx']
             if len(best_idxes) > 0:
                 is_doc_id_exists = []
@@ -193,11 +197,24 @@ class MatchCitation:
                         if doc_id_list not in is_group_exists:
                             quote_list.append(group_data)
                             best_indices += 1
-                            final_response.append(f"{[best_indices]}")
+
+                            # 检查 final_response 的最后一个元素是否以换行符结尾
+                            if final_response and final_response[-1].endswith("\n"):
+                                # 去除换行符,并将其添加到新的元素中
+                                final_response[-1] = final_response[-1][:-1]
+                                final_response.append(f"{[best_indices]}\n")
+                            else:
+                                final_response.append(f"{[best_indices]}")
+
                             is_group_exists.append(doc_id_list)
                         else:
-                            # print("已存在")
-                            final_response.append(f"{[is_group_exists.index(doc_id_list) + 1]}")
+                            # 检查 final_response 的最后一个元素是否以换行符结尾
+                            if final_response and final_response[-1].endswith("\n"):
+                                # 去除换行符,并将其添加到新的元素中
+                                final_response[-1] = final_response[-1][:-1]
+                                final_response.append(f"{[is_group_exists.index(doc_id_list) + 1]}\n")
+                            else:
+                                final_response.append(f"{[is_group_exists.index(doc_id_list) + 1]}")
 
         data = {'result': ''.join(final_response), 'quote_list': quote_list, 'summary': ''}
         # Save to JSON file
@@ -208,14 +225,14 @@ class MatchCitation:
             json.dump(json_data, f, ensure_ascii=False, indent=4)
 
         loguru.logger.info(f"Parameters saved to {output_file}")
-        print(json_data)
+        # print(json_data)
         return data
 
 
 if __name__ == '__main__':
     mc = MatchCitation()
 
-    with open(f'{PROJECT_BASE}/data/docs/citations_samples/sample19.json', 'r', encoding='utf-8') as f:
+    with open(f'{PROJECT_BASE}/data/docs/citations_samples/citation_match.json', 'r', encoding='utf-8') as f:
         input_data = json.load(f)
     result = mc.ground_response(
         question=input_data["question"],

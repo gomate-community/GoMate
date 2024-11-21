@@ -25,6 +25,7 @@ from apps.core.judge.views import judge_router
 from apps.core.parser.views import parse_router
 from apps.core.citation.views import citation_router
 from apps.core.refiner.views import refiner_router
+from apps.core.rewrite.views import rewriter_router
 import uvicorn
 
 app_config = AppConfig()
@@ -34,6 +35,7 @@ app.include_router(judge_router, prefix="/gomate_tool", tags=["judger"])
 app.include_router(parse_router, prefix="/gomate_tool", tags=["parser"])
 app.include_router(citation_router, prefix="/gomate_tool", tags=["citation"])
 app.include_router(refiner_router, prefix="/gomate_tool", tags=["refiner"])
+app.include_router(rewriter_router, prefix="/gomate_tool", tags=["rewrite"])
 
 if __name__ == '__main__':
     uvicorn.run('main:app', host=app_config.API_HOST, port=app_config.API_PORT, workers=8, reload=True)
