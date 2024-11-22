@@ -1,21 +1,21 @@
-# GoMate
+# TrustRAG
 
 可配置的模块化RAG框架。
 
 [![Python](https://img.shields.io/badge/Python-3.10.0-3776AB.svg?style=flat)](https://www.python.org)
 ![workflow status](https://github.com/gomate-community/rageval/actions/workflows/makefile.yml/badge.svg)
-[![codecov](https://codecov.io/gh/gomate-community/GoMate/graph/badge.svg?token=eG99uSM8mC)](https://codecov.io/gh/gomate-community/GoMate)
+[![codecov](https://codecov.io/gh/gomate-community/TrustRAG/graph/badge.svg?token=eG99uSM8mC)](https://codecov.io/gh/gomate-community/TrustRAG)
 [![pydocstyle](https://img.shields.io/badge/pydocstyle-enabled-AD4CD3)](http://www.pydocstyle.org/en/stable/)
 [![PEP8](https://img.shields.io/badge/code%20style-pep8-orange.svg)](https://www.python.org/dev/peps/pep-0008/)
 
-## 🔥Gomate 简介
+## 🔥TrustRAG 简介
 
-GoMate是一款配置化模块化的Retrieval-Augmented Generation (RAG) 框架，旨在提供**可靠的输入与可信的输出**
+TrustRAG是一款配置化模块化的Retrieval-Augmented Generation (RAG) 框架，旨在提供**可靠的输入与可信的输出**
 ，确保用户在检索问答场景中能够获得高质量且可信赖的结果。
 
-GoMate框架的设计核心在于其**高度的可配置性和模块化**，使得用户可以根据具体需求灵活调整和优化各个组件，以满足各种应用场景的要求。
+TrustRAG框架的设计核心在于其**高度的可配置性和模块化**，使得用户可以根据具体需求灵活调整和优化各个组件，以满足各种应用场景的要求。
 
-## 🔨Gomate框架
+## 🔨TrustRAG 框架
 
 ![framework.png](resources%2Fframework.png)
 
@@ -27,8 +27,8 @@ GoMate框架的设计核心在于其**高度的可配置性和模块化**，使�
 
 ## 🎉 更新记录
 
-- gomate打包构建，支持pip和source两种方式安装
-- 添加[MinerU文档解析](https://github.com/gomate-community/GoMate/blob/main/docs/mineru.md)
+- TrustRAG 打包构建，支持pip和source两种方式安装
+- 添加[MinerU文档解析](https://github.com/gomate-community/TrustRAG/blob/main/docs/mineru.md)
   ：一站式开源高质量数据提取工具，支持PDF/网页/多格式电子书提取`[20240907] `
 - RAPTOR:递归树检索器实现
 - 支持多种文件解析并且模块化目前支持解析的文件类型包括：`text`,`docx`,`ppt`,`excel`,`html`,`pdf`,`md`等
@@ -45,14 +45,14 @@ GoMate框架的设计核心在于其**高度的可配置性和模块化**，使�
 1. 创建conda环境（可选）
 
 ```sehll
-conda create -n gomate python=3.9
-conda activate gomate
+conda create -n trustrag python=3.9
+conda activate trustrag
 ```
 
 2. 使用`pip`安装依赖
 
 ```sehll
-pip install gomate   
+pip install trustrag   
 ```
 
 ### 方法2：源码安装
@@ -60,7 +60,7 @@ pip install gomate
 1. 下载源码
 
 ```shell
-git clone https://github.com/gomate-community/GoMate.git
+git clone https://github.com/gomate-community/TrustRAG.git
 ```
 
 2. 安装依赖
@@ -95,14 +95,14 @@ import pickle
 import pandas as pd
 from tqdm import tqdm
 
-from gomate.modules.document.chunk import TextChunker
-from gomate.modules.document.txt_parser import TextParser
-from gomate.modules.document.utils import PROJECT_BASE
-from gomate.modules.generator.llm import GLM4Chat
-from gomate.modules.reranker.bge_reranker import BgeRerankerConfig, BgeReranker
-from gomate.modules.retrieval.bm25s_retriever import BM25RetrieverConfig
-from gomate.modules.retrieval.dense_retriever import DenseRetrieverConfig
-from gomate.modules.retrieval.hybrid_retriever import HybridRetriever, HybridRetrieverConfig
+from trustrag.modules.document.chunk import TextChunker
+from trustrag.modules.document.txt_parser import TextParser
+from trustrag.modules.document.utils import PROJECT_BASE
+from trustrag.modules.generator.llm import GLM4Chat
+from trustrag.modules.reranker.bge_reranker import BgeRerankerConfig, BgeReranker
+from trustrag.modules.retrieval.bm25s_retriever import BM25RetrieverConfig
+from trustrag.modules.retrieval.dense_retriever import DenseRetrieverConfig
+from trustrag.modules.retrieval.hybrid_retriever import HybridRetriever, HybridRetrieverConfig
 ```
 
 
@@ -229,10 +229,10 @@ test[['answer']].to_csv(f'{PROJECT_BASE}/output/gomate_baseline.csv', index=Fals
 ```python
 import os
 
-from gomate.modules.document.common_parser import CommonParser
-from gomate.modules.generator.llm import GLMChat
-from gomate.modules.reranker.bge_reranker import BgeReranker
-from gomate.modules.retrieval.dense_retriever import DenseRetriever
+from trustrag.modules.document.common_parser import CommonParser
+from trustrag.modules.generator.llm import GLMChat
+from trustrag.modules.reranker.bge_reranker import BgeReranker
+from trustrag.modules.retrieval.dense_retriever import DenseRetriever
 
 
 class RagApplication():
@@ -252,7 +252,7 @@ class RagApplication():
         pass
 ```
 
-模块可见[rag.py](gomate/applications/rag.py)
+模块可见[rag.py](trustrag/applications/rag.py)
 
 ### 🌐体验RAG效果
 
@@ -267,7 +267,7 @@ app_config.llm_model_path = "/data/users/searchgpt/pretrained_models/chatglm3-6b
 retriever_config = DenseRetrieverConfig(
     model_name_or_path="/data/users/searchgpt/pretrained_models/bge-large-zh-v1.5",
     dim=1024,
-    index_dir='/data/users/searchgpt/yq/GoMate/examples/retrievers/dense_cache'
+    index_dir='/data/users/searchgpt/yq/TrustRAG/examples/retrievers/dense_cache'
 )
 rerank_config = BgeRerankerConfig(
     model_name_or_path="/data/users/searchgpt/pretrained_models/bge-reranker-large"
@@ -292,7 +292,7 @@ app后台日志：
 
 ## ⭐️ Star History
 
-[![Star History Chart](https://api.star-history.com/svg?repos=gomate-community/GoMate&type=Date)](https://star-history.com/#gomate-community/GoMate&Date)
+[![Star History Chart](https://api.star-history.com/svg?repos=gomate-community/TrustRAG&type=Date)](https://star-history.com/#gomate-community/TrustRAG&Date)
 
 ## 研究与开发团队
 
@@ -302,7 +302,7 @@ app后台日志：
 
 欢迎多提建议、Bad cases，欢迎进群及时交流，也欢迎大家多提PR</br>
 
-<img src="https://github.com/gomate-community/GoMate/blob/pipeline/resources/wechat.png" width="180px" height="270px">
+<img src="https://github.com/gomate-community/TrustRAG/blob/pipeline/resources/wechat.png" width="180px" height="270px">
 
 
 群满或者合作交流可以联系：
