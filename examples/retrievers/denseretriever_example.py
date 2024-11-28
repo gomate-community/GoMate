@@ -13,8 +13,8 @@ import os
 
 import pandas as pd
 
-from gomate.modules.document.utils import PROJECT_BASE
-from gomate.modules.retrieval.dense_retriever import DenseRetriever, DenseRetrieverConfig
+from trustrag.modules.document.utils import PROJECT_BASE
+from trustrag.modules.retrieval.dense_retriever import DenseRetriever, DenseRetrieverConfig
 
 if __name__ == '__main__':
     print(PROJECT_BASE)

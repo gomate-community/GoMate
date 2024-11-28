@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import pytest
-from gomate.applications import RerankerApp
+from trustrag.applications import RerankerApp
 # import os
 
 def test_reranker():

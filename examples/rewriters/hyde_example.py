@@ -3,11 +3,11 @@ import os
 import pandas as pd
 from tqdm import tqdm
 
-from gomate.modules.document.common_parser import CommonParser
-from gomate.modules.generator.llm import GLMChat
-from gomate.modules.retrieval.dense_retriever import DenseRetriever, DenseRetrieverConfig
-from gomate.modules.rewriter.hyde_rewriter import HydeRewriter
-from gomate.modules.rewriter.promptor import Promptor
+from trustrag.modules.document.common_parser import CommonParser
+from trustrag.modules.generator.llm import GLMChat
+from trustrag.modules.retrieval.dense_retriever import DenseRetriever, DenseRetrieverConfig
+from trustrag.modules.rewriter.hyde_rewriter import HydeRewriter
+from trustrag.modules.rewriter.promptor import Promptor
 
 if __name__ == '__main__':
     promptor = Promptor(task="WEB_SEARCH", language="zh")

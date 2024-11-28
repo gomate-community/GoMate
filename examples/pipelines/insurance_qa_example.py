@@ -12,9 +12,9 @@
 import json
 import pandas as pd
 from transformers import AutoTokenizer
-from gomate.modules.retrieval.embedding import SBertEmbeddingModel
-from gomate.modules.retrieval.faiss_retriever import FaissRetriever
-from gomate.modules.retrieval.faiss_retriever import FaissRetrieverConfig
+from trustrag.modules.retrieval.embedding import SBertEmbeddingModel
+from trustrag.modules.retrieval.faiss_retriever import FaissRetriever
+from trustrag.modules.retrieval.faiss_retriever import FaissRetrieverConfig
 
 ## step1 build faiss index
 embedding_model_path = "/home/test/pretrained_models/bge-large-zh-v1.5"

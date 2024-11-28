@@ -9,7 +9,7 @@
 @software: PyCharm
 @description: coding..
 """
-from gomate.modules.document.pdf_parser_fast import PdfParserUsingPyMuPDF
+from trustrag.modules.document.pdf_parser_fast import PdfParserUsingPyMuPDF
 
 
 if __name__ == '__main__':

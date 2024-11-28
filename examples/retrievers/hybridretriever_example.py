@@ -13,13 +13,13 @@ import pickle
 import pandas as pd
 from tqdm import tqdm
 
-from gomate.modules.document.chunk import TextChunker
-from gomate.modules.document.common_parser import CommonParser
-from gomate.modules.document.utils import PROJECT_BASE
-from gomate.modules.retrieval.bm25s_retriever import BM25RetrieverConfig
-from gomate.modules.retrieval.dense_retriever import DenseRetrieverConfig
-from gomate.modules.retrieval.hybrid_retriever import HybridRetriever, HybridRetrieverConfig
-from gomate.modules.generator.llm import PROMPT_TEMPLATE,SYSTEM_PROMPT
+from trustrag.modules.document.chunk import TextChunker
+from trustrag.modules.document.common_parser import CommonParser
+from trustrag.modules.document.utils import PROJECT_BASE
+from trustrag.modules.retrieval.bm25s_retriever import BM25RetrieverConfig
+from trustrag.modules.retrieval.dense_retriever import DenseRetrieverConfig
+from trustrag.modules.retrieval.hybrid_retriever import HybridRetriever, HybridRetrieverConfig
+from trustrag.modules.generator.llm import PROMPT_TEMPLATE,SYSTEM_PROMPT
 
 def process_chunk(text):
     """

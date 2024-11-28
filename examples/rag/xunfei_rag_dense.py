@@ -3,11 +3,11 @@ import pickle
 import pandas as pd
 from tqdm import tqdm
 
-from gomate.modules.document.chunk import TextChunker
-from gomate.modules.document.txt_parser import TextParser
-from gomate.modules.document.utils import PROJECT_BASE
-from gomate.modules.generator.llm import QwenChat
-from gomate.modules.retrieval.dense_retriever import DenseRetrieverConfig,DenseRetriever
+from trustrag.modules.document.chunk import TextChunker
+from trustrag.modules.document.txt_parser import TextParser
+from trustrag.modules.document.utils import PROJECT_BASE
+from trustrag.modules.generator.llm import QwenChat
+from trustrag.modules.retrieval.dense_retriever import DenseRetrieverConfig,DenseRetriever
 
 
 def generate_chunks():

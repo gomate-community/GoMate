@@ -10,9 +10,9 @@
 - `index_path`：向量维度
 
 ```python
-from gomate.modules.document.common_parser import CommonParser
-from gomate.modules.document.utils import PROJECT_BASE
-from gomate.modules.retrieval.bm25s_retriever import BM25RetrieverConfig, BM25Retriever
+from trustrag.modules.document.common_parser import CommonParser
+from trustrag.modules.document.utils import PROJECT_BASE
+from trustrag.modules.retrieval.bm25s_retriever import BM25RetrieverConfig, BM25Retriever
 
 if __name__ == '__main__':
 
@@ -55,7 +55,7 @@ if __name__ == '__main__':
 import pandas as pd
 from tqdm import tqdm
 
-from gomate.modules.retrieval.dense_retriever import DenseRetriever, DenseRetrieverConfig
+from trustrag.modules.retrieval.dense_retriever import DenseRetriever, DenseRetrieverConfig
 
 if __name__ == '__main__':
     retriever_config = DenseRetrieverConfig(
@@ -91,10 +91,10 @@ if __name__ == '__main__':
 > 混合检索，将Bm25检索以及Dense检索的结果进行合并
 
 ```python
-from gomate.modules.document.common_parser import CommonParser
-from gomate.modules.retrieval.bm25s_retriever import BM25RetrieverConfig
-from gomate.modules.retrieval.dense_retriever import DenseRetrieverConfig
-from gomate.modules.retrieval.hybrid_retriever import HybridRetriever, HybridRetrieverConfig
+from trustrag.modules.document.common_parser import CommonParser
+from trustrag.modules.retrieval.bm25s_retriever import BM25RetrieverConfig
+from trustrag.modules.retrieval.dense_retriever import DenseRetrieverConfig
+from trustrag.modules.retrieval.hybrid_retriever import HybridRetriever, HybridRetrieverConfig
 
 if __name__ == '__main__':
     # BM25 and Dense Retriever configurations

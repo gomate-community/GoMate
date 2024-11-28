@@ -10,7 +10,7 @@
 @description: coding..
 """
 import pandas as pd
-from gomate.modules.judger.bge_judger import BgeJudger, BgeJudgerConfig
+from trustrag.modules.judger.bge_judger import BgeJudger, BgeJudgerConfig
 
 if __name__ == '__main__':
     judger_config = BgeJudgerConfig(

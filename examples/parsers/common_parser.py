@@ -1,4 +1,4 @@
-from gomate.modules.document.common_parser import CommonParser
+from trustrag.modules.document.common_parser import CommonParser
 
 
 # cp=CommonParser()

@@ -9,8 +9,8 @@
 """
 import json
 
-from gomate.modules.retrieval.embedding import SBertEmbeddingModel
-from gomate.modules.retrieval.faiss_retriever import FaissRetriever, FaissRetrieverConfig
+from trustrag.modules.retrieval.embedding import SBertEmbeddingModel
+from trustrag.modules.retrieval.faiss_retriever import FaissRetriever, FaissRetrieverConfig
 
 if __name__ == '__main__':
     embedding_model_path = "/data/users/searchgpt/pretrained_models/bge-large-zh-v1.5"

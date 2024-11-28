@@ -13,9 +13,9 @@ import shutil
 import gradio as gr
 import loguru
 
-from gomate.applications.rag import RagApplication, ApplicationConfig
-from gomate.modules.reranker.bge_reranker import BgeRerankerConfig
-from gomate.modules.retrieval.dense_retriever import DenseRetrieverConfig
+from trustrag.applications.rag import RagApplication, ApplicationConfig
+from trustrag.modules.reranker.bge_reranker import BgeRerankerConfig
+from trustrag.modules.retrieval.dense_retriever import DenseRetrieverConfig
 
 # 修改成自己的配置！！！
 app_config = ApplicationConfig()

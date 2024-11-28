@@ -14,7 +14,7 @@ from fastapi import APIRouter
 
 from api.apps.core.refiner.bodys import RefinerBody
 from api.apps.handle.response.json_response import ApiResponse
-from gomate.modules.refiner.compressor import LLMCompressApi
+from trustrag.modules.refiner.compressor import LLMCompressApi
 
 refiner_router = APIRouter()
 compressor = LLMCompressApi()

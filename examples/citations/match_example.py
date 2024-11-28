@@ -1,4 +1,4 @@
-from gomate.modules.citation.match_citation import MatchCitation
+from trustrag.modules.citation.match_citation import MatchCitation
 import json
 
 mc = MatchCitation()

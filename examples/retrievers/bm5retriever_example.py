@@ -9,8 +9,8 @@
 """
 import os
 
-from gomate.modules.document.common_parser import CommonParser
-from gomate.modules.retrieval.bm25_retriever import BM25RetrieverConfig, BM25Retriever, tokenizer
+from trustrag.modules.document.common_parser import CommonParser
+from trustrag.modules.retrieval.bm25_retriever import BM25RetrieverConfig, BM25Retriever, tokenizer
 
 if __name__ == '__main__':
     bm25_retriever_config = BM25RetrieverConfig(

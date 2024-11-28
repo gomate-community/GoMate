@@ -12,10 +12,10 @@ import shutil
 
 import gradio as gr
 
-from gomate.applications.rag_weibo import WeiboRagApplication, ApplicationConfig
-from gomate.modules.document.utils import PROJECT_BASE
-from gomate.modules.reranker.bge_reranker import BgeRerankerConfig
-from gomate.modules.retrieval.dense_retriever import DenseRetrieverConfig
+from trustrag.applications.rag_weibo import WeiboRagApplication, ApplicationConfig
+from trustrag.modules.document.utils import PROJECT_BASE
+from trustrag.modules.reranker.bge_reranker import BgeRerankerConfig
+from trustrag.modules.retrieval.dense_retriever import DenseRetrieverConfig
 
 # 修改成自己的配置！！！
 app_config = ApplicationConfig()

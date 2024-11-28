@@ -1,6 +1,6 @@
 import os
-from gomate.modules.document.pdf_mineru_parser import  PdfParserWithMinerU
-from gomate.modules.document.utils import PROJECT_BASE
+from trustrag.modules.document.pdf_mineru_parser import  PdfParserWithMinerU
+from trustrag.modules.document.utils import PROJECT_BASE
 from tqdm import tqdm
 if __name__ == '__main__':
     pdf_parser=PdfParserWithMinerU(url='http://localhost:8888/pdf_parse')
