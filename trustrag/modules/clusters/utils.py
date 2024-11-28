@@ -1,6 +1,6 @@
 import sys
 
-sys.path.append("/data/users/searchgpt/yq/GoMate_dev")
+sys.path.append("/data/users/searchgpt/yq/TrustRAG")
 import json
 import os
 import time
@@ -19,12 +19,10 @@ from singlepass import SGCluster
 from datetime import datetime
 import uuid
 
-
-
 keywords = [
     "美国",
     "中美贸易",
-    "俄乌冲突",
+    "俄罗斯",
     "中东",
 ]
 
@@ -135,24 +133,31 @@ class LLMCompressApi():
             注意：
             1. 生成标题首尾不要带有引号，中间可以带有引号
             2. 如果输入标题内容是英文，请用中文编写
-            新闻标题:
+            
+            ##新闻标题列表:
             {titles}
-            主题标题:
+            
+            ##主题标题:
+            
             """
         else:
             self.prompt_template = """
-                    请根据以下提供的新闻素材，编写一份主题报告，内容贴切主题内容，如果输入标题内容是英文，请用中文编写，不少于50字。
-    
-                    新闻素材:
-                    {contexts}
-    
-                    主题报告:
-                    """
+            请根据以下提供的新闻素材，编写一份主题报告，内容贴切主题内容，如果输入标题内容是英文，请用中文编写，不少于50字。
+            
+            注意：
+            1. 文章开头或者结尾不要生成额外修饰词
+            2. 主题内容越多多好，尽量全面详细
+            
+            ##新闻素材:
+            {contexts}
+
+            ##主题内容:
+            """
         self.api_url = "http://10.208.63.29:8888"
 
     def compress(self, titles, contents):
         if self.type == 'title':
-            titles = "\n".join(titles)
+            titles = "\n".join([str(title) for title in titles])
             prompt = self.prompt_template.format(titles=titles)
         else:
             contexts = ''
@@ -187,13 +192,15 @@ def get_es_data():
         with open(f"data/{word}_data.json", "r", encoding="utf-8") as f:
             data = json.load(f)
         sources = [hit["_source"] for hit in data["hits"]["hits"]]
+        ids = [hit["_id"] for hit in data["hits"]["hits"]]
 
         source_df = pd.DataFrame(sources)
+        # print(source_df)
+        source_df["id"] = ids
+        # source_df["id"] = "source_" + source_df["id"].astype(str)
 
-        source_df["id"] = source_df.index
-        source_df["id"] = "source_" + source_df["id"].astype(str)
-
-        source_df[["id", "title", "content"]].to_excel(f"data/{word}_data.xlsx")
+        # source_df.to_excel(f"data/{word}_data.xlsx")
+        source_df[["id", "title", "content","url"]].to_excel(f"data/{word}_data.xlsx")
 
 
 def run_cluster_data():
@@ -260,12 +267,13 @@ def generate_report():
                         titles = group["title"][:30].tolist()
                         contents = group["title"][:5].tolist()
                         response1 = llm_api.compress(titles, contents)
+
                         titles = group["title"][:5].tolist()
                         response2 = llm_report.compress(titles, contents)
-
+                        urls=group["url"][:5].tolist()
                         f.write(
                             json.dumps({"cluster_level1_index": index, "level1_title": response1["response"].strip(),
-                                        "level1_content": response2["response"].strip()}, ensure_ascii=False) + "\n")
+                                        "level1_content": response2["response"].strip(),"level1_urls":urls}, ensure_ascii=False) + "\n")
 
             with open(f"result/{keyword}_cluster_level2_index.jsonl", "w", encoding="utf-8") as f:
                 for index, group in tqdm(df.groupby(by=["cluster_level2_index"])):
@@ -275,14 +283,18 @@ def generate_report():
                         response1 = llm_api.compress(titles, contents)
                         titles = group["title"][:5].tolist()
                         response2 = llm_report.compress(titles, contents)
+                        urls=group["url"][:5].tolist()
+
                         f.write(
                             json.dumps({"cluster_level2_index": index, "level2_title": response1["response"].strip(),
-                                        "level2_content": response2["response"].strip()}, ensure_ascii=False) + "\n")
+                                        "level2_content": response2["response"].strip(),"level2_urls":urls}, ensure_ascii=False) + "\n")
 
 
 def insert_mongo_report():
     mc = MongoCursor()
     for idx, keyword in enumerate(keywords):
+        with open(f"data/{keyword}_data.json", "r", encoding="utf-8") as f:
+            sources = json.load(f)
         try:
             loguru.logger.info("正在插入MongoDB成功：" + keyword)
             df = pd.read_excel(f"result/{keyword}_cluster_double.xlsx")
@@ -293,6 +305,7 @@ def insert_mongo_report():
                     level1_mapping[data['cluster_level1_index']] = {
                         'level1_title': data['level1_title'],
                         'level1_content': data['level1_content'],
+                        'level1_urls': data['level1_urls'],
                     }
 
             level2_mapping = {}
@@ -302,17 +315,22 @@ def insert_mongo_report():
                     level2_mapping[data['cluster_level2_index']] = {
                         'level2_title': data['level2_title'],
                         'level2_content': data['level2_content'],
+                        'level2_urls': data['level2_urls'],
                     }
 
             df['level1_title'] = df['cluster_level1_index'].apply(
                 lambda x: level1_mapping.get(x, {}).get('level1_title', ''))
             df['level1_content'] = df['cluster_level1_index'].apply(
                 lambda x: level1_mapping.get(x, {}).get('level1_content', ''))
+            df['level1_urls'] = df['cluster_level1_index'].apply(
+                lambda x: level1_mapping.get(x, {}).get('level1_urls', []))
+
             df['level2_title'] = df['cluster_level2_index'].apply(
                 lambda x: level2_mapping.get(x, {}).get('level2_title', ''))
             df['level2_content'] = df['cluster_level2_index'].apply(
                 lambda x: level2_mapping.get(x, {}).get('level2_content', ''))
-
+            df['level2_urls'] = df['cluster_level2_index'].apply(
+                lambda x: level1_mapping.get(x, {}).get('level2_urls', []))
             # 查看结果
             # 获取当前日期并格式化为 YYYYMMDD 格式
             current_date = datetime.now().strftime("%Y%m%d")
@@ -329,7 +347,8 @@ def insert_mongo_report():
                 'source': 'admin',
                 'owner': 'system',
                 'created_time': int(time.time() * 1000),
-                'modified_time': int(time.time() * 1000)
+                'modified_time': int(time.time() * 1000),
+                "articles": sources
             }
             contents = []
             for level1_index, group1 in df.groupby(by=["cluster_level1_index"]):
@@ -338,12 +357,14 @@ def insert_mongo_report():
                     nodes.append(
                         {
                             'title': group2['level2_title'].unique()[0],
-                            'content': group2['level2_content'].unique()[0]
+                            'content': group2['level2_content'].unique()[0],
+                            'level2_urls': group2['level2_urls']
                         }
                     )
                 contents.append({
                     'title': group1['level1_title'].unique()[0],
                     'content': group1['level1_content'].unique()[0],
+                    'level1_urls': group1['level1_urls'],
                     'nodes': nodes
                 })
             template['content'] = contents
@@ -389,12 +410,13 @@ def main():
         loguru.logger.info("调度器已关闭")
 
 
-# def sing_run():
+def sing_run():
+    get_es_data()
+    run_cluster_data()
+    generate_report()
+    insert_mongo_report()
 
-    # get_es_data()
-    # run_cluster_data()
-    # generate_report()
-    # insert_mongo_report()
 
 if __name__ == '__main__':
+    sing_run()
     main()

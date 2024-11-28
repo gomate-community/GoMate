@@ -8,7 +8,7 @@ from io import BytesIO
 # files = {'file': ('testfile.txt', data)}
 #
 # # 发送POST请求
-# response = requests.post("http://10.208.62.156:10000/gomate_tool/parse/", files=files)
+# response = requests.post("http://127.0.0.1:10000/gomate_tool/parse/", files=files)
 #
 # # 打印响应内容
 # print(response.json())
@@ -21,7 +21,7 @@ file_path = '/data/users/searchgpt/yq/GoMate/data/docs/夏至各地习俗.docx'
 files = {'file': open(file_path, 'rb')}
 
 # 发送文件
-response = requests.post("http://10.208.62.156:10000/gomate_tool/parse/", files=files)
+response = requests.post("http://127.0.0.1:10000/gomate_tool/parse/", files=files)
 print(response.json())
 
 files['file'].close()

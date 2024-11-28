@@ -20,4 +20,4 @@ git install ...
 ```
 
 ## Demo
-![demo](resources/demo.png)
+![app_logging3.png](resources%2Fapp_logging3.png)

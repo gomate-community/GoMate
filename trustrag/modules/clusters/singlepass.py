@@ -192,7 +192,7 @@ class SGCluster(object):
             data['cluster_count'] = data.groupby(by='cluster_index')['id'].transform('count')
             usual_print(self.output_file, "正在保存到")
             # print(data)
-            save_cols = ['id', 'title', 'content', 'cluster_level1_index', 'cluster_level2_index', 'cluster_label',
+            save_cols = ['id', 'title', 'content', 'url','cluster_level1_index', 'cluster_level2_index', 'cluster_label',
                          'cluster_count']
         if self.output_file.endswith('xlsx'):
             data[save_cols].to_excel(self.output_file, index=None)
