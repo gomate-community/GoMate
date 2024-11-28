@@ -16,8 +16,8 @@ from langchain_core.documents import Document
 from tqdm import tqdm
 from langchain_community.vectorstores.faiss import FAISS
 
-from gomate.modules.retrieval.embedding import TextEmbedding
-from gomate.modules.retrieval.faiss_retriever import FaissRetriever, FaissRetrieverConfig
+from trustrag.modules.retrieval.embedding import TextEmbedding
+from trustrag.modules.retrieval.faiss_retriever import FaissRetriever, FaissRetrieverConfig
 
 
 def process_batch(batch, batch_index):

@@ -17,14 +17,14 @@ from fastapi import APIRouter
 from fastapi import File, UploadFile, HTTPException
 from fastapi.responses import JSONResponse
 
-from gomate.modules.document.chunk import TextChunker
-from gomate.modules.document.docx_parser import DocxParser
-from gomate.modules.document.excel_parser import ExcelParser
-from gomate.modules.document.html_parser import HtmlParser
-from gomate.modules.document.json_parser import JsonParser
-from gomate.modules.document.pdf_parser_fast import PdfSimParser
-from gomate.modules.document.ppt_parser import PptParser
-from gomate.modules.document.txt_parser import TextParser
+from trustrag.modules.document.chunk import TextChunker
+from trustrag.modules.document.docx_parser import DocxParser
+from trustrag.modules.document.excel_parser import ExcelParser
+from trustrag.modules.document.html_parser import HtmlParser
+from trustrag.modules.document.json_parser import JsonParser
+from trustrag.modules.document.pdf_parser_fast import PdfSimParser
+from trustrag.modules.document.ppt_parser import PptParser
+from trustrag.modules.document.txt_parser import TextParser
 
 tc = TextChunker()
 parse_router = APIRouter()

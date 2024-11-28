@@ -2,7 +2,7 @@ import json
 import os
 import re
 
-from gomate.modules.document.utils import PROJECT_BASE
+from trustrag.modules.document.utils import PROJECT_BASE
 
 
 def process_markdown(markdown_content):

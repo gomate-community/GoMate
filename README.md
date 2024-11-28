@@ -284,11 +284,10 @@ python app.py
 ```
 
 浏览器访问：[127.0.0.1:7860](127.0.0.1:7860)
-![demo.png](resources%2Fdemo.png)
+![trustrag_demo.png](resources%2Ftrustrag_demo.png)
 
 app后台日志：
-
-![app_logging.png](resources%2Fapp_logging.png)
+![app_logging3.png](resources%2Fapp_logging3.png)
 
 ## ⭐️ Star History
 
@@ -308,3 +307,7 @@ app后台日志：
 群满或者合作交流可以联系：
 
 <img src="https://raw.githubusercontent.com/yanqiangmiffy/Chinese-LangChain/master/images/personal.jpg" width="180px">
+
+## 致谢
+- 文档解析：[infiniflow/ragflow](https://github.com/infiniflow/ragflow/blob/main/deepdoc/README.md)
+- PDF文件解析[opendatalab/MinerU](https://github.com/opendatalab/MinerU)

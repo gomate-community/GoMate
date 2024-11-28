@@ -3,12 +3,12 @@ import pickle
 import pandas as pd
 from tqdm import tqdm
 
-from gomate.modules.document.chunk import TextChunker
-from gomate.modules.document.txt_parser import TextParser
-from gomate.modules.document.utils import PROJECT_BASE
-from gomate.modules.generator.llm import GLM4Chat
-from gomate.modules.reranker.bge_reranker import BgeRerankerConfig, BgeReranker
-from gomate.modules.retrieval.bm25s_retriever import BM25RetrieverConfig, BM25Retriever
+from trustrag.modules.document.chunk import TextChunker
+from trustrag.modules.document.txt_parser import TextParser
+from trustrag.modules.document.utils import PROJECT_BASE
+from trustrag.modules.generator.llm import GLM4Chat
+from trustrag.modules.reranker.bge_reranker import BgeRerankerConfig, BgeReranker
+from trustrag.modules.retrieval.bm25s_retriever import BM25RetrieverConfig, BM25Retriever
 
 
 def generate_chunks():

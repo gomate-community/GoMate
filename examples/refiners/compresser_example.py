@@ -1,4 +1,4 @@
-from gomate.modules.refiner.compressor import LLMCompressApi
+from trustrag.modules.refiner.compressor import LLMCompressApi
 
 query = "RCEP具体包括哪些国家"
 contexts = [

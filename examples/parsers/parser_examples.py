@@ -1,4 +1,4 @@
-from gomate.modules.document.common_parser import CommonParser
+from trustrag.modules.document.common_parser import CommonParser
 
 if __name__ == '__main__':
     parser = CommonParser()

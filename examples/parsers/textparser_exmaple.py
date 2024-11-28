@@ -9,7 +9,7 @@
 @software: PyCharm
 @description: coding..
 """
-from gomate.modules.document.text_parser import TextParser
+from trustrag.modules.document.text_parser import TextParser
 
 
 

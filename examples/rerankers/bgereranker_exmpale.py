@@ -10,7 +10,7 @@
 @description: coding..
 """
 
-from gomate.modules.reranker.bge_reranker import BgeReranker, BgeRerankerConfig
+from trustrag.modules.reranker.bge_reranker import BgeReranker, BgeRerankerConfig
 
 if __name__ == '__main__':
     reranker_config = BgeRerankerConfig(

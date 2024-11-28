@@ -2,7 +2,7 @@ import json
 
 import pandas as pd
 
-from gomate.modules.judger.chatgpt_judger import OpenaiJudger, OpenaiJudgerConfig
+from trustrag.modules.judger.chatgpt_judger import OpenaiJudger, OpenaiJudgerConfig
 
 if __name__ == '__main__':
 

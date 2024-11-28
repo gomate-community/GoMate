@@ -1,5 +1,5 @@
 import pytest
-from gomate.applications import RewriterApp
+from trustrag.applications import RewriterApp
 # import os
 
 def test_rewriter():

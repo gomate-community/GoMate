@@ -14,8 +14,8 @@ from fastapi import APIRouter
 
 from api.apps.core.judge.bodys import JudgeBody
 from api.apps.handle.response.json_response import ApiResponse
-from gomate.modules.judger.bge_judger import BgeJudger, BgeJudgerConfig
-from gomate.modules.judger.chatgpt_judger import OpenaiJudger, OpenaiJudgerConfig
+from trustrag.modules.judger.bge_judger import BgeJudger, BgeJudgerConfig
+from trustrag.modules.judger.chatgpt_judger import OpenaiJudger, OpenaiJudgerConfig
 
 judge_router = APIRouter()
 

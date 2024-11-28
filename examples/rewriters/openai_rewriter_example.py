@@ -1,4 +1,4 @@
-from gomate.modules.rewriter.openai_rewrite import OpenaiRewriter,OpenaiRewriterConfig
+from trustrag.modules.rewriter.openai_rewrite import OpenaiRewriter,OpenaiRewriterConfig
 if __name__ == '__main__':
 
     rewriter_config = OpenaiRewriterConfig(

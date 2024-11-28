@@ -13,19 +13,19 @@ import shutil
 import gradio as gr
 import loguru
 
-from gomate.applications.rag import RagApplication, ApplicationConfig
-from gomate.modules.reranker.bge_reranker import BgeRerankerConfig
-from gomate.modules.retrieval.dense_retriever import DenseRetrieverConfig
+from trustrag.applications.rag import RagApplication, ApplicationConfig
+from trustrag.modules.reranker.bge_reranker import BgeRerankerConfig
+from trustrag.modules.retrieval.dense_retriever import DenseRetrieverConfig
 
 # 修改成自己的配置！！！
 app_config = ApplicationConfig()
-app_config.docs_path = "/data/users/searchgpt/yq/GoMate_dev/data/docs/"
+app_config.docs_path = "/data/users/searchgpt/yq/TrustRAG/data/docs/"
 app_config.llm_model_path = "/data/users/searchgpt/pretrained_models/glm-4-9b-chat"
 
 retriever_config = DenseRetrieverConfig(
     model_name_or_path="/data/users/searchgpt/pretrained_models/bge-large-zh-v1.5",
     dim=1024,
-    index_dir='/data/users/searchgpt/yq/GoMate/examples/retrievers/dense_cache'
+    index_path='/data/users/searchgpt/yq/TrustRAG/examples/retrievers/dense_cache'
 )
 rerank_config = BgeRerankerConfig(
     model_name_or_path="/data/users/searchgpt/pretrained_models/bge-reranker-large"
@@ -115,7 +115,7 @@ def predict(input,
 
 
 with gr.Blocks(theme="soft") as demo:
-    gr.Markdown("""<h1><center>Gomate Application</center></h1>
+    gr.Markdown("""<h1><center>TrustRAG Application</center></h1>
         <center><font size=3>
         </center></font>
         """)
@@ -177,7 +177,7 @@ with gr.Blocks(theme="soft") as demo:
             # )
         with gr.Column(scale=4):
             with gr.Row():
-                chatbot = gr.Chatbot(label='Gomate Application').style(height=650)
+                chatbot = gr.Chatbot(label='TrustRAG Application').style(height=650)
             with gr.Row():
                 message = gr.Textbox(label='请输入问题')
             with gr.Row():
@@ -185,8 +185,8 @@ with gr.Blocks(theme="soft") as demo:
                 send = gr.Button("🚀 发送")
             with gr.Row():
                 gr.Markdown("""提醒：<br>
-                                        [Gomate Application](https://github.com/gomate-community/GoMate) <br>
-                                        有任何使用问题[Github Issue区](https://github.com/gomate-community/GoMate)进行反馈. 
+                                        [TrustRAG Application](https://github.com/TrustRAG-community/TrustRAG) <br>
+                                        有任何使用问题[Github Issue区](https://github.com/TrustRAG-community/TrustRAG)进行反馈. 
                                         <br>
                                         """)
         with gr.Column(scale=2):

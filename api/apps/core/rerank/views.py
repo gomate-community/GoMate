@@ -15,7 +15,7 @@ from fastapi import APIRouter
 from api.apps.core.rerank.bodys import RerankBody
 from api.apps.core.rerank.models import Application
 from api.apps.handle.response.json_response import UserNotFoundResponse, ApiResponse
-from gomate.modules.reranker.bge_reranker import BgeReranker, BgeRerankerConfig
+from trustrag.modules.reranker.bge_reranker import BgeReranker, BgeRerankerConfig
 
 # from apps.handle.exception.exception import MallException
 # from apps.core.config.models import LLMModel

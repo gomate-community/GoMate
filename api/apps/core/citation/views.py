@@ -14,8 +14,8 @@ from fastapi import APIRouter
 
 from api.apps.core.citation.bodys import CitationBody
 from api.apps.handle.response.json_response import ApiResponse
-from gomate.modules.citation.match_citation import MatchCitation
-from gomate.modules.citation.source_citation import SourceCitation
+from trustrag.modules.citation.match_citation import MatchCitation
+from trustrag.modules.citation.source_citation import SourceCitation
 mc = MatchCitation()
 sc = SourceCitation()
 citation_router = APIRouter()

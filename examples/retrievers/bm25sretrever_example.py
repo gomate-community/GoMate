@@ -11,8 +11,8 @@ import os
 
 import pandas as pd
 
-from gomate.modules.document.utils import PROJECT_BASE
-from gomate.modules.retrieval.bm25s_retriever import BM25RetrieverConfig, BM25Retriever
+from trustrag.modules.document.utils import PROJECT_BASE
+from trustrag.modules.retrieval.bm25s_retriever import BM25RetrieverConfig, BM25Retriever
 
 if __name__ == '__main__':
     # corpus = []

@@ -1,6 +1,6 @@
 from setuptools import setup, find_packages
 try:
-    from gomate.version import __version__
+    from trustrag.version import __version__
 except ImportError:
     __version__ = "unknown version"
 
@@ -9,12 +9,12 @@ with open('requirements.txt') as f:
     required = f.read().splitlines()
 
 setup(
-    name="gomate",
+    name="trustrag",
     version=__version__,
-    author="gomate-community",
-    packages=['gomate'],
-    package_dir={'gomate': 'gomate'},
-    package_data={'gomate': ['*.*', 'applications/*', 'modules/document/*']},
+    author="trustrag-community",
+    packages=['trustrag'],
+    package_dir={'trustrag': 'trustrag'},
+    package_data={'trustrag': ['*.*', 'applications/*', 'modules/document/*']},
     install_requires=required,
     author_email="yanqiang@ict.ac.cn",
     description="RAG Framework within Reliable input,Trusted output",
