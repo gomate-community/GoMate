@@ -23,7 +23,7 @@ print(current_path)
 
 # 找到根目录，这里假设项目的根目录为 'GoMate' 或 'GoMate_dev'
 project_root = current_path
-while project_root.name != 'GoMate' and project_root.name != 'GoMate_dev':
+while project_root.name != 'TrustRAG' and project_root.name != 'TrustRAG_dev':
     project_root = project_root.parent
     # 如果到达根目录还没找到项目根目录，则可能路径有问题，防止死循环
     if project_root == project_root.parent:

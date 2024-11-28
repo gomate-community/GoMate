@@ -284,11 +284,10 @@ python app.py
 ```
 
 浏览器访问：[127.0.0.1:7860](127.0.0.1:7860)
-![demo.png](resources%2Fdemo.png)
+![trustrag_demo.png](resources%2Ftrustrag_demo.png)
 
 app后台日志：
-
-![app_logging.png](resources%2Fapp_logging.png)
+![app_logging3.png](resources%2Fapp_logging3.png)
 
 ## ⭐️ Star History
 

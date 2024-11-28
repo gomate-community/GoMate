@@ -45,10 +45,10 @@ class RagApplication():
                 pass
         self.retriever.build_from_texts(chunks)
         print("init_vector_store done! ")
-        self.retriever.save_index(self.config.retriever_config.index_dir)
+        self.retriever.save_index(self.config.retriever_config.index_path)
 
     def load_vector_store(self):
-        self.retriever.load_index(self.config.retriever_config.index_dir)
+        self.retriever.load_index(self.config.retriever_config.index_path)
 
     def add_document(self, file_path):
         chunks = self.parser.parse(file_path)
