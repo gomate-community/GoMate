@@ -244,7 +244,7 @@ def run_cluster_data():
                     )
                     sc.classify(group)
             except:
-                pass
+                loguru.logger.info("=========二级聚类报错==========")
 
 
 def generate_report():
@@ -358,19 +358,19 @@ def insert_mongo_report():
                         {
                             'title': group2['level2_title'].unique()[0],
                             'content': group2['level2_content'].unique()[0],
-                            'level2_urls': group2['level2_urls']
+                            'level2_urls': group2['level2_urls'].values.tolist()
                         }
                     )
                 contents.append({
                     'title': group1['level1_title'].unique()[0],
                     'content': group1['level1_content'].unique()[0],
-                    'level1_urls': group1['level1_urls'],
+                    'level1_urls': group1['level1_urls'].values.tolist(),
                     'nodes': nodes
                 })
             template['content'] = contents
             mc.insert_one(template, 'report')
         except Exception as e:
-            print(e)
+            loguru.logger.error(e)
             loguru.logger.error("插入MongoDB失败:" + keyword)
 
 
@@ -411,9 +411,9 @@ def main():
 
 
 def sing_run():
-    get_es_data()
-    run_cluster_data()
-    generate_report()
+    # get_es_data()
+    # run_cluster_data()
+    # generate_report()
     insert_mongo_report()
 
 
