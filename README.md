@@ -23,6 +23,10 @@ The core design of TrustRAG lies in its **high configurability and modularity**,
 
 ## DeepResearch Features
 
+The [Python DeepResearch workflow](api/agent/README.md) supports free web search
+through Parallel Search MCP, with no search API key required. Existing provider
+selections and configured Serper/Tavily credentials remain in use.
+
 The DeepResearch framework achieves deep information search and processing through layered queries, recursive iteration, and intelligent decision-making. This process includes the following key steps:
 
 1. Intent Understanding
