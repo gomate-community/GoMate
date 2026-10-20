@@ -1,4 +1,5 @@
 import os
+from copy import deepcopy
 import yaml
 from typing import Dict, Any, Optional
 from loguru import logger
@@ -26,7 +27,7 @@ DEFAULT_CONFIG = {
         "default_depth": 2,
         "concurrency_limit": 2,
         "context_size": 128000,
-        "search_source": "serper",
+        "search_source": "auto",
         "max_results_per_query": 5
     }
 }
@@ -48,7 +49,7 @@ def load_config(config_path: Optional[str] = None) -> Dict[str, Any]:
     global _config
 
     # Start with default configuration
-    config = DEFAULT_CONFIG.copy()
+    config = deepcopy(DEFAULT_CONFIG)
 
     # Try to load from specified config file
     if config_path and os.path.exists(config_path):
@@ -89,6 +90,8 @@ def load_config(config_path: Optional[str] = None) -> Dict[str, Any]:
     # Serper
     if os.getenv("SERPER_KEY"):
         config["serper"]["api_key"] = os.getenv("SERPER_KEY")
+    if os.getenv("SERPER_API_KEY"):
+        config["serper"]["api_key"] = os.getenv("SERPER_API_KEY")
 
     # Tavily
     if os.getenv("TAVILY_KEY"):

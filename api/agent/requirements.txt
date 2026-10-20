@@ -1,0 +1,8 @@
+# Minimal dependencies for the Python DeepResearch entrypoints.
+openai
+tiktoken
+loguru
+PyYAML>=6
+aiohttp
+httpx>=0.27,<1
+mcp>=1.26,<2

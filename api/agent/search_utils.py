@@ -40,7 +40,11 @@ async def search_and_summarize(
         if hasattr(search_provider, 'get_organic_urls'):
             urls = search_provider.get_organic_urls()
         else:
-            urls = []
+            # Derive URLs from this response instead of mutable provider state,
+            # so concurrent searches retain their respective sources.
+            items = results.get("data", []) if isinstance(results, dict) else results
+            urls = [item["url"] for item in items
+                    if isinstance(item, dict) and item.get("url")] if isinstance(items, list) else []
 
         # Format the search results
         formatted_results = []
