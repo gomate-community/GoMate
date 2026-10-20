@@ -12,12 +12,12 @@ openai:
 
 # Serper settings
 serper:
-  api_key: "xxx"  # Set your Serper API key here
+  api_key: null  # Optional: set your Serper API key here
   base_url: "https://google.serper.dev/search"
 
 # Tavily settings
 tavily:
-  api_key: "tvly-dev-xxx"  # Use the token without 'Bearer' prefix
+  api_key: null  # Optional: use the token without 'Bearer' prefix
   base_url: "https://api.tavily.com/search"
   # Additional options that can be passed to Tavily API:
   # search_depth: "advanced" # can be "basic" or "advanced"
@@ -29,5 +29,6 @@ research:
   default_depth: 2
   concurrency_limit: 2
   context_size: 128000
-  # Uncomment and set to "tavily" to use Tavily search engine
-  search_source: "serper"
+  # auto uses configured Serper/Tavily credentials, otherwise anonymous Parallel MCP.
+  # Explicit choices: parallel, serper, tavily, mp_search, qdrant, none (no search).
+  search_source: "auto"

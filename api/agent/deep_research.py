@@ -13,6 +13,7 @@ from loguru import logger
 
 from api.agent.config import get_config
 from api.agent.providers import get_search_provider
+from api.agent.search_context import SearchContext
 from api.agent.utils import format_source_metadata, add_event_loop_policy
 from api.agent.prompts import (
     SYSTEM_PROMPT,
@@ -387,7 +388,7 @@ async def deep_research(
     all_learnings = []
 
     # Initialize search provider
-    search_provider = get_search_provider(search_source=search_source)
+    search_provider = get_search_provider(search_source=search_source, context=SearchContext())
 
     # Helper function to handle progress callbacks
     async def update_progress(progress_data):
@@ -739,7 +740,7 @@ async def deep_research_stream(
     all_learnings = []
 
     # Initialize search provider
-    search_provider = get_search_provider(search_source=search_source)
+    search_provider = get_search_provider(search_source=search_source, context=SearchContext())
 
     try:
         # Step 1: Yield initial status

@@ -35,7 +35,7 @@ def run_gradio_demo():
         "report_mode": True,  # 总是生成详细报告
         "show_details": True,  # 总是显示研究详情
         "last_status": "",  # 跟踪最后一个状态更新
-        "search_source": "tavily",  # 默认搜索提供商
+        "search_source": get_config()["research"]["search_source"],
         "history_chat": []
     }
 
@@ -400,7 +400,7 @@ def run_gradio_demo():
                 depth=conversation_state.get("depth", 1),
                 breadth=conversation_state.get("breadth", 1),
                 user_clarifications=user_responses,
-                search_source=conversation_state.get("search_source", "serper"),
+                search_source=conversation_state.get("search_source", "auto"),
                 history_context=history_context
         ):
             # Update thinking message with current research step
@@ -577,8 +577,8 @@ def run_gradio_demo():
                 info="更高 = 更多来源但更慢"
             ),
             gr.Dropdown(
-                choices=["serper", "tavily", "mp_search"],
-                value="serper",
+                choices=["auto", "parallel", "serper", "tavily", "mp_search", "qdrant", "none"],
+                value=get_config()["research"]["search_source"],
                 label="搜索提供商",
                 info="要使用的搜索引擎"
             )

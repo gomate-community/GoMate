@@ -2,6 +2,7 @@ import tiktoken
 from openai import OpenAI
 import json
 from api.agent.config import get_config
+from api.agent.search_context import SearchContext
 from api.agent.text_splitter import RecursiveCharacterTextSplitter
 from loguru import logger
 import os
@@ -118,16 +119,34 @@ def generate_object(model_config, system, prompt, schema):
     return ans
 
 
-def get_search_provider(search_source=None):
+def get_search_provider(search_source=None, context=None):
     """
     Get the appropriate search provider based on configuration.
 
     Returns:
         An instance of the search provider class
     """
+    config = get_config()
     if search_source is None:
-        config = get_config()
-        search_source = config.get("research", {}).get("search_source", "serper")
+        search_source = config.get("research", {}).get("search_source", "auto")
+
+    if search_source == "auto":
+        # Keep intentionally configured incumbent credentials in use. Explicit
+        # selections never fall back, even when their credentials are missing.
+        if os.getenv("SERPER_API_KEY") or config.get("serper", {}).get("api_key"):
+            search_source = "serper"
+        elif config.get("tavily", {}).get("api_key"):
+            search_source = "tavily"
+        else:
+            search_source = "parallel"
+
+    if search_source == "none":
+        return DisabledSearchClient()
+    if search_source == "parallel":
+        from .parallel_client import ParallelSearchClient
+        # Direct resolver callers start a standalone research run. The main
+        # research entrypoints supply their own context for all follow-up calls.
+        return ParallelSearchClient(context=context or SearchContext())
 
     if search_source == "mp_search":
         from .mp_search_client import MPSearchClient
@@ -141,3 +160,11 @@ def get_search_provider(search_source=None):
     else:  # Default to serper
         from .serper_client import SerperClient
         return SerperClient()
+
+
+class DisabledSearchClient:
+    """Allow research callers to explicitly disable external search."""
+
+    async def search(self, query):
+        """Return no sources without contacting a search service."""
+        return []

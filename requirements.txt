@@ -46,6 +46,9 @@ hanziconv
 PyPDF2
 gradio
 loguru
+mcp>=1.26,<2
+httpx>=0.27,<1
+PyYAML>=6
 xgboost
 bm25s
 jieba
